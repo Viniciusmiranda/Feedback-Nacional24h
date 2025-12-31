@@ -55,6 +55,6 @@ async function seedHelper() {
 seedHelper();
 
 // Start
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => { // Adicione '0.0.0.0' aqui
     console.log(`Server running on port ${PORT}`);
 });
