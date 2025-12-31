@@ -24,8 +24,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/avaliacoes', reviewRoutes);
 app.use('/api/atendentes', attendantRoutes);
 
-// Root Route (Serve index.html)
+// Root Route (Serve login.html)
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/login.html'));
+});
+
+// Evaluation Route (Serve index.html)
+app.get('/avaliar', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
@@ -35,21 +40,25 @@ app.get('/health', (req, res) => {
 });
 
 // Seed Initial Admin (If empty)
+// Seed/Update Admin
 async function seedHelper() {
-    const userCount = await prisma.user.count();
-    if (userCount === 0) {
-        console.log("Seeding initial admin...");
+    try {
         const bcrypt = require('bcryptjs');
-        const hash = await bcrypt.hash("123456", 10);
-        await prisma.user.create({
-            data: {
+        const hash = await bcrypt.hash("nacional_2026", 10);
+
+        await prisma.user.upsert({
+            where: { email: "admin@nacional.com" },
+            update: { password: hash },
+            create: {
                 name: "Gestor Admin",
                 email: "admin@nacional.com",
                 password: hash,
                 role: "admin"
             }
         });
-        console.log("Admin created: admin@nacional.com / 123456");
+        console.log("Admin ensured: admin@nacional.com / nacional_2026");
+    } catch (error) {
+        console.error("Error seeding admin:", error);
     }
 }
 seedHelper();
