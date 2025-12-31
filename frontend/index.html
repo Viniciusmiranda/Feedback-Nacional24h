@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Maria | NA 24h</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="😀Avalie o seu atendimento!">
+  <meta property="og:description" content="Nacional Assistência 24h®">
+  <meta property="og:image"
+    content="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/1200px-Google_Maps_icon_%282020%29.svg.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #ffffff;
+      --accent-blue: #2b1da7;
+      --deep-blue: #030518;
+      --gold: #FFD700;
+      --success: #28a745;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      height: 100vh;
+      height: 100dvh;
+      width: 100%;
+      margin: 0;
+      background: linear-gradient(135deg, #000092 0%, #00004a 50%, #000000 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      font-family: 'Montserrat', sans-serif;
+      overflow: hidden;
+      color: var(--primary);
+    }
+
+    /* ANIMATED BACKGROUND LAYERS */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(43, 29, 167, 0.7) 0%, transparent 60%);
+      animation: pulseBg 6s ease-in-out infinite alternate;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(15, 23, 42, 0) 60deg, rgba(43, 29, 167, 0.5) 180deg, transparent 360deg);
+      animation: rotateBg 12s linear infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes pulseBg {
+      0% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+
+      100% {
+        transform: scale(1.6);
+        opacity: 0.9;
+      }
+    }
+
+    @keyframes rotateBg {
+      0% {
+        transform: rotate(0deg) scale(1.1);
+      }
+
+      50% {
+        transform: rotate(180deg) scale(1.3);
+      }
+
+      100% {
+        transform: rotate(360deg) scale(1.1);
+      }
+    }
+
+    /* CONTAINER */
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 600px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .logo-top {
+      margin-bottom: 40px;
+      max-width: 380px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.1));
+    }
+
+    .logo-top:hover {
+      transform: scale(1.05);
+    }
+
+    .logo-top img {
+      width: 100%;
+      display: block;
+    }
+
+    /* BUTTONS */
+    .btn-main {
+      width: 100%;
+      max-width: 450px;
+      height: 100px;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50px;
+      background: linear-gradient(135deg, rgba(43, 29, 167, 0.5) 0%, rgba(0, 0, 0, 0.3) 100%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--primary);
+      font-size: 1.5rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(43, 29, 167, 0.6);
+      transition: all 0.4s;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: gentlePulse 3s infinite;
+    }
+
+    .btn-main:active {
+      transform: scale(0.95);
+    }
+
+    @keyframes gentlePulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(43, 29, 167, 0.4);
+      }
+
+      50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 30px rgba(43, 29, 167, 0.7);
+      }
+
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(43, 29, 167, 0.4);
+      }
+    }
+
+    /* RATING AREA */
+    .rating-container {
+      display: none;
+      /* Starting hidden */
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      animation: fadeInScale 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .rating-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    .stars {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .star-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      padding: 0 5px;
+    }
+
+    .star-item:hover {
+      transform: scale(1.15);
+    }
+
+    .star {
+      font-size: 3rem;
+      color: rgba(255, 255, 255, 0.2);
+      transition: all 0.2s ease;
+      margin-bottom: 5px;
+    }
+
+    .star-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
+      opacity: 0.8;
+    }
+
+    .star-emoji {
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+      filter: grayscale(100%) opacity(0.5);
+      transition: all 0.3s;
+    }
+
+    /* Active/Locked States */
+    .star-item.active .star,
+    .star.active {
+      color: var(--gold);
+    }
+
+    .star-item.active .star-label {
+      color: #fff;
+    }
+
+    .star-item.active .star-emoji {
+      filter: grayscale(0%) opacity(1);
+      transform: scale(1.2);
+    }
+
+    .stars.locked {
+      pointer-events: none;
+    }
+
+    .stars.locked .star-item.active .star-emoji {
+      filter: grayscale(100%) opacity(0.5);
+      transform: scale(1);
+    }
+
+    .stars.locked .star-item.final-selected .star-emoji {
+      filter: grayscale(0%) opacity(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+      transform: scale(1.4);
+    }
+
+    .star-item.dimmed {
+      opacity: 0.3;
+      transform: scale(0.9);
+      filter: grayscale(1);
+    }
+
+    /* OBSERVATION BOX */
+    .observation-container {
+      display: none;
+      /* Logic will toggle this to flex */
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      animation: fadeInUp 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .obs-textarea {
+      width: 90%;
+      max-width: 400px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      color: white;
+      padding: 15px;
+      font-size: 1rem;
+      resize: none;
+      margin-bottom: 15px;
+      backdrop-filter: blur(5px);
+    }
+
+    .obs-textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-submit-obs {
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #28a745 0%, #208838 100%);
+      border: none;
+      border-radius: 25px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .btn-submit-obs:active {
+      transform: scale(0.95);
+    }
+
+    /* UTILS */
+    .hidden {
+      display: none !important;
+    }
+
+    .flash-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: white;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .flash-overlay.active {
+      opacity: 0.8;
+      transition: opacity 0.1s ease-in;
+    }
+
+    /* FOOTER */
+    .footer {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.75rem;
+      z-index: 200;
+      padding: 10px 0 20px 0;
+    }
+
+    .footer img {
+      width: 70px;
+      margin-top: 8px;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    .footer:hover img {
+      opacity: 1;
+    }
+
+    .manager-access {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: rgba(255, 255, 255, 0.15);
+      font-size: 1.2rem;
+      text-decoration: none;
+      z-index: 1000;
+      padding: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.02);
+      transition: all 0.3s ease;
+    }
+
+    .manager-access:hover {
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.1);
+      transform: rotate(15deg);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="flash-overlay" id="flashOverlay"></div>
+  <div id="particles"></div>
+
+  <a href="login.html" class="manager-access" title="Acesso Gestor">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
+  </a>
+
+  <div class="container">
+    <div class="logo-top">
+      <a href="https://www.instagram.com/nacionalassistencia24h/" target="_blank">
+        <img src="nacional-1.png" alt="Logo Nacional">
+      </a>
+      <div id="attendantNameDisplay"
+        style="margin-top: 15px; font-size: 1.8rem; color: rgba(255,255,255,0.9); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+        Atd. Geral
+      </div>
+    </div>
+
+    <!-- STAGE 1: BUTTON -->
+    <button id="btnAvaliar" class="btn-main" onclick="startEvaluation()">
+      AVALIAR ATENDIMENTO
+    </button>
+
+    <!-- STAGE 2: STARS -->
+    <div id="ratingSection" class="rating-container">
+      <div class="rating-title">O que achou do meu atendimento?</div>
+      <div class="stars" id="starsContainer">
+        <!-- 1 -->
+        <div class="star-item" data-value="1" onclick="submitRating(1)">
+          <div class="star">★</div>
+          <span class="star-emoji">😠</span>
+          <span class="star-label">Péssimo</span>
+        </div>
+        <!-- 2 -->
+        <div class="star-item" data-value="2" onclick="submitRating(2)">
+          <div class="star">★</div>
+          <span class="star-emoji">☹️</span>
+          <span class="star-label">Ruim</span>
+        </div>
+        <!-- 3 -->
+        <div class="star-item" data-value="3" onclick="submitRating(3)">
+          <div class="star">★</div>
+          <span class="star-emoji">🙂</span>
+          <span class="star-label">Bom</span>
+        </div>
+        <!-- 4 -->
+        <div class="star-item" data-value="4" onclick="submitRating(4)">
+          <div class="star">★</div>
+          <span class="star-emoji">😄</span>
+          <span class="star-label">Ótimo</span>
+        </div>
+        <!-- 5 -->
+        <div class="star-item" data-value="5" onclick="submitRating(5)">
+          <div class="star">★</div>
+          <span class="star-emoji">🤩</span>
+          <span class="star-label">Excelente</span>
+        </div>
+      </div>
+
+      <!-- Observation Section -->
+      <div class="observation-container" id="obsContainer">
+        <textarea class="obs-textarea" placeholder="Gostaria de deixar alguma observação? (Opcional)"></textarea>
+        <button class="btn-submit-obs" onclick="finishProcess()">ENVIAR OPINIÃO</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>©2026 Nacional Assistência 24h | Avaliação Atendimento v.1.0</span>
+    <span> Desenvolvido pela
+      <a href="https://www.instagram.com/atomossolucaoegestao/" target="_blank"
+        style="text-decoration: none; color: inherit;">
+        <img src="atomos.png" alt="Átomos">
+      </a>
+    </span>
+  </div>
+
+  <script>
+    // --- CONFIG ---
+    const API_URL = "http://localhost:3000/api/avaliacoes";
+
+    // --- STATE ---
+    let userContext = {
+      ip: null,
+      city: null,
+      state: null,
+      mapsLink: null,
+      device: navigator.userAgent,
+      attendant: "Geral",
+      reviewId: null
+    };
+
+    let isEvaluated = false;
+
+    // --- DOM REFERENCES ---
+    const starItems = document.querySelectorAll('.star-item');
+    const starsContainer = document.getElementById('starsContainer');
+    const obsContainer = document.getElementById('obsContainer');
+    const btnAvaliar = document.getElementById('btnAvaliar');
+    const ratingSection = document.getElementById('ratingSection');
+    const flash = document.getElementById('flashOverlay');
+    const displayAttendant = document.getElementById('attendantNameDisplay');
+
+    // --- INIT ---
+    // 1. Get Attendant Name
+    const params = new URLSearchParams(window.location.search);
+    const attName = params.get('attendant');
+    if (attName) {
+      userContext.attendant = attName;
+      displayAttendant.innerText = "Atd. " + attName;
+    }
+
+    // 2. Hover Logic
+    starItems.forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        if (isEvaluated) return;
+        highlightStars(parseInt(item.getAttribute('data-value')));
+      });
+      item.addEventListener('mouseleave', () => {
+        if (isEvaluated) return;
+        highlightStars(0);
+      });
+    });
+
+    function highlightStars(value) {
+      starItems.forEach(item => {
+        const sVal = parseInt(item.getAttribute('data-value'));
+        const star = item.querySelector('.star');
+        if (sVal <= value) {
+          item.classList.add('active');
+          star.classList.add('active');
+        } else {
+          item.classList.remove('active');
+          star.classList.remove('active');
+        }
+      });
+    }
+
+    // --- ACTIONS ---
+
+    function startEvaluation() {
+      // Start data collection in background
+      collectUserData();
+
+      // UI Transition
+      btnAvaliar.style.transform = "scale(1.5)";
+      btnAvaliar.style.opacity = "0";
+
+      flash.classList.add('active');
+      setTimeout(() => flash.classList.remove('active'), 200);
+
+      setTimeout(() => {
+        btnAvaliar.classList.add('hidden');
+        ratingSection.style.display = 'flex';
+      }, 400);
+    }
+
+    function submitRating(value) {
+      if (isEvaluated) return;
+      isEvaluated = true; // Lock
+
+      console.log("Rating CLICKADO:", value);
+
+      // 1. Lock Visuals
+      starsContainer.classList.add('locked');
+      starItems.forEach(item => {
+        const sVal = parseInt(item.getAttribute('data-value'));
+        const star = item.querySelector('.star');
+
+        item.classList.remove('active', 'dimmed');
+        star.classList.remove('active');
+        item.classList.remove('final-selected');
+
+        if (sVal <= value) {
+          item.classList.add('active');
+          star.classList.add('active');
+          if (sVal === value) item.classList.add('final-selected');
+        } else {
+          item.classList.add('dimmed');
+        }
+      });
+
+      // 2. Feedback Text
+      const messages = { 1: "Sentimos muito!", 2: "Vamos melhorar!", 3: "Obrigado!", 4: "Que bom!", 5: "Uau! Obrigado! 💙" };
+      const title = document.querySelector('.rating-title');
+      if (title) {
+        title.innerText = messages[value] || "Obrigado!";
+        title.style.color = value >= 4 ? "#FFD700" : "#ffffff";
+      }
+
+      if (navigator.vibrate) navigator.vibrate(100);
+
+      // 3. SHOW OBS CONTAINER (Immediate)
+      if (obsContainer) {
+        obsContainer.style.display = 'flex';
+        // Ensure visible just in case
+        obsContainer.style.visibility = 'visible';
+        obsContainer.style.opacity = '1';
+      }
+
+      // 4. Send API
+      submitToApi(value);
+    }
+
+    async function submitToApi(value) {
+      try {
+        const payload = {
+          rating: value,
+          attendant: userContext.attendant,
+          ip: userContext.ip,
+          city: userContext.city,
+          state: userContext.state,
+          device: userContext.device,
+          link_maps: userContext.mapsLink
+        };
+
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          userContext.reviewId = data.id;
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    async function finishProcess() {
+      const btn = document.querySelector('.btn-submit-obs');
+      const textarea = document.querySelector('.obs-textarea');
+      const obs = textarea.value;
+
+      btn.innerText = "Enviando...";
+      btn.disabled = true;
+
+      if (userContext.reviewId && obs) {
+        try {
+          await fetch(`${API_URL}/${userContext.reviewId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ observation: obs })
+          });
+        } catch (e) { console.error(e); }
+      }
+
+      btn.innerText = "Enviado com Sucesso! ✓";
+      btn.style.background = "#28a745";
+
+      // Reload after delay
+      setTimeout(() => location.reload(), 2000);
+    }
+
+    // --- UTILS ---
+    async function collectUserData() {
+      try {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        userContext.ip = data.ip;
+      } catch (e) { }
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          userContext.mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+          try {
+            const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=pt`);
+            const geoData = await geoRes.json();
+            if (geoData.city) userContext.city = geoData.city;
+            if (geoData.principalSubdivision) userContext.state = geoData.principalSubdivision;
+          } catch (e) { }
+        }, () => { }, { timeout: 5000 });
+      }
+    }
+
+    // Particles
+    const pContainer = document.getElementById('particles');
+    for (let i = 0; i < 50; i++) {
+      const p = document.createElement('div');
+      p.classList.add('particle');
+      p.style.left = Math.random() * 100 + '%';
+      p.style.animationDelay = Math.random() * 5 + 's';
+      pContainer.appendChild(p);
+    }
+  </script>
+</body>
+
+</html>

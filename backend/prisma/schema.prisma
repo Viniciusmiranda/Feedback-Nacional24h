@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Changed to "postgresql" for production
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("gestor") // admin, gestor, atendente
+  active    Boolean  @default(true)
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("users")
+}
+
+model Company {
+  id         String      @id @default(uuid())
+  name       String
+  domain     String?
+  active     Boolean     @default(true)
+  users      User[]
+  attendants Attendant[]
+  createdAt  DateTime    @default(now())
+
+  @@map("empresas")
+}
+
+model Attendant {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?
+  active    Boolean  @default(true)
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  reviews   Review[]
+  createdAt DateTime @default(now())
+
+  @@map("atendentes")
+}
+
+model Review {
+  id          String    @id @default(uuid())
+  stars       Int
+  comment     String?
+  device      String?
+  ip          String?
+  city        String?
+  state       String?
+  location    String? // maps link
+  attendantId String
+  attendant   Attendant @relation(fields: [attendantId], references: [id])
+  createdAt   DateTime  @default(now())
+
+  @@map("avaliacoes")
+}
