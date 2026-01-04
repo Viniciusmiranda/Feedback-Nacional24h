@@ -133,7 +133,14 @@ exports.getDashboardData = async (req, res) => {
             }
         });
 
+        // Company Details
+        const company = await prisma.company.findUnique({
+            where: { id: companyId },
+            select: { name: true }
+        });
+
         res.json({
+            companyName: company?.name || "Minha Empresa",
             metrics: {
                 total: totalReviews,
                 average: aggs._avg.stars || 0,

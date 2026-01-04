@@ -767,6 +767,11 @@
                 const data = await res.json();
                 globalData = data; // Store globally
 
+                // Update Header Texts
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                document.getElementById('pageTitle').innerText = data.companyName;
+                document.getElementById('pageSubtitle').innerText = `Bem-vindo(a), ${user.name || 'Gestor'}. Aqui estão os resultados em tempo real.`;
+
                 // Render All Views
                 renderMetrics(data.metrics);
                 renderCharts(data.attendants);

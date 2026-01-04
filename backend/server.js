@@ -25,7 +25,7 @@ app.use('/api/avaliacoes', reviewRoutes);
 app.use('/api/atendentes', attendantRoutes);
 
 // Landing / Login / Register
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../frontend/login.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, '../frontend/register.html')));
 
 // Dynamic Routes (Must come after API routes)
@@ -36,13 +36,13 @@ app.get('/:slug/dashboard', (req, res) => {
 
 // 2. Evaluation: /:companySlug/:attendantName
 app.get('/:slug/:attendant', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    res.sendFile(path.join(__dirname, '../frontend/ex-atd.html'));
 });
 
 // 3. Fallback for /:companySlug -> Redirect to login or dashboard
 app.get('/:slug', (req, res) => {
     // Could check if slug exists, but for now serve login
-    res.sendFile(path.join(__dirname, '../frontend/login.html'));
+    res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 // Health Check
