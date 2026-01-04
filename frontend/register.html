@@ -34,16 +34,38 @@
         }
 
         .login-container {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 3rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 2.5rem;
             border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            width: 100%;
-            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            width: 90%;
+            max-width: 480px;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            /* Responsive Height Handling */
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Custom Scrollbar for container */
+        .login-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .login-container::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1.5rem;
+                width: 95%;
+            }
         }
 
         h2 {
