@@ -1379,8 +1379,15 @@
                     }
 
                     if (data.logo) {
-                        document.getElementById('logoPreview').innerHTML = `<img src="${data.logo}" style="width:100%; height:100%; object-fit:contain;">`;
-                        document.getElementById('sidebarLogo').src = data.logo;
+                        const img = document.getElementById('logoPreviewImg');
+                        const container = document.getElementById('logoPreviewContainer');
+                        if (img && container) {
+                            img.src = data.logo;
+                            container.style.display = 'block';
+                        }
+                        if (document.getElementById('sidebarLogo')) {
+                            document.getElementById('sidebarLogo').src = data.logo;
+                        }
                     }
                 }
             } catch (e) { console.error("Error loading settings", e); }
@@ -1420,8 +1427,15 @@
                     alert('Alterações salvas com sucesso!');
                     // Update preview immediately if logo changed
                     if (data.company.logo) {
-                        document.getElementById('logoPreview').innerHTML = `<img src="${data.company.logo}" style="width:100%; height:100%; object-fit:contain;">`;
-                        document.getElementById('sidebarLogo').src = data.company.logo;
+                        const img = document.getElementById('logoPreviewImg');
+                        const container = document.getElementById('logoPreviewContainer');
+                        if (img && container) {
+                            img.src = data.company.logo;
+                            container.style.display = 'block';
+                        }
+                        if (document.getElementById('sidebarLogo')) {
+                            document.getElementById('sidebarLogo').src = data.company.logo;
+                        }
                     }
                 } else {
                     alert('Erro ao salvar.');
