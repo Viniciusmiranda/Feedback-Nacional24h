@@ -1486,10 +1486,22 @@
         }
 
         // --- COLOR GENERATOR ---
+        // Vivid Neon Palette for Dark Mode
         const attendantColors = [
-            '#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE',
-            '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE',
-            '#B2FF59', '#EEFF41', '#FFFF00', '#FFD740', '#FFAB40', '#FF6E40'
+            '#FF0055', // Neon Red
+            '#00FF99', // Neon Green
+            '#00CCFF', // Neon Blue
+            '#FFDD00', // Neon Yellow
+            '#FF6600', // Neon Orange
+            '#CC00FF', // Neon Purple
+            '#FF00AA', // Hot Pink
+            '#00FFFF', // Cyan
+            '#FF3333', // Bright Red
+            '#39FF14', // Electric Green
+            '#7DF9FF', // Electric Blue
+            '#FF1493', // Deep Pink
+            '#FFFF00', // Electric Yellow
+            '#BF00FF', // Electric Purple
         ];
 
         function getAttendantColor(name) {
@@ -1515,8 +1527,9 @@
                 const attColor = getAttendantColor(attName);
                 const date = new Date(item.createdAt).toLocaleDateString();
 
+                // Increased opacity (33 hex = ~20%) for vivid background effect
                 tr.innerHTML = `
-                    <td><span class="badge badge-attendant" style="color: ${attColor}; border: 1px solid ${attColor}44; background: ${attColor}11;">${attName}</span></td>
+                    <td><span class="badge badge-attendant" style="color: ${attColor}; border: 1px solid ${attColor}; background: ${attColor}33; font-weight: bold; text-shadow: 0 0 10px ${attColor}44;">${attName}</span></td>
                     <td>${date}</td>
                     <td><span class="stars-display">${starsHtml}</span></td>
                     <td>${item.comment || '-'}</td>
