@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const { PrismaClient } = require('@prisma/client');
+const path = require('path'); // Moved to top
+const fs = require('fs'); // Added fs
 const authRoutes = require('./src/routes/authRoutes');
 const reviewRoutes = require('./src/routes/reviewRoutes');
 const attendantRoutes = require('./src/routes/attendantRoutes');
@@ -15,8 +17,14 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Ensure Uploads Directory Exists
+const uploadDir = path.join(__dirname, 'public/uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 // Serve Frontend Static Files
-const path = require('path');
 app.use(express.static(path.join(__dirname, '../frontend'), { index: false }));
 
 // Routes
@@ -81,5 +89,5 @@ seedHelper();
 
 // Start
 app.listen(PORT, '0.0.0.0', () => { // Adicione '0.0.0.0' aqui
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT} `);
 });
