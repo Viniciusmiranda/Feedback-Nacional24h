@@ -992,6 +992,64 @@
 
                     <hr style="margin: 30px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
 
+                    <!-- PLANS SECTION -->
+                    <h2 style="margin-bottom: 20px;">Plano e Assinatura</h2>
+                    <div id="plansContainer"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+
+                        <!-- GRATIS -->
+                        <div class="plan-card" id="plan-GRATIS"
+                            style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid transparent;">
+                            <h3 style="font-size: 1.2rem; color: #fff;">Gratis</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Avalie</p>
+                            <ul
+                                style="list-style: none; padding: 0; margin: 20px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6;">
+                                <li>✓ Até 5 atendentes</li>
+                                <li>✓ Avaliações ilimitadas</li>
+                                <li>✓ Dashboard básico</li>
+                                <li>✓ Alerta WhatsApp</li>
+                            </ul>
+                            <button disabled
+                                style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: none; color: #fff; border-radius: 6px;">Atual</button>
+                        </div>
+
+                        <!-- PEQUENAS -->
+                        <div class="plan-card" id="plan-PEQUENAS"
+                            style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid transparent;">
+                            <h3 style="font-size: 1.2rem; color: #fff;">Pequenas</h3>
+                            <p style="color: var(--accent); font-weight: bold;">R$ 9,90/mês</p>
+                            <ul
+                                style="list-style: none; padding: 0; margin: 20px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6;">
+                                <li>✓ Até 20 atendentes</li>
+                                <li>✓ Dashboard avançado</li>
+                                <li>✓ Relatórios completos</li>
+                                <li>✓ Suporte prioritário</li>
+                            </ul>
+                            <a href="https://wa.me/5511999999999?text=Quero%20assinar%20o%20plano%20Pequenas%20Empresas"
+                                target="_blank" class="btn-glow"
+                                style="display: flex; justify-content: center; text-decoration: none;">Fazer Upgrade</a>
+                        </div>
+
+                        <!-- GRANDES -->
+                        <div class="plan-card" id="plan-GRANDES"
+                            style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid transparent;">
+                            <h3 style="font-size: 1.2rem; color: #fff;">Grandes</h3>
+                            <p style="color: var(--accent); font-weight: bold;">R$ 29,90/mês</p>
+                            <ul
+                                style="list-style: none; padding: 0; margin: 20px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6;">
+                                <li>✓ Atendentes ilimitados</li>
+                                <li>✓ Dashboard premium</li>
+                                <li>✓ Tudo ilimitado</li>
+                                <li>✓ Suporte prioritário</li>
+                            </ul>
+                            <a href="https://wa.me/5511999999999?text=Quero%20assinar%20o%20plano%20Grandes%20Empresas"
+                                target="_blank" class="btn-glow"
+                                style="display: flex; justify-content: center; text-decoration: none;">Fazer Upgrade</a>
+                        </div>
+                    </div>
+
+                    <hr style="margin: 30px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+
                     <h3 style="margin-bottom: 20px; color: var(--danger);">Zona de Perigo</h3>
                     <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Ações sensíveis
                         relacionadas a sua conta.</p>
@@ -1413,12 +1471,40 @@
                 const data = await res.json();
                 globalData = { ...globalData, ...data, reviewsPage: 1 }; // Reset page
 
-                // PLAN BADGE
-                const planBadge = document.getElementById('planBadge');
                 if (planBadge) {
                     planBadge.innerText = `PLANO ${data.plan || 'GRATIS'}`;
                     planBadge.style.display = 'inline-block';
                 }
+
+                // UPDATE PLAN CARDS
+                const currentPlan = data.plan || 'GRATIS';
+                document.querySelectorAll('.plan-card').forEach(card => {
+                    // Reset
+                    card.style.border = "1px solid transparent";
+                    card.style.background = "rgba(255,255,255,0.05)";
+                    const btn = card.querySelector('a, button');
+                    if (btn.tagName === 'BUTTON') {
+                        // Reset 'Atual' button check
+                        // If it's the current plan card, disable it. If not (downgrade?), maybe keep disabled or hide.
+                        // But for simplicity, we re-render buttons via logic below or just class toggle.
+                        // Actually simpler:
+                    }
+                });
+
+                // Highlight Current
+                const activeCard = document.getElementById(`plan-${currentPlan}`);
+                if (activeCard) {
+                    activeCard.style.border = "2px solid var(--accent)";
+                    activeCard.style.background = "rgba(77, 77, 255, 0.1)";
+                    // Change button to "Atual"
+                    const actionEl = activeCard.querySelector('.btn-glow') || activeCard.querySelector('button');
+                    if (actionEl) {
+                        const parent = actionEl.parentNode;
+                        parent.innerHTML += `<button disabled style="width: 100%; padding: 10px; background: var(--accent); border: none; color: #fff; border-radius: 6px;">Plano Atual</button>`;
+                        actionEl.remove();
+                    }
+                }
+
 
                 // Update Header Texts
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
