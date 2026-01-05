@@ -173,14 +173,20 @@
         .logo-area img {
             max-width: 100%;
             height: auto;
-            /* Make logo white for contrast on dark bg */
-            filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
             opacity: 0.9;
             transition: all 0.3s;
         }
 
+        /* Filter only for default logo to make it white */
+        .logo-default-filter {
+            filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        }
+
         .logo-area img:hover {
             opacity: 1;
+        }
+
+        .logo-default-filter:hover {
             filter: brightness(0) invert(1) drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
         }
 
@@ -598,7 +604,7 @@
     <!-- SIDEBAR -->
     <nav class="sidebar">
         <div class="logo-area">
-            <img id="sidebarLogo" src="/logo.png" alt="AvalieJá Logo">
+            <img id="sidebarLogo" src="/logo.png" alt="AvalieJá Logo" class="logo-default-filter">
         </div>
 
         <div class="nav-links">
@@ -1386,7 +1392,14 @@
                             container.style.display = 'block';
                         }
                         if (document.getElementById('sidebarLogo')) {
-                            document.getElementById('sidebarLogo').src = data.logo;
+                            const sbLogo = document.getElementById('sidebarLogo');
+                            sbLogo.src = data.logo;
+                            // If it's the default logo path, add filter, else remove it
+                            if (data.logo.includes('logo.png')) {
+                                sbLogo.classList.add('logo-default-filter');
+                            } else {
+                                sbLogo.classList.remove('logo-default-filter');
+                            }
                         }
                     }
                 }
@@ -1434,7 +1447,14 @@
                             container.style.display = 'block';
                         }
                         if (document.getElementById('sidebarLogo')) {
-                            document.getElementById('sidebarLogo').src = data.company.logo;
+                            const sbLogo = document.getElementById('sidebarLogo');
+                            sbLogo.src = data.company.logo;
+                            // Check if default
+                            if (data.company.logo.includes('logo.png')) {
+                                sbLogo.classList.add('logo-default-filter');
+                            } else {
+                                sbLogo.classList.remove('logo-default-filter');
+                            }
                         }
                     }
                 } else {
