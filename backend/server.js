@@ -58,6 +58,16 @@ app.get('/:slug', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
+app.get('/debug/files', (req, res) => {
+    const frontendPath = path.join(__dirname, '../frontend');
+    if (fs.existsSync(frontendPath)) {
+        const files = fs.readdirSync(frontendPath);
+        res.json({ path: frontendPath, files });
+    } else {
+        res.json({ error: 'Frontend folder not found', path: frontendPath });
+    }
+});
+
 // Health Check
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date() });
