@@ -478,12 +478,57 @@
             transform: scale(1);
         }
 
+        /* MOBILE TOGGLE & OVERLAY */
+        .menu-toggle {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 1024px) {
+            .menu-toggle {
+                display: block;
+            }
+
             .sidebar {
                 transform: translateX(-100%);
-                width: 0;
-                padding: 0;
+                width: 280px;
+                /* Keep correct width */
+                padding: 30px;
+                /* Ensure it sits on top of overlay */
+                z-index: 100;
+                background: #0a1628;
+                /* Solid bg for visibility */
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
             }
 
             .main-content {
@@ -511,6 +556,9 @@
         <div class="gradient-orb orb3"></div>
     </div>
 
+    <!-- Mobile Overlay -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <!-- SIDEBAR -->
     <nav class="sidebar">
         <div class="logo-area">
@@ -518,11 +566,11 @@
         </div>
 
         <div class="nav-links">
-            <a href="#" class="nav-item active" onclick="switchTab('dashboard')">
+            <a href="#" class="nav-item active" onclick="switchTab('dashboard', this)">
                 <span class="nav-icon">📊</span>
                 Dashboard
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="switchTab('gestores', this)">
                 <span class="nav-icon">👥</span>
                 Gestores
             </a>
@@ -530,19 +578,17 @@
                 <span class="nav-icon">👩‍💼</span>
                 Atendentes
             </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">🎨</span>
-                Personalizar
+            <a href="#" class="nav-item" onclick="switchTab('integracoes', this)">
                 <span class="nav-icon">🔌</span>
                 Integrações
-            </a>
-            <a href="#" class="nav-item" onclick="switchTab('ajustes', this)">
-                <span>⚙️</span> Ajustes
             </a>
             <a href="#" class="nav-item" onclick="switchTab('personalizacao', this)">
                 <span>🎨</span> Personalização
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="switchTab('ajustes', this)">
+                <span>⚙️</span> Ajustes
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('suporte', this)">
                 <span class="nav-icon">🎧</span>
                 Suporte
             </a>
@@ -558,6 +604,9 @@
 
         <!-- HEADER -->
         <header class="header">
+            <!-- Mobile Toggle -->
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
             <div class="page-title">
                 <h1 id="pageTitle">Visão Geral</h1>
                 <p id="pageSubtitle">Bem-vindo(a), Gestor. Aqui estão os resultados em tempo real.</p>
@@ -687,6 +736,96 @@
             </section>
         </div>
 
+        <!-- VIEW: GESTORES -->
+        <div id="view-gestores" class="view-section" style="display: none;">
+            <section class="glass-panel" style="padding: 40px; text-align: center;">
+                <h2 style="margin-bottom: 20px;">Gestão de Usuários</h2>
+                <p class="text-muted">Funcionalidade em breve: Adicione outros gestores para administrar a conta.</p>
+            </section>
+        </div>
+
+        <!-- VIEW: INTEGRACOES -->
+        <div id="view-integracoes" class="view-section" style="display: none;">
+            <section class="glass-panel" style="padding: 40px; text-align: center;">
+                <h2 style="margin-bottom: 20px;">Integrações</h2>
+                <p class="text-muted">Em breve: Conecte com WhatsApp, Slack e CRMs.</p>
+            </section>
+        </div>
+
+        <!-- VIEW: AJUSTES -->
+        <div id="view-ajustes" class="view-section" style="display: none;">
+            <section class="glass-panel" style="padding: 40px; text-align: center;">
+                <h2 style="margin-bottom: 20px;">Configurações da Conta</h2>
+                <p class="text-muted">Altere sua senha e dados cadastrais aqui.</p>
+            </section>
+        </div>
+
+        <!-- VIEW: SUPORTE -->
+        <div id="view-suporte" class="view-section" style="display: none;">
+            <section class="glass-panel" style="padding: 40px; text-align: center;">
+                <h2 style="margin-bottom: 20px;">Precisa de Ajuda?</h2>
+                <p class="text-muted">Entre em contato: suporte@avaliaja.app.br</p>
+                <a href="https://wa.me/5511999999999" target="_blank" class="btn-glow"
+                    style="display: inline-flex; margin-top: 20px; text-decoration: none;">
+                    Falar no WhatsApp
+                </a>
+            </section>
+        </div>
+
+        <!-- VIEW: PERSONALIZACAO -->
+        <div id="view-personalizacao" class="view-section" style="display: none;">
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <section class="glass-panel" style="flex: 1; min-width: 300px; padding: 30px;">
+                    <h2 style="margin-bottom: 20px;">Identidade Visual</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">Customize a aparência da página de
+                        avaliação.</p>
+
+                    <form onsubmit="saveCustomization(event)">
+
+                        <div style="margin-bottom: 25px;">
+                            <label style="display:block; margin-bottom: 10px; font-weight: 600;">Logo da Empresa</label>
+                            <input type="file" id="logoInput" accept="image/*" style="margin-bottom: 10px;">
+                            <div id="logoPreview"
+                                style="width: 120px; height: 120px; border: 2px dashed rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 12px;">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Sem logo</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 25px;">
+                            <label style="display:block; margin-bottom: 10px; font-weight: 600;">Cor de Fundo
+                                Principal</label>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <input type="color" id="colorInput" value="#2b1da7"
+                                    style="border: none; width: 50px; height: 50px; cursor: pointer; border-radius: 8px;">
+                                <span style="font-size: 0.9rem; color: var(--text-muted);">Escolha a cor que predomina
+                                    no fundo da avaliação.</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 25px;">
+                            <label style="display:block; margin-bottom: 10px; font-weight: 600;">Título da Pergunta (5
+                                Estrelas)</label>
+                            <input type="text" id="questionTitleInput"
+                                placeholder="Ex: Como você avalia nosso atendimento?"
+                                style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; outline: none;">
+                        </div>
+
+                        <div
+                            style="margin-bottom: 30px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+                            <input type="checkbox" id="showObsInput"
+                                style="width: 20px; height: 20px; cursor: pointer;">
+                            <label for="showObsInput" style="cursor: pointer;">Permitir comentários
+                                (Observações)?</label>
+                        </div>
+
+                        <button type="submit" class="btn-glow" style="width: 100%; justify-content: center;">
+                            💾 Salvar Alterações
+                        </button>
+                    </form>
+                </section>
+            </div>
+        </div>
+
     </main>
 
     <!-- ATTENDANT MODAL -->
@@ -732,6 +871,11 @@
         };
 
         // --- NAVIGATION LOGIC ---
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+        }
+
         function switchView(viewName, navElement) {
             // Update Nav
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
