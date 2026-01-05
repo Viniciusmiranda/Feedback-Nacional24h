@@ -947,9 +947,14 @@
             loadDashboard(); // Refresh list on close
         }
 
+        function getCompSlug() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            return user.companySlug || 'empresa'; // Fallback
+        }
+
         async function generateAttendantLink() {
             const name = document.getElementById('attendantNameInput').value.trim();
-            if (!name) return; // Silent fail or custom visual cue
+            if (!name) return;
 
             const btn = document.querySelector('button[onclick="generateAttendantLink()"]');
             const originalText = btn.innerText;
@@ -964,17 +969,13 @@
                 });
 
                 if (res.ok) {
-                    // Logic to build link (SaaS: /:companySlug/:attendantName)
-                    const pathParts = window.location.pathname.split('/');
-                    const slug = pathParts[1]; // /slug/dashboard -> slug
+                    const slug = getCompSlug();
                     const origin = window.location.origin;
-
+                    // Format: domain.com/SLUG/NAME
                     const fullLink = `${origin}/${slug}/${encodeURIComponent(name)}`;
 
                     document.getElementById('generatedLink').value = fullLink;
                     document.getElementById('resultArea').style.display = 'block';
-
-                    // Do NOT close modal.
                 } else {
                     alert('Erro ao criar.');
                 }
@@ -987,6 +988,7 @@
         function copyLink() {
             const copyText = document.getElementById("generatedLink");
             copyText.select();
+            copyText.setSelectionRange(0, 99999); // Mobile compatibility
             navigator.clipboard.writeText(copyText.value);
 
             const btn = document.getElementById('btnCopy');
@@ -1000,11 +1002,14 @@
         }
 
         function copyLinkByName(name) {
-            let baseUrl = window.location.href.replace('dashboard.html', 'index.html').split('?')[0];
-            const fullLink = `${baseUrl}?attendant=${encodeURIComponent(name)}`;
+            const slug = getCompSlug();
+            const origin = window.location.origin;
+            // Format: domain.com/SLUG/NAME
+            const fullLink = `${origin}/${slug}/${encodeURIComponent(name)}`;
+
             navigator.clipboard.writeText(fullLink);
 
-            // Visual feedback on the button itself
+            // Visual feedback
             const btn = document.getElementById(`btn-copy-${name}`);
             if (btn) {
                 const original = btn.innerText;
@@ -1014,7 +1019,7 @@
                 setTimeout(() => {
                     btn.innerText = original;
                     btn.style.background = "rgba(255,255,255,0.1)";
-                    btn.style.color = "#fff"; // keep white
+                    btn.style.color = "#fff";
                 }, 2000);
             }
         }
