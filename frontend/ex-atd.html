@@ -522,8 +522,7 @@
   <div class="footer">
     <span>©2026 Avalia Já | Avaliação Atendimento v.2.0</span>
     <span> Desenvolvido pela
-      <a href="https://www.avaliaja.app.br/" target="_blank"
-        style="text-decoration: none; color: inherit;">
+      <a href="https://www.avaliaja.app.br/" target="_blank" style="text-decoration: none; color: inherit;">
         <img src="logo.png" alt="Avalie Já">
       </a>
     </span>
@@ -542,7 +541,8 @@
       device: navigator.userAgent,
       attendant: "Geral",
       companySlug: null,
-      reviewId: null
+      reviewId: null,
+      redirectUrl: null
     };
 
     let isEvaluated = false;
@@ -592,6 +592,11 @@
 
             if (s.questionTitle) {
               document.querySelector('.rating-title').innerText = s.questionTitle;
+            }
+
+            // Capture Redirect URL
+            if (s.redirectUrl) {
+              userContext.redirectUrl = s.redirectUrl;
             }
 
             // Show/Hide Observation
@@ -767,8 +772,12 @@
       btn.innerText = "Enviado com Sucesso! ✓";
       btn.style.background = "#28a745";
 
-      // Reload after delay
-      setTimeout(() => location.reload(), 2000);
+      // Redirect if configured, otherwise reload
+      if (userContext.redirectUrl) {
+        setTimeout(() => window.location.href = userContext.redirectUrl, 2000);
+      } else {
+        setTimeout(() => location.reload(), 2000);
+      }
     }
 
     // --- UTILS ---

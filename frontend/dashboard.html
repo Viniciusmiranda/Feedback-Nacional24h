@@ -1149,6 +1149,17 @@
                                     oninput="updatePreviewText(this.value)">
                             </div>
 
+                            <div>
+                                <label>Link de Redirecionamento (Opcional)</label>
+                                <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">
+                                    Após avaliar, o cliente será enviado para este link (ex: Google Maps). Deixe vazio
+                                    para mensagem padrão.
+                                </p>
+                                <input type="url" id="redirectUrlInput" class="input-light"
+                                    placeholder="https://g.page/..."
+                                    style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;">
+                            </div>
+
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <input type="checkbox" id="showObsInput" checked
                                     onchange="togglePreviewObs(this.checked)" style="width: 20px; height: 20px;">
@@ -1363,6 +1374,7 @@
                     if (data.settings) {
                         const s = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
                         if (s.questionTitle) document.getElementById('questionTitleInput').value = s.questionTitle;
+                        if (s.redirectUrl) document.getElementById('redirectUrlInput').value = s.redirectUrl;
                         if (s.showObservation !== undefined) document.getElementById('showObsInput').checked = s.showObservation;
                     }
 
@@ -1386,6 +1398,7 @@
 
             const settings = {
                 questionTitle: document.getElementById('questionTitleInput').value,
+                redirectUrl: document.getElementById('redirectUrlInput').value,
                 showObservation: document.getElementById('showObsInput').checked
             };
             formData.append('settings', JSON.stringify(settings));
