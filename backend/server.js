@@ -25,7 +25,9 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // Serve Frontend Static Files
-app.use(express.static(path.join(__dirname, '../frontend'), { index: false }));
+// Docker Volume Mounts ./frontend to /frontend
+const frontendPath = '/frontend';
+app.use(express.static(frontendPath, { index: false }));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -38,24 +40,24 @@ app.use('/api/company', companyRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Landing / Login / Register
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
-app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, '../frontend/register.html')));
+app.get('/', (req, res) => res.sendFile(path.join(frontendPath, 'index.html')));
+app.get('/cadastro', (req, res) => res.sendFile(path.join(frontendPath, 'register.html')));
 
 // Dynamic Routes (Must come after API routes)
 // 1. Dashboard: /:companySlug/dashboard
 app.get('/:slug/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
+    res.sendFile(path.join(frontendPath, 'dashboard.html'));
 });
 
 // 2. Evaluation: /:companySlug/:attendantName
 app.get('/:slug/:attendant', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/ex-atd.html'));
+    res.sendFile(path.join(frontendPath, 'ex-atd.html'));
 });
 
 // 3. Fallback for /:companySlug -> Redirect to login or dashboard
 app.get('/:slug', (req, res) => {
     // Could check if slug exists, but for now serve login
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 // Health Check
