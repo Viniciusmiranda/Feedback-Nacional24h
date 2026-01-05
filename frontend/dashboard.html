@@ -1485,6 +1485,23 @@
             }
         }
 
+        // --- COLOR GENERATOR ---
+        const attendantColors = [
+            '#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE',
+            '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE',
+            '#B2FF59', '#EEFF41', '#FFFF00', '#FFD740', '#FFAB40', '#FF6E40'
+        ];
+
+        function getAttendantColor(name) {
+            if (!name) return '#ffffff';
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const index = Math.abs(hash % attendantColors.length);
+            return attendantColors[index];
+        }
+
         function renderRecentReviews(reviews) {
             const tbody = document.getElementById('recentReviewsBody');
             if (!tbody) return;
@@ -1495,10 +1512,11 @@
                 const tr = document.createElement('tr');
                 const starsHtml = '★'.repeat(item.stars) + '☆'.repeat(5 - item.stars);
                 const attName = item.attendant ? item.attendant.name : 'Geral';
+                const attColor = getAttendantColor(attName);
                 const date = new Date(item.createdAt).toLocaleDateString();
 
                 tr.innerHTML = `
-                    <td><span class="badge badge-attendant">${attName}</span></td>
+                    <td><span class="badge badge-attendant" style="color: ${attColor}; border: 1px solid ${attColor}44; background: ${attColor}11;">${attName}</span></td>
                     <td>${date}</td>
                     <td><span class="stars-display">${starsHtml}</span></td>
                     <td>${item.comment || '-'}</td>
@@ -1751,8 +1769,9 @@
             tbody.innerHTML = '';
             sorted.forEach(att => {
                 const tr = document.createElement('tr');
+                const attColor = getAttendantColor(att.name);
                 tr.innerHTML = `
-                    <td><b>${att.name}</b></td>
+                    <td><b style="color: ${attColor}; font-size: 1.05rem;">${att.name}</b></td>
                     <td>${att._count.reviews} avaliações</td>
                     <td><span style="color:#00e676;">Ativo</span></td>
                     <td style="display:flex; gap:10px;">
