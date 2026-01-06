@@ -672,19 +672,7 @@
                 <p id="pageSubtitle">Bem-vindo(a), Gestor. Aqui estão os resultados em tempo real.</p>
             </div>
             <div class="header-actions">
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="date" id="dateStart" class="glass-panel"
-                        style="padding: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.2); outline: none;"
-                        onchange="filterDashboardByDate()">
-                    <span style="color: var(--text-muted);">até</span>
-                    <input type="date" id="dateEnd" class="glass-panel"
-                        style="padding: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.2); outline: none;"
-                        onchange="filterDashboardByDate()">
-                </div>
 
-                <button class="btn-glow" onclick="exportDashboardPDF()" style="background: var(--danger);">
-                    📄 PDF
-                </button>
 
                 <button class="btn-glow" onclick="openAttendantModal()">
                     + Novo Atendente
