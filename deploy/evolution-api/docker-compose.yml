@@ -20,7 +20,7 @@ services:
       - DATABASE_SAVE_DATA_HISTORIC_ON_WORKSPACE=true
       - DATABASE_SAVE_DATA_FROM_OLD_MESSAGES=true
       - REDIS_ENABLED=true
-      - REDIS_URI=redis://redis:6379/1
+      - REDIS_URI=redis://evolution_redis:6379/1
       - REDIS_PREFIX_KEY=evolution
       - WEBSOCKET_ENABLED=true
     volumes:
