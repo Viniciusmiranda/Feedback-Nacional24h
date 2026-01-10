@@ -65,6 +65,12 @@ app.get('/', (req, res) => res.sendFile(path.join(frontendPath, 'index.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(frontendPath, 'register.html')));
 
 // Dynamic Routes (Must come after API routes)
+// Health Check (Move up)
+app.get('/health', (req, res) => {
+    res.json({ status: 'OK', timestamp: new Date() });
+});
+
+// Dynamic Routes (Must come after API routes)
 // 1. Dashboard: /:companySlug/dashboard
 app.get('/:slug/dashboard', (req, res) => {
     res.sendFile(path.join(frontendPath, 'dashboard.html'));
@@ -79,11 +85,6 @@ app.get('/:slug/:attendant', (req, res) => {
 app.get('/:slug', (req, res) => {
     // Could check if slug exists, but for now serve login
     res.sendFile(path.join(frontendPath, 'index.html'));
-});
-
-// Health Check
-app.get('/health', (req, res) => {
-    res.json({ status: 'OK', timestamp: new Date() });
 });
 
 // Seed Initial Admin (If empty)

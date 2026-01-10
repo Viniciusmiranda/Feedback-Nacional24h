@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 // Create Attendant (Private)
 router.post('/', auth, async (req, res) => {
-    const { name, phone, integrationId, active } = req.body;
+    const { name, phone, integrationId, active, sector, notify } = req.body;
     const { companyId } = req.user;
 
     if (!companyId) return res.status(400).json({ error: "Contexto de empresa desconhecido." });
@@ -29,8 +29,6 @@ router.post('/', auth, async (req, res) => {
 
         const limit = PLAN_LIMITS[company.plan] || 5;
 
-        // Note: Active status doesn't bypass limit check usually, but could arguably be debated.
-        // For now, simple count check.
         if (currentCount >= limit) {
             return res.status(403).json({
                 error: `Limite do plano atingido (${currentCount}/${limit}). Faça upgrade para adicionar mais.`
@@ -43,6 +41,8 @@ router.post('/', auth, async (req, res) => {
                 companyId,
                 phone: phone || null,
                 integrationId: integrationId || null,
+                sector: sector || null,
+                notify: notify !== undefined ? notify : true,
                 active: active !== undefined ? active : true
             }
         });
@@ -57,7 +57,7 @@ router.post('/', auth, async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
     const { id } = req.params;
     const { companyId } = req.user;
-    const { name, phone, integrationId, active } = req.body;
+    const { name, phone, integrationId, active, sector, notify } = req.body;
 
     try {
         // Verify ownership
@@ -73,6 +73,8 @@ router.put('/:id', auth, async (req, res) => {
                 name: name !== undefined ? name : undefined,
                 phone: phone !== undefined ? phone : undefined,
                 integrationId: integrationId !== undefined ? integrationId : undefined,
+                sector: sector !== undefined ? sector : undefined,
+                notify: notify !== undefined ? notify : undefined,
                 active: active !== undefined ? active : undefined
             }
         });

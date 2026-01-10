@@ -55,6 +55,8 @@ model Attendant {
   email     String?
   phone     String? // Add phone
   integrationId String? // Add Integration ID
+  sector        String?
+  notify        Boolean @default(true)
   active    Boolean  @default(true)
   companyId String
   company   Company  @relation(fields: [companyId], references: [id])

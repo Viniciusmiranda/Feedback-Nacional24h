@@ -782,6 +782,7 @@
                             <tr>
                                 <th>Nome</th>
                                 <th>Telefone</th>
+                                <th>Setor</th>
                                 <th>ID Int.</th>
                                 <th>Avaliações</th>
                                 <th>Status</th>
@@ -1317,15 +1318,28 @@
                 <input type="text" id="attendantPhoneInput" placeholder="Telefone (ex: 11999999999)"
                     style="flex:1; min-width: 200px; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: #fff; outline: none;">
 
-                <input type="text" id="attendantIntegrationIdInput" placeholder="ID Integração"
+                <input type="text" id="attendantSectorInput" placeholder="Setor (ex: Vendas)"
                     style="flex:1; min-width: 200px; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: #fff; outline: none;">
             </div>
 
-            <div style="margin-bottom:20px; display:flex; align-items:center; gap:10px;">
-                <input type="checkbox" id="attendantActiveInput" checked
-                    style="width:20px; height:20px; cursor:pointer; accent-color: var(--primary);">
-                <label for="attendantActiveInput" style="cursor:pointer; color: #fff; font-weight: 500;">Atendente
-                    Ativo</label>
+            <div style="margin-bottom:15px;">
+                <input type="text" id="attendantIntegrationIdInput" placeholder="ID Integração"
+                    style="width: 100%; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: #fff; outline: none;">
+            </div>
+
+            <div style="margin-bottom:20px; display:flex; flex-direction:column; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="attendantNotifyInput" checked
+                        style="width:20px; height:20px; cursor:pointer; accent-color: var(--primary);">
+                    <label for="attendantNotifyInput" style="cursor:pointer; color: #fff; font-weight: 500;">Receber
+                        Notificações de Avaliação</label>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="attendantActiveInput" checked
+                        style="width:20px; height:20px; cursor:pointer; accent-color: var(--primary);">
+                    <label for="attendantActiveInput" style="cursor:pointer; color: #fff; font-weight: 500;">Atendente
+                        Ativo</label>
+                </div>
             </div>
 
             <div id="resultArea"
@@ -1973,11 +1987,12 @@
                 tr.innerHTML = `
                     <td><b style="color: ${attColor}; font-size: 1.05rem;">${att.name}</b></td>
                     <td>${att.phone || '-'}</td>
+                    <td>${att.sector || '-'}</td>
                     <td>${att.integrationId || '-'}</td>
                     <td>${att._count.reviews} avaliações</td>
                     <td>${statusBadge}</td>
                     <td style="display:flex; gap:10px;">
-                        <button onclick='openAttendantModal(${JSON.stringify(att)})' style="background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer;" title="Editar">
+                        <button onclick="openAttendantModal('${att.id}')" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer;" title="Editar">
                            ✏️
                         </button>
                         <button id="btn-copy-${att.name}" onclick="copyLinkByName('${att.name}')" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer;" title="Copiar Link">
@@ -2106,16 +2121,21 @@
         }
 
         // --- MODAL LOGIC ---
-        function openAttendantModal(data = null) {
+        function openAttendantModal(attId = null) {
             const m = document.getElementById('attendantModal');
             m.classList.add('active');
 
-            if (data) {
+            if (attId) {
                 // Edit Mode
+                const data = globalData.attendants.find(a => a.id === attId);
+                if (!data) return alert("Erro: Atendente não encontrado.");
+
                 document.getElementById('attendantIdInput').value = data.id;
                 document.getElementById('attendantNameInput').value = data.name;
                 document.getElementById('attendantPhoneInput').value = data.phone || '';
+                document.getElementById('attendantSectorInput').value = data.sector || '';
                 document.getElementById('attendantIntegrationIdInput').value = data.integrationId || '';
+                document.getElementById('attendantNotifyInput').checked = data.notify !== false; // Default true (conceptually)
                 document.getElementById('attendantActiveInput').checked = data.active !== false;
                 document.getElementById('resultArea').style.display = 'none';
             } else {
@@ -2123,7 +2143,9 @@
                 document.getElementById('attendantIdInput').value = '';
                 document.getElementById('attendantNameInput').value = '';
                 document.getElementById('attendantPhoneInput').value = '';
+                document.getElementById('attendantSectorInput').value = '';
                 document.getElementById('attendantIntegrationIdInput').value = '';
+                document.getElementById('attendantNotifyInput').checked = true;
                 document.getElementById('attendantActiveInput').checked = true;
                 document.getElementById('resultArea').style.display = 'none';
             }
@@ -2147,7 +2169,9 @@
             if (!name) return alert("O nome é obrigatório.");
 
             const phone = document.getElementById('attendantPhoneInput').value.trim();
+            const sector = document.getElementById('attendantSectorInput').value.trim();
             const integrationId = document.getElementById('attendantIntegrationIdInput').value.trim();
+            const notify = document.getElementById('attendantNotifyInput').checked;
             const active = document.getElementById('attendantActiveInput').checked;
 
             const btn = document.querySelector('button[onclick="saveAttendant()"]');
@@ -2158,7 +2182,9 @@
             const payload = {
                 name,
                 phone: phone || null,
+                sector: sector || null,
                 integrationId: integrationId || null,
+                notify,
                 active
             };
 
@@ -2210,7 +2236,10 @@
                     const err = await res.json();
                     alert('Erro: ' + (err.error || 'Erro desconhecido'));
                 }
-            } catch (e) { console.error(e); alert('Erro de conexão'); }
+            } catch (e) {
+                console.error(e);
+                alert('Erro de conexão: ' + (e.message || e));
+            }
 
             btn.innerText = originalText;
             btn.disabled = false;
