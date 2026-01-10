@@ -1310,22 +1310,22 @@
             <input type="hidden" id="attendantIdInput">
             <div style="margin-bottom:15px">
                 <input type="text" id="attendantNameInput" placeholder="Nome do Atendente (ex: João Silva)"
-                    style="width: 100%; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; outline: none;">
+                    style="width: 100%; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: #fff; outline: none; font-size: 1rem;">
             </div>
 
-            <div style="margin-bottom:15px; display:flex; gap:10px">
+            <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap: wrap;">
                 <input type="text" id="attendantPhoneInput" placeholder="Telefone (ex: 11999999999)"
-                    style="flex:1; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; outline: none;">
+                    style="flex:1; min-width: 200px; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: #fff; outline: none;">
 
                 <input type="text" id="attendantIntegrationIdInput" placeholder="ID Integração"
-                    style="flex:1; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; outline: none;">
+                    style="flex:1; min-width: 200px; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: #fff; outline: none;">
             </div>
 
             <div style="margin-bottom:20px; display:flex; align-items:center; gap:10px;">
                 <input type="checkbox" id="attendantActiveInput" checked
-                    style="width:20px; height:20px; cursor:pointer;">
-                <label for="attendantActiveInput" style="cursor:pointer; color:#eee;">Atendente Ativo (Link
-                    funciona)</label>
+                    style="width:20px; height:20px; cursor:pointer; accent-color: var(--primary);">
+                <label for="attendantActiveInput" style="cursor:pointer; color: #fff; font-weight: 500;">Atendente
+                    Ativo</label>
             </div>
 
             <div id="resultArea"
