@@ -1996,80 +1996,81 @@
                     }
                 });
         } // --- NEW CHARTS (Map &
-            Trend)--- let trendChartInstance = null; function renderNewCharts(byState, byDate) { // 1. MAP (Google
-            GeoChart) // Transform { 'SP' : 10, 'RJ' : 5 } to [['State', 'Reviews' ], ['BR-SP', 10], ...] // Google
-            GeoChart for Brazil uses "BR-XX" codes(ISO 3166 - 2: BR) const mapData = [['Estado', 'Avaliações']]; if
-                (byState && byState.length > 0) {
-                byState.forEach(item => {
-                    // item is { state: 'SP', _count: { id: 10 } } from Prisma groupBy
-                    if (item.state) {
-                        // Ensure state code is like "BR-SP"
-                        let code = item.state.toUpperCase();
-                        if (!code.startsWith('BR-')) code = 'BR-' + code;
-                        mapData.push([code, item._count.id]);
-                    }
-                });
-            } else {
-                mapData.push(['BR-DF', 0]); // Dummy to render map
-            }
-
-            const dataTable = google.visualization.arrayToDataTable(mapData);
-            const options = {
-                region: 'BR', // Brazil
-                displayMode: 'regions',
-                resolution: 'provinces',
-                colorAxis: { colors: ['#e0f7fa', '#006064'] }, // Light to Dark Blue
-                backgroundColor: 'transparent',
-                datalessRegionColor: 'rgba(255,255,255,0.05)',
-                defaultColor: '#f5f5f5',
-            };
-
-            const chart = new google.visualization.GeoChart(document.getElementById('geoChart'));
-            chart.draw(dataTable, options);
-
-
-            // 2. TREND CHART (Chart.js)
-            // byDate is { '2025-01-01': 5, ... }
-            const ctxTrend = document.getElementById('trendChart').getContext('2d');
-
-            // Generate labels for last 30 days to ensure continuity
-            const labels = [];
-            const dataPoints = [];
-            const today = new Date();
-            for (let i = 29; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(today.getDate() - i);
-                const dayStr = d.toISOString().split('T')[0];
-                labels.push(dayStr.split('-').slice(1).join('/')); // MM/DD
-                dataPoints.push(byDate[dayStr] || 0);
-            }
-
-            if (trendChartInstance) trendChartInstance.destroy();
-
-            trendChartInstance = new Chart(ctxTrend, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Avaliações Diárias',
-                        data: dataPoints,
-                        borderColor: '#00e676', // Green
-                        backgroundColor: 'rgba(0, 230, 118, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
-                        x: { grid: { display: false } }
-                    },
-                    plugins: { legend: { display: false } }
+        // 1. MAP (Google GeoChart)
+        // Transform { 'SP': 10, 'RJ': 5 } to [['State', 'Reviews'], ['BR-SP', 10], ...]
+        // Google GeoChart for Brazil uses "BR-XX" codes (ISO 3166-2:BR)
+        const mapData = [['Estado', 'Avaliações']]; if
+            (byState && byState.length > 0) {
+            byState.forEach(item => {
+                // item is { state: 'SP', _count: { id: 10 } } from Prisma groupBy
+                if (item.state) {
+                    // Ensure state code is like "BR-SP"
+                    let code = item.state.toUpperCase();
+                    if (!code.startsWith('BR-')) code = 'BR-' + code;
+                    mapData.push([code, item._count.id]);
                 }
             });
+        } else {
+            mapData.push(['BR-DF', 0]); // Dummy to render map
+        }
+
+        const dataTable = google.visualization.arrayToDataTable(mapData);
+        const options = {
+            region: 'BR', // Brazil
+            displayMode: 'regions',
+            resolution: 'provinces',
+            colorAxis: { colors: ['#e0f7fa', '#006064'] }, // Light to Dark Blue
+            backgroundColor: 'transparent',
+            datalessRegionColor: 'rgba(255,255,255,0.05)',
+            defaultColor: '#f5f5f5',
+        };
+
+        const chart = new google.visualization.GeoChart(document.getElementById('geoChart'));
+        chart.draw(dataTable, options);
+
+
+        // 2. TREND CHART (Chart.js)
+        // byDate is { '2025-01-01': 5, ... }
+        const ctxTrend = document.getElementById('trendChart').getContext('2d');
+
+        // Generate labels for last 30 days to ensure continuity
+        const labels = [];
+        const dataPoints = [];
+        const today = new Date();
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(today.getDate() - i);
+            const dayStr = d.toISOString().split('T')[0];
+            labels.push(dayStr.split('-').slice(1).join('/')); // MM/DD
+            dataPoints.push(byDate[dayStr] || 0);
+        }
+
+        if (trendChartInstance) trendChartInstance.destroy();
+
+        trendChartInstance = new Chart(ctxTrend, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Avaliações Diárias',
+                    data: dataPoints,
+                    borderColor: '#00e676', // Green
+                    backgroundColor: 'rgba(0, 230, 118, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
         }
 
         // Init Google Charts
@@ -2809,8 +2810,7 @@
 
             const div = document.createElement('article');
             div.className = 'glass-panel';
-            div.style.cssText = 'padding: 30px; position: relative; overflow: hidden; display: flex;
-            flex - direction: column; ';
+            div.style.cssText = 'padding: 30px; position: relative; overflow: hidden; display: flex; flex-direction: column;';
             div.id = cardId;
 
             div.innerHTML = `
@@ -2957,13 +2957,13 @@
                 formData.append('settings', JSON.stringify(newSettings));
                 // We should also update legacy fields for compatibility if desired,
                 // but let's stick to settings.integrations as primary now.
-                // Legacy fields (whatsapp, notifications) might be overwritten by emptiness if we don't send
-                them ?
-                        // The backend `updateSettings` updates only what is sent.
-                        // So legacy notifications remain unless we update them.
-                        // It's fine.
+                // Legacy fields (whatsapp, notifications) might be overwritten by emptiness if we don't send them.
+                // The backend `updateSettings` updates only what is sent.
+                // The backend `updateSettings` updates only what is sent.
+                // So legacy notifications remain unless we update them.
+                // It's fine.
 
-                        const res = await fetch('/api/company/settings', {
+                const res = await fetch('/api/company/settings', {
                     method: 'PUT',
                     headers: { 'Authorization': `Bearer ${token} ` },
                     body: formData
@@ -3051,15 +3051,13 @@
 
                 list.innerHTML = '';
                 if (suggestions.length === 0) {
-                    list.innerHTML = '<p style="text-align:center; color:#666;">Nenhuma sugestão ainda. Seja o
-                    primeiro!</p > ';
+                    list.innerHTML = '<p style="text-align:center; color:#666;">Nenhuma sugestão ainda. Seja o primeiro!</p>';
                     return;
                 }
 
                 suggestions.forEach(s => {
                     const div = document.createElement('div');
-                    div.style.cssText = 'background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;
-                    display: flex; align - items: center; gap: 15px; ';
+                    div.style.cssText = 'background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px;';
                     div.innerHTML = `
                             <div style="flex: 1;">
                                 <p style="margin: 0; color: #fff; font-size: 1rem;">${s.text}</p>
@@ -3080,49 +3078,50 @@
                     list.appendChild(div);
                 });
             } catch (e) {
-                console.error(e); list.innerHTML = '<p style="color:red">Erro ao carregar.</p>
-                '; }
+                console.error(e);
+                list.innerHTML = '<p style="color:red">Erro ao carregar.</p>';
             }
+        }
 
-            async function voteSuggestion(id, type) {
-                try {
-                    const res = await fetch(`/api/suggestions/${id}/vote`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify({ type })
-                    });
-                    if (res.ok) {
-                        loadSuggestions();
-                    }
-                } catch (e) { console.error(e); }
-            }
+        async function voteSuggestion(id, type) {
+            try {
+                const res = await fetch(`/api/suggestions/${id}/vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ type })
+                });
+                if (res.ok) {
+                    loadSuggestions();
+                }
+            } catch (e) { console.error(e); }
+        }
 
-            function openSuggestionModal() {
-                document.getElementById('suggestionModal').classList.add('active');
-            }
-            function closeSuggestionModal() {
-                document.getElementById('suggestionModal').classList.remove('active');
-            }
+        function openSuggestionModal() {
+            document.getElementById('suggestionModal').classList.add('active');
+        }
+        function closeSuggestionModal() {
+            document.getElementById('suggestionModal').classList.remove('active');
+        }
 
-            async function submitSuggestion(e) {
-                e.preventDefault();
-                const text = document.getElementById('suggestionText').value;
-                if (!text) return;
+        async function submitSuggestion(e) {
+            e.preventDefault();
+            const text = document.getElementById('suggestionText').value;
+            if (!text) return;
 
-                try {
-                    const res = await fetch('/api/suggestions', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify({ text })
-                    });
-                    if (res.ok) {
-                        alert('Sugestão enviada!');
-                        closeSuggestionModal();
-                        document.getElementById('suggestionText').value = '';
-                        loadSuggestions();
-                    } else alert('Erro ao enviar.');
-                } catch (e) { console.error(e); }
-            }
+            try {
+                const res = await fetch('/api/suggestions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ text })
+                });
+                if (res.ok) {
+                    alert('Sugestão enviada!');
+                    closeSuggestionModal();
+                    document.getElementById('suggestionText').value = '';
+                    loadSuggestions();
+                } else alert('Erro ao enviar.');
+            } catch (e) { console.error(e); }
+        }
     </script>
 </body>
 
