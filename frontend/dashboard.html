@@ -1141,186 +1141,168 @@
                                             <option value="servicos" style="background: #0a1628;">Serviços</option>
                                     </div>
 
-                                    <!-- VIEW: SUPORTE -->
-                                    <div id="view-suporte" class="view-section" style="display: none;">
-                                        <section class="glass-panel"
-                                            style="padding: 40px; text-align: center; margin-bottom: 30px;">
-                                            <h2 style="margin-bottom: 20px;">Precisa de Ajuda?</h2>
-                                            <p class="text-muted">Entre em contato: suporte@avaliaja.app.br</p>
-                                            <a href="https://wa.me/5511999999999" target="_blank" class="btn-glow"
-                                                style="display: inline-flex; margin-top: 20px; text-decoration: none;">
-                                                Falar no WhatsApp
-                                            </a>
-                                        </section>
-
-                                        <!-- SUGGESTIONS (New) -->
-                                        <section class="glass-panel"
-                                            style="padding: 30px; max-width: 800px; margin: 0 auto 30px auto;">
-                                            <div
-                                                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                                                <div>
-                                                    <h2 style="margin: 0; font-size: 1.5rem;">💡 Sugestões da Comunidade
-                                                    </h2>
-                                                    <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">
-                                                        Vote nas melhorias que você quer ver!</p>
-                                                </div>
-                                                <button onclick="openSuggestionModal()" class="btn-glow"
-                                                    style="padding: 8px 15px; font-size: 0.85rem;">+ NOVA
-                                                    SUGESTÃO</button>
-                                            </div>
-                                            <div id="suggestionsList"
-                                                style="display: flex; flex-direction: column; gap: 15px;">
-                                                <!-- Loaded via JS -->
-                                                <p style="text-align:center; color:#666;">Carregando...</p>
-                                            </div>
-                                        </section>
-
-                                        <section class="glass-panel"
-                                            style="padding: 40px; max-width: 800px; margin: 0 auto;">
-                                            <div
-                                                style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
-                                                <div style="font-size: 2rem;">🚀</div>
-                                                <div>
-                                                    <h2 style="margin: 0;">Novidades e Atualizações</h2>
-                                                    <p style="color: var(--text-muted);">Confira o que há de novo no
-                                                        Avalia Já.</p>
-                                                </div>
-                                            </div>
-                                            <div id="changelogContent" style="line-height: 1.6; color: #e2e8f0;">
-                                                Carregando histórico...
-                                            </div>
-                                        </section>
-                                    </div>
-
-                                    <!-- VIEW: PERSONALIZAÇÃO -->
-                                    <div id="view-personalizacao" class="view-section" style="display: none;">
-                                        <div
-                                            style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
-
-                                            <!-- Controls Column -->
-                                            <div style="flex: 1; min-width: 300px; max-width: 500px;">
-                                                <section class="glass-panel"
-                                                    style="padding: 30px; margin-bottom: 20px;">
-                                                    <h2 style="margin-bottom: 20px;">Identidade Visual</h2>
-                                                    <p style="color: var(--text-muted); margin-bottom: 20px;">
-                                                        Customize a aparência em tempo real.
-                                                    </p>
-                                                    <form onsubmit="saveCustomization(event)"
-                                                        style="display: grid; gap: 20px;">
-                                                        <div>
-                                                            <label>Cor Principal</label>
-                                                            <div style="display: flex; gap: 10px; align-items: center;">
-                                                                <input type="color" id="colorInput" value="#4d4dff"
-                                                                    style="border: none; background: none; width: 50px; height: 50px; cursor: pointer;"
-                                                                    oninput="updatePreviewColor(this.value)">
-                                                                <span style="font-size: 0.9rem; color: #ccc;">Clique
-                                                                    para escolher</span>
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label>Logotipo</label>
-                                                            <div style="display: flex; gap: 10px; align-items: center;">
-                                                                <label class="btn-glow"
-                                                                    style="margin: 0; cursor: pointer; display: inline-block; font-size: 0.9rem; padding: 10px 15px;">
-                                                                    Escolher Arquivo
-                                                                    <input type="file" id="logoInput" hidden
-                                                                        accept="image/*"
-                                                                        onchange="updatePreviewLogo(this)">
-                                                                </label>
-                                                                <span style="font-size: 0.8rem; color: #aaa;">Max 2MB
-                                                                    (PNG/JPG)</span>
-                                                            </div>
-                                                            <div id="logoPreviewContainer"
-                                                                style="margin-top: 10px; display: none;">
-                                                                <img id="logoPreviewImg" src=""
-                                                                    style="height: 40px; object-fit: contain;">
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label>Título da Pergunta de Avaliação</label>
-                                                            <input type="text" id="questionTitleInput"
-                                                                class="input-light"
-                                                                placeholder="Ex: Como foi sua experiência?"
-                                                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;"
-                                                                oninput="updatePreviewText(this.value)">
-                                                        </div>
-
-                                                        <div>
-                                                            <label>Link de Redirecionamento (Opcional)</label>
-                                                            <p
-                                                                style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">
-                                                                Após avaliar, o cliente será enviado para este link (ex:
-                                                                Google Maps). Deixe vazio
-                                                                para mensagem padrão.
-                                                            </p>
-                                                            <input type="url" id="redirectUrlInput" class="input-light"
-                                                                placeholder="https://g.page/..."
-                                                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;">
-                                                        </div>
-
-                                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                                            <input type="checkbox" id="showObsInput" checked
-                                                                onchange="togglePreviewObs(this.checked)"
-                                                                style="width: 20px; height: 20px;">
-                                                            <label for="showObsInput" style="margin: 0;">Permitir
-                                                                comentários
-                                                                (Observação)</label>
-                                                        </div>
-
-                                                        <hr
-                                                            style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
-
-                                                        <div>
-                                                            <label>Perguntas Adicionais</label>
-                                                            <p
-                                                                style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">
-                                                                Adicione perguntas
-                                                                extras para o cliente responder (ex: "Como conheceu?").
-                                                            </p>
-                                                            <div id="extraQuestionsList"
-                                                                style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
-                                                            </div>
-                                                            <button type="button" onclick="addQuestionField()"
-                                                                class="btn-glow"
-                                                                style="background: rgba(255,255,255,0.1); font-size: 0.8rem; padding: 8px 15px;">+
-                                                                Adicionar Pergunta</button>
-                                                        </div>
-
-                                                        <button type="submit" class="btn-glow">💾 Salvar
-                                                            Alterações</button>
-                                                    </form>
-                                                </section>
-                                            </div>
-
-                                            <!-- Preview Column (Smartphone) -->
-                                            <div
-                                                style="flex: 1; min-width: 320px; display: flex; justify-content: center; align-items: flex-start;">
-                                                <div style="text-align: center;">
-                                                    <span
-                                                        style="display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem;">Visualização
-                                                        <h4 style="margin: 30px 0 10px 0;">Simulação (Mobile preview)
-                                                        </h4>
-                                                        <!-- Mobile Frame Container with Scale -->
-                                                        <div
-                                                            style="width: 380px; height: 700px; border: 12px solid #333; border-radius: 40px; overflow: hidden; position: relative; background: #fff; transform: scale(0.7); transform-origin: top center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
-                                                            <div style="width: 100%; height: 100%; overflow-y: auto;">
-                                                                <iframe id="mobilePreviewIframe" src="/ex-atd.html"
-                                                                    style="width: 100%; height: 100%; border: none;"></iframe>
-                                                            </div>
-                                                        </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                    </form>
+                </div>
 
 
 
 
+
+<!-- VIEW: SUPORTE -->
+<div id="view-suporte" class="view-section" style="display: none;">
+    <section class="glass-panel" style="padding: 40px; text-align: center; margin-bottom: 30px;">
+        <h2 style="margin-bottom: 20px;">Precisa de Ajuda?</h2>
+        <p class="text-muted">Entre em contato: suporte@avaliaja.app.br</p>
+        <a href="https://wa.me/5511999999999" target="_blank" class="btn-glow"
+            style="display: inline-flex; margin-top: 20px; text-decoration: none;">
+            Falar no WhatsApp
+        </a>
+    </section>
+
+    <!-- SUGGESTIONS (New) -->
+    <section class="glass-panel" style="padding: 30px; max-width: 800px; margin: 0 auto 30px auto;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <div>
+                <h2 style="margin: 0; font-size: 1.5rem;">💡 Sugestões da Comunidade
+                </h2>
+                <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">
+                    Vote nas melhorias que você quer ver!</p>
+            </div>
+            <button onclick="openSuggestionModal()" class="btn-glow" style="padding: 8px 15px; font-size: 0.85rem;">+
+                NOVA
+                SUGESTÃO</button>
+        </div>
+        <div id="suggestionsList" style="display: flex; flex-direction: column; gap: 15px;">
+            <!-- Loaded via JS -->
+            <p style="text-align:center; color:#666;">Carregando...</p>
+        </div>
+    </section>
+
+    <section class="glass-panel" style="padding: 40px; max-width: 800px; margin: 0 auto;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
+            <div style="font-size: 2rem;">🚀</div>
+            <div>
+                <h2 style="margin: 0;">Novidades e Atualizações</h2>
+                <p style="color: var(--text-muted);">Confira o que há de novo no
+                    Avalia Já.</p>
+            </div>
+        </div>
+        <div id="changelogContent" style="line-height: 1.6; color: #e2e8f0;">
+            Carregando histórico...
+        </div>
+    </section>
+</div>
+
+<!-- VIEW: PERSONALIZAÇÃO -->
+<div id="view-personalizacao" class="view-section" style="display: none;">
+    <div style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
+
+        <!-- Controls Column -->
+        <div style="flex: 1; min-width: 300px; max-width: 500px;">
+            <section class="glass-panel" style="padding: 30px; margin-bottom: 20px;">
+                <h2 style="margin-bottom: 20px;">Identidade Visual</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    Customize a aparência em tempo real.
+                </p>
+                <form onsubmit="saveCustomization(event)" style="display: grid; gap: 20px;">
+                    <div>
+                        <label>Cor Principal</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="colorInput" value="#4d4dff"
+                                style="border: none; background: none; width: 50px; height: 50px; cursor: pointer;"
+                                oninput="updatePreviewColor(this.value)">
+                            <span style="font-size: 0.9rem; color: #ccc;">Clique
+                                para escolher</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label>Logotipo</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label class="btn-glow"
+                                style="margin: 0; cursor: pointer; display: inline-block; font-size: 0.9rem; padding: 10px 15px;">
+                                Escolher Arquivo
+                                <input type="file" id="logoInput" hidden accept="image/*"
+                                    onchange="updatePreviewLogo(this)">
+                            </label>
+                            <span style="font-size: 0.8rem; color: #aaa;">Max 2MB
+                                (PNG/JPG)</span>
+                        </div>
+                        <div id="logoPreviewContainer" style="margin-top: 10px; display: none;">
+                            <img id="logoPreviewImg" src="" style="height: 40px; object-fit: contain;">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label>Título da Pergunta de Avaliação</label>
+                        <input type="text" id="questionTitleInput" class="input-light"
+                            placeholder="Ex: Como foi sua experiência?"
+                            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;"
+                            oninput="updatePreviewText(this.value)">
+                    </div>
+
+                    <div>
+                        <label>Link de Redirecionamento (Opcional)</label>
+                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">
+                            Após avaliar, o cliente será enviado para este link (ex:
+                            Google Maps). Deixe vazio
+                            para mensagem padrão.
+                        </p>
+                        <input type="url" id="redirectUrlInput" class="input-light" placeholder="https://g.page/..."
+                            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;">
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="showObsInput" checked onchange="togglePreviewObs(this.checked)"
+                            style="width: 20px; height: 20px;">
+                        <label for="showObsInput" style="margin: 0;">Permitir
+                            comentários
+                            (Observação)</label>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+                    <div>
+                        <label>Perguntas Adicionais</label>
+                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">
+                            Adicione perguntas
+                            extras para o cliente responder (ex: "Como conheceu?").
+                        </p>
+                        <div id="extraQuestionsList"
+                            style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+                        </div>
+                        <button type="button" onclick="addQuestionField()" class="btn-glow"
+                            style="background: rgba(255,255,255,0.1); font-size: 0.8rem; padding: 8px 15px;">+
+                            Adicionar Pergunta</button>
+                    </div>
+
+                    <button type="submit" class="btn-glow">💾 Salvar
+                        Alterações</button>
+                </form>
+            </section>
+        </div>
+
+        <!-- Preview Column (Smartphone) -->
+        <div style="flex: 1; min-width: 320px; display: flex; justify-content: center; align-items: flex-start;">
+            <div style="text-align: center;">
+                <span
+                    style="display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem;">Visualização
+                    <h4 style="margin: 30px 0 10px 0;">Simulação (Mobile preview)
+                    </h4>
+                    <!-- Mobile Frame Container with Scale -->
+                    <div
+                        style="width: 380px; height: 700px; border: 12px solid #333; border-radius: 40px; overflow: hidden; position: relative; background: #fff; transform: scale(0.7); transform-origin: top center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+                        <div style="width: 100%; height: 100%; overflow-y: auto;">
+                            <iframe id="mobilePreviewIframe" src="/ex-atd.html"
+                                style="width: 100%; height: 100%; border: none;"></iframe>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>    
 
     </main>
-
     <!-- USER MODAL (New) -->
     <div class="modal-overlay" id="userModal">
         <div class="modal-content glass-panel" style="max-width: 400px;">
