@@ -10,8 +10,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="😀Avalie o seu atendimento!">
   <meta property="og:description" content="Avalia Já | Avaliação de Atendimento">
-  <meta property="og:image"
-    content="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/1200px-Google_Maps_icon_%282020%29.svg.png">
+  <meta property="og:image" content="__OG_IMAGE__">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -671,7 +670,7 @@
       </a>
       <div id="attendantNameDisplay"
         style="margin-top: 15px; font-size: 1.8rem; color: rgba(255,255,255,0.9); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
-        Atd. Geral
+        Atd. Exemplo
       </div>
     </div>
 
@@ -718,6 +717,7 @@
 
       <!-- Observation Section -->
       <div class="observation-container" id="obsContainer">
+        <div id="extraQuestionsContainer" style="width: 100%; margin-bottom: 15px;"></div>
         <textarea class="obs-textarea" placeholder="Gostaria de deixar alguma observação? (Opcional)"></textarea>
         <button class="btn-submit-obs" onclick="finishProcess()">ENVIAR OPINIÃO</button>
       </div>
@@ -812,6 +812,23 @@
             if (s.showObservation === false) {
               obsContainer.classList.add('hidden'); // Force hide via class
               obsContainer.style.display = 'none';  // Inline safety
+            }
+
+            // Render Extra Questions
+            if (s.questions && Array.isArray(s.questions)) {
+              const qContainer = document.getElementById('extraQuestionsContainer');
+              if (qContainer) {
+                qContainer.innerHTML = ''; // Clear previous
+                s.questions.forEach((q, idx) => {
+                  const div = document.createElement('div');
+                  div.style.marginBottom = '15px';
+                  div.innerHTML = `
+                            <label style="display:block; margin-bottom: 5px; font-weight: bold; color: #fff; font-size: 0.9rem;">${q}</label>
+                            <input type="text" class="extra-answer" data-question="${q}" placeholder="Sua resposta..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.2); color: #fff;">
+                        `;
+                  qContainer.appendChild(div);
+                });
+              }
             }
           }
         }
@@ -936,6 +953,13 @@
         const payload = {
           rating: value,
           observation: observationText, // Add observation here
+          extraAnswers: (() => {
+            const answers = [];
+            document.querySelectorAll('.extra-answer').forEach(inp => {
+              answers.push({ question: inp.dataset.question, answer: inp.value });
+            });
+            return answers;
+          })(),
           attendant: userContext.attendant,
           ip: userContext.ip,
           city: userContext.city,

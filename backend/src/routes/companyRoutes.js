@@ -24,6 +24,7 @@ router.put('/settings', verifyToken, upload.single('logo'), companyController.up
 // User Management
 router.get('/users', verifyToken, companyController.getUsers);
 router.post('/users', verifyToken, companyController.inviteUser);
+router.put('/users/:id/password', verifyToken, companyController.updateUserPassword);
 
 // Public route for evaluation page
 router.get('/public/:slug', companyController.getPublicSettings);

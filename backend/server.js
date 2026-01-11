@@ -65,6 +65,8 @@ app.use('/api/avaliacoes', reviewRoutes);
 app.use('/api/atendentes', attendantRoutes);
 const companyRoutes = require('./src/routes/companyRoutes');
 app.use('/api/company', companyRoutes);
+const suggestionRoutes = require('./src/routes/suggestionRoutes');
+app.use('/api/suggestions', suggestionRoutes);
 
 // Serve Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
@@ -86,8 +88,33 @@ app.get('/:slug/dashboard', (req, res) => {
 });
 
 // 2. Evaluation: /:companySlug/:attendantName
-app.get('/:slug/:attendant', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'ex-atd.html'));
+app.get('/:slug/:attendant', async (req, res) => {
+    try {
+        const { slug } = req.params;
+        const filePath = path.join(frontendPath, 'ex-atd.html');
+        let html = fs.readFileSync(filePath, 'utf8');
+
+        // Fetch Company Logic for OG Image
+        const company = await prisma.company.findUnique({
+            where: { slug: slug },
+            select: { logo: true }
+        });
+
+        // Default or Custom Image
+        let ogImage = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/1200px-Google_Maps_icon_%282020%29.svg.png"; // Original Default
+        if (company && company.logo) {
+            // Ensure absolute URL
+            // company.logo is typically "/uploads/..."
+            ogImage = `https://app.avaliaja.app.br${company.logo}`;
+        }
+
+        html = html.replace('__OG_IMAGE__', ogImage);
+        res.send(html);
+    } catch (err) {
+        // Fallback in case of error (e.g. valid slug but DB error, or read error)
+        console.error("Error serving ex-atd.html:", err);
+        res.sendFile(path.join(frontendPath, 'ex-atd.html'));
+    }
 });
 
 // 3. Fallback for /:companySlug -> Redirect to login or dashboard

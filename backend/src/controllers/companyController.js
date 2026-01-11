@@ -137,3 +137,29 @@ exports.inviteUser = async (req, res) => {
         res.status(500).json({ error: 'Erro ao criar usuário' });
     }
 };
+
+exports.updateUserPassword = async (req, res) => {
+    try {
+        const { companyId } = req.user;
+        const { id } = req.params;
+        const { password } = req.body;
+
+        if (!password || password.length < 6) {
+            return res.status(400).json({ error: 'Senha deve ter no mínimo 6 caracteres.' });
+        }
+
+        const user = await prisma.user.findFirst({ where: { id: id, companyId: companyId } });
+        if (!user) return res.status(404).json({ error: 'Usuário não encontrado.' });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await prisma.user.update({
+            where: { id: id },
+            data: { password: hashedPassword }
+        });
+
+        res.json({ message: 'Senha atualizada com sucesso.' });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: 'Erro ao atualizar senha.' });
+    }
+};

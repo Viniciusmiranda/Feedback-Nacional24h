@@ -678,7 +678,7 @@
             <div class="header-actions">
 
 
-                <button class="btn-glow" onclick="openAttendantModal()">
+                <button id="btnAddAttendant" class="btn-glow" onclick="openAttendantModal()" style="display: none;">
                     + Novo Atendente
                 </button>
                 <div class="glass-panel"
@@ -945,97 +945,140 @@
         <div id="view-integracoes" class="view-section" style="display: none;">
             <h2 style="margin-bottom: 20px;">Conecte seus Apps</h2>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
-
-                <!-- CARD: WhatsApp -->
-                <article class="glass-panel"
-                    style="padding: 30px; position: relative; overflow: hidden; display: flex; flex-direction: column;">
-
-                    <div style="position: relative; z-index: 1;">
-                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-                            <img src="/whatsapp.png" alt="WhatsApp Logo"
-                                style="width: 50px; height: 50px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(37, 211, 102, 0.5));">
-                            <div>
-                                <h3 style="margin: 0; color: #fff;">WhatsApp</h3>
-                                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Notificações
-                                    automáticas</p>
-                            </div>
-                        </div>
-
-                        <form onsubmit="saveIntegrations(event)">
-                            <div style="margin-bottom: 15px;">
-                                <label
-                                    style="display:block; margin-bottom: 8px; font-size: 0.85rem; color: #ccc;">Número
-                                    (com DDD)</label>
-                                <input type="text" id="whatsappInput" placeholder="Ex: 5511999999999"
-                                    style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: #fff;">
-                                <p style="font-size: 0.75rem; color: #666; margin-top: 5px;">Separe múltiplos números
-                                    por vírgula.</p>
-                            </div>
-
-                            <div style="margin-bottom: 20px;">
-                                <label style="display:block; margin-bottom: 8px; font-size: 0.85rem; color: #ccc;">Regra
-                                    de Disparo</label>
-                                <select id="notifyRuleInput"
-                                    style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #0a1628; color: #fff;">
-                                    <option value="all">🔔 Todas as avaliações</option>
-                                    <option value="bad">⚠️ Apenas notas baixas (1-2)</option>
-                                    <option value="off">🔕 Desativado</option>
-                                </select>
-                            </div>
-
-                            <button type="submit" class="btn-glow"
-                                style="width: 100%; justify-content: center; background: #25D366;">
-                                Salvar WhatsApp
-                            </button>
-                        </form>
-                    </div>
-                </article>
-
-                <!-- CARD: N8N (Webhook) -->
-                <article class="glass-panel" style="padding: 30px;">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-                        <div
-                            style="width: 50px; height: 50px; background: #ea4b71; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;">
-                            n8n</div>
-                        <div>
-                            <h3 style="margin: 0; color: #fff;">Webhook (N8N)</h3>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Automação de workflows
-                            </p>
-                        </div>
-                    </div>
-
-                    <form onsubmit="saveIntegrations(event)">
-                        <div style="margin-bottom: 15px;">
-                            <label style="display:block; margin-bottom: 8px; font-size: 0.85rem; color: #ccc;">URL do
-                                Webhook (POST)</label>
-                            <input type="url" id="n8nWebhookInput" placeholder="https://primary.n8n.cloud/webhook/..."
-                                style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: #fff;">
-                        </div>
-                        <button type="submit" class="btn-glow"
-                            style="background: #ea4b71; width: 100%; justify-content: center;">
-                            Salvar Integração
-                        </button>
-                    </form>
-                </article>
-
-                <!-- CARD: Email -->
-                <article class="glass-panel" style="padding: 30px; opacity: 0.5;">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-                        <span style="font-size: 2.5rem;">📧</span>
-                        <div>
-                            <h3 style="margin: 0; color: #fff;">E-mail</h3>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Relatórios diários</p>
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem; color: #ccc;">Em breve disponível nos planos Enterprise.</p>
-                </article>
-
+            <!-- ADD INTEGRATION BAR -->
+            <div class="glass-panel"
+                style="padding: 20px; margin-bottom: 30px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1;">
+                    <label style="display:block; margin-bottom: 8px; font-size: 0.9rem; color: #ccc;">Nova
+                        Integração</label>
+                    <select id="newIntegrationSelect"
+                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #0a1628; color: #fff; cursor: pointer;">
+                        <option value="">Selecione o serviço...</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="lnassist">LnAssist</option>
+                        <option value="worklab">WorkLab</option>
+                        <option value="amplimed">Amplimed</option>
+                        <option value="webhook">Webhook (N8N/Outros)</option>
+                    </select>
+                </div>
+                <button class="btn-glow" onclick="addNewIntegrationCard()" style="height: 45px; margin-top: 24px;">
+                    + Adicionar
+                </button>
             </div>
+
+            <!-- DYNAMIC CONTAINER -->
+            <div id="integrationsContainer"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+                <!-- Cards will be added here -->
+            </div>
+        </div>
         </div>
 
         <!-- VIEW: MINHA CONTA (Antigo Ajustes) -->
         <div id="view-ajustes" class="view-section" style="display: none;">
+            <div style="width: 100%; padding: 0 20px;">
+                <h2 style="margin-bottom: 20px;">Configurações da Conta</h2>
+
+                <section class="glass-panel" style="padding: 30px;">
+                    <!-- COMPANY FORM (Full Width) -->
+                    <form onsubmit="saveAccountDetails(event)"
+                        style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px;">
+                        <h3
+                            style="margin: 0 0 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                            🏢 Dados da Empresa</h3>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <label style="display:block; margin-bottom: 8px; font-size: 0.9rem; color: #ccc;">Nome
+                                    Fantasia</label>
+                                <div
+                                    style="display: flex; align-items: center; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); padding: 0 15px;">
+                                    <span style="font-size: 1.2rem; opacity: 0.7;">🏷️</span>
+                                    <input type="text" id="companyNameInput" placeholder="Ex: Doce Sabor"
+                                        style="flex: 1; padding: 12px; border: none; background: transparent; color: #fff; outline: none;">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label
+                                    style="display:block; margin-bottom: 8px; font-size: 0.9rem; color: #ccc;">Segmento</label>
+                                <div
+                                    style="display: flex; align-items: center; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); padding: 0 15px;">
+                                    <span style="font-size: 1.2rem; opacity: 0.7;">📊</span>
+                                    <select id="companyAreaInput"
+                                        style="flex: 1; padding: 12px; border: none; background: transparent; color: #fff; outline: none; cursor: pointer;">
+                                        <option value="" style="background: #0a1628;">Selecione...</option>
+                                        <option value="varejo" style="background: #0a1628;">Varejo / Loja</option>
+                                        <option value="saude" style="background: #0a1628;">Saúde / Clínica</option>
+                                        <option value="servicos" style="background: #0a1628;">Serviços</option>
+                                        <option value="alimentacao" style="background: #0a1628;">Alimentação</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-glow" style="align-self: flex-end;">💾 Salvar Dados</button>
+                    </form>
+
+                    <hr style="margin: 30px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+
+                    <!-- PLANS SECTION -->
+                    <h2 style="margin-bottom: 20px;">Plano e Assinatura</h2>
+                    <div id="plansContainer"
+                        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
+
+                        <!-- GRATIS -->
+                        <div class="plan-card" id="plan-GRATIS"
+                            style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid transparent;">
+                            <h3 style="font-size: 1.2rem; color: #fff;">Gratis</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Avalie</p>
+                            <ul
+                                style="list-style: none; padding: 0; margin: 20px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6;">
+                                <li>✓ Até 5 atendentes</li>
+                                <li>✓ Avaliações ilimitadas</li>
+                                <li>✓ Dashboard básico</li>
+                                <li>✓ Alerta WhatsApp</li>
+                            </ul>
+                            <button disabled
+                                style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: none; color: #fff; border-radius: 6px;">Atual</button>
+                        </div>
+
+                        <!-- PEQUENAS -->
+                        <div class="plan-card" id="plan-PEQUENAS"
+                            style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid transparent;">
+                            <h3 style="font-size: 1.2rem; color: #fff;">Pequenas</h3>
+                            <p style="color: var(--accent); font-weight: bold;">R$ 19,90/mês</p>
+                            <ul
+                                style="list-style: none; padding: 0; margin: 20px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6;">
+                                <li>✓ Até 20 atendentes</li>
+                                <li>✓ Dashboard avançado</li>
+                                <li>✓ Relatórios completos</li>
+                                <li>✓ Suporte prioritário</li>
+                            </ul>
+                            <a href="https://wa.me/5511999999999?text=Quero%20assinar%20o%20plano%20Pequenas%20Empresas"
+                                target="_blank" class="btn-glow"
+                                style="display: flex; justify-content: center; text-decoration: none;">Fazer Upgrade</a>
+                        </div>
+
+                        <!-- GRANDES -->
+                        <div class="plan-card" id="plan-GRANDES"
+                            style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid transparent;">
+                            <h3 style="font-size: 1.2rem; color: #fff;">Grandes</h3>
+                            <p style="color: var(--accent); font-weight: bold;">R$ 49,90/mês</p>
+                            <ul
+                                style="list-style: none; padding: 0; margin: 20px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6;">
+                                <li>✓ Atendentes ilimitados</li>
+                                <li>✓ Dashboard premium</li>
+                                <li>✓ Tudo ilimitado</li>
+                                <li>✓ Suporte prioritário</li>
+                            </ul>
+                            <a href="https://wa.me/5511999999999?text=Quero%20assinar%20o%20plano%20Grandes%20Empresas"
+                                target="_blank" class="btn-glow"
+                                style="display: flex; justify-content: center; text-decoration: none;">Fazer Upgrade</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
             <div style="max-width: 1000px; margin: 0 auto;">
                 <h2 style="margin-bottom: 20px;">Configurações da Conta</h2>
 
@@ -1096,203 +1139,181 @@
                                             <option value="varejo" style="background: #0a1628;">Varejo / Loja</option>
                                             <option value="saude" style="background: #0a1628;">Saúde / Clínica</option>
                                             <option value="servicos" style="background: #0a1628;">Serviços</option>
-                                            <option value="alimentacao" style="background: #0a1628;">Alimentação
-                                            </option>
-                                        </select>
                                     </div>
-                                </div>
 
-                                <button type="submit" class="btn-glow" style="align-self: flex-end;">💾 Salvar
-                                    Dados</button>
-                            </form>
-                        </div>
+                                    <!-- VIEW: SUPORTE -->
+                                    <div id="view-suporte" class="view-section" style="display: none;">
+                                        <section class="glass-panel"
+                                            style="padding: 40px; text-align: center; margin-bottom: 30px;">
+                                            <h2 style="margin-bottom: 20px;">Precisa de Ajuda?</h2>
+                                            <p class="text-muted">Entre em contato: suporte@avaliaja.app.br</p>
+                                            <a href="https://wa.me/5511999999999" target="_blank" class="btn-glow"
+                                                style="display: inline-flex; margin-top: 20px; text-decoration: none;">
+                                                Falar no WhatsApp
+                                            </a>
+                                        </section>
 
-                        <hr style="margin: 30px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+                                        <!-- SUGGESTIONS (New) -->
+                                        <section class="glass-panel"
+                                            style="padding: 30px; max-width: 800px; margin: 0 auto 30px auto;">
+                                            <div
+                                                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                                                <div>
+                                                    <h2 style="margin: 0; font-size: 1.5rem;">💡 Sugestões da Comunidade
+                                                    </h2>
+                                                    <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">
+                                                        Vote nas melhorias que você quer ver!</p>
+                                                </div>
+                                                <button onclick="openSuggestionModal()" class="btn-glow"
+                                                    style="padding: 8px 15px; font-size: 0.85rem;">+ NOVA
+                                                    SUGESTÃO</button>
+                                            </div>
+                                            <div id="suggestionsList"
+                                                style="display: flex; flex-direction: column; gap: 15px;">
+                                                <!-- Loaded via JS -->
+                                                <p style="text-align:center; color:#666;">Carregando...</p>
+                                            </div>
+                                        </section>
 
-                        <!-- PLANS SECTION -->
-                        <h2 style="margin-bottom: 20px;">Plano e Assinatura</h2>
-                        <div id="plansContainer"
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                                        <section class="glass-panel"
+                                            style="padding: 40px; max-width: 800px; margin: 0 auto;">
+                                            <div
+                                                style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
+                                                <div style="font-size: 2rem;">🚀</div>
+                                                <div>
+                                                    <h2 style="margin: 0;">Novidades e Atualizações</h2>
+                                                    <p style="color: var(--text-muted);">Confira o que há de novo no
+                                                        Avalia Já.</p>
+                                                </div>
+                                            </div>
+                                            <div id="changelogContent" style="line-height: 1.6; color: #e2e8f0;">
+                                                Carregando histórico...
+                                            </div>
+                                        </section>
+                                    </div>
 
-                            <!-- GRATIS -->
-                            <div class="plan-card" id="plan-GRATIS"
-                                style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid transparent;">
-                                <h3 style="font-size: 1.2rem; color: #fff;">Gratis</h3>
-                                <p style="color: var(--text-muted); font-size: 0.9rem;">Avalie</p>
-                                <ul
-                                    style="list-style: none; padding: 0; margin: 20px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6;">
-                                    <li>✓ Até 5 atendentes</li>
-                                    <li>✓ Avaliações ilimitadas</li>
-                                    <li>✓ Dashboard básico</li>
-                                    <li>✓ Alerta WhatsApp</li>
-                                </ul>
-                                <button disabled
-                                    style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: none; color: #fff; border-radius: 6px;">Atual</button>
-                            </div>
+                                    <!-- VIEW: PERSONALIZAÇÃO -->
+                                    <div id="view-personalizacao" class="view-section" style="display: none;">
+                                        <div
+                                            style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
 
-                            <!-- PEQUENAS -->
-                            <div class="plan-card" id="plan-PEQUENAS"
-                                style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid transparent;">
-                                <h3 style="font-size: 1.2rem; color: #fff;">Pequenas</h3>
-                                <p style="color: var(--accent); font-weight: bold;">R$ 9,90/mês</p>
-                                <ul
-                                    style="list-style: none; padding: 0; margin: 20px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6;">
-                                    <li>✓ Até 20 atendentes</li>
-                                    <li>✓ Dashboard avançado</li>
-                                    <li>✓ Relatórios completos</li>
-                                    <li>✓ Suporte prioritário</li>
-                                </ul>
-                                <a href="https://wa.me/5511999999999?text=Quero%20assinar%20o%20plano%20Pequenas%20Empresas"
-                                    target="_blank" class="btn-glow"
-                                    style="display: flex; justify-content: center; text-decoration: none;">Fazer
-                                    Upgrade</a>
-                            </div>
+                                            <!-- Controls Column -->
+                                            <div style="flex: 1; min-width: 300px; max-width: 500px;">
+                                                <section class="glass-panel"
+                                                    style="padding: 30px; margin-bottom: 20px;">
+                                                    <h2 style="margin-bottom: 20px;">Identidade Visual</h2>
+                                                    <p style="color: var(--text-muted); margin-bottom: 20px;">
+                                                        Customize a aparência em tempo real.
+                                                    </p>
+                                                    <form onsubmit="saveCustomization(event)"
+                                                        style="display: grid; gap: 20px;">
+                                                        <div>
+                                                            <label>Cor Principal</label>
+                                                            <div style="display: flex; gap: 10px; align-items: center;">
+                                                                <input type="color" id="colorInput" value="#4d4dff"
+                                                                    style="border: none; background: none; width: 50px; height: 50px; cursor: pointer;"
+                                                                    oninput="updatePreviewColor(this.value)">
+                                                                <span style="font-size: 0.9rem; color: #ccc;">Clique
+                                                                    para escolher</span>
+                                                            </div>
+                                                        </div>
 
-                            <!-- GRANDES -->
-                            <div class="plan-card" id="plan-GRANDES"
-                                style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid transparent;">
-                                <h3 style="font-size: 1.2rem; color: #fff;">Grandes</h3>
-                                <p style="color: var(--accent); font-weight: bold;">R$ 29,90/mês</p>
-                                <ul
-                                    style="list-style: none; padding: 0; margin: 20px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6;">
-                                    <li>✓ Atendentes ilimitados</li>
-                                    <li>✓ Dashboard premium</li>
-                                    <li>✓ Tudo ilimitado</li>
-                                    <li>✓ Suporte prioritário</li>
-                                </ul>
-                                <a href="https://wa.me/5511999999999?text=Quero%20assinar%20o%20plano%20Grandes%20Empresas"
-                                    target="_blank" class="btn-glow"
-                                    style="display: flex; justify-content: center; text-decoration: none;">Fazer
-                                    Upgrade</a>
-                            </div>
-                        </div>
+                                                        <div>
+                                                            <label>Logotipo</label>
+                                                            <div style="display: flex; gap: 10px; align-items: center;">
+                                                                <label class="btn-glow"
+                                                                    style="margin: 0; cursor: pointer; display: inline-block; font-size: 0.9rem; padding: 10px 15px;">
+                                                                    Escolher Arquivo
+                                                                    <input type="file" id="logoInput" hidden
+                                                                        accept="image/*"
+                                                                        onchange="updatePreviewLogo(this)">
+                                                                </label>
+                                                                <span style="font-size: 0.8rem; color: #aaa;">Max 2MB
+                                                                    (PNG/JPG)</span>
+                                                            </div>
+                                                            <div id="logoPreviewContainer"
+                                                                style="margin-top: 10px; display: none;">
+                                                                <img id="logoPreviewImg" src=""
+                                                                    style="height: 40px; object-fit: contain;">
+                                                            </div>
+                                                        </div>
 
-                        <hr style="margin: 30px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+                                                        <div>
+                                                            <label>Título da Pergunta de Avaliação</label>
+                                                            <input type="text" id="questionTitleInput"
+                                                                class="input-light"
+                                                                placeholder="Ex: Como foi sua experiência?"
+                                                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;"
+                                                                oninput="updatePreviewText(this.value)">
+                                                        </div>
 
-                        <h3 style="margin-bottom: 20px; color: var(--danger);">Zona de Perigo</h3>
-                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Ações sensíveis
-                            relacionadas a sua conta.</p>
-                        <button
-                            style="border: 1px solid var(--danger); background: transparent; color: var(--danger); padding: 10px 20px; border-radius: 8px; cursor: pointer;">Alterar
-                            Senha de Acesso</button>
-                </section>
-            </div>
-        </div>
+                                                        <div>
+                                                            <label>Link de Redirecionamento (Opcional)</label>
+                                                            <p
+                                                                style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">
+                                                                Após avaliar, o cliente será enviado para este link (ex:
+                                                                Google Maps). Deixe vazio
+                                                                para mensagem padrão.
+                                                            </p>
+                                                            <input type="url" id="redirectUrlInput" class="input-light"
+                                                                placeholder="https://g.page/..."
+                                                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;">
+                                                        </div>
 
-        <!-- VIEW: SUPORTE -->
-        <div id="view-suporte" class="view-section" style="display: none;">
-            <section class="glass-panel" style="padding: 40px; text-align: center; margin-bottom: 30px;">
-                <h2 style="margin-bottom: 20px;">Precisa de Ajuda?</h2>
-                <p class="text-muted">Entre em contato: suporte@avaliaja.app.br</p>
-                <a href="https://wa.me/5511999999999" target="_blank" class="btn-glow"
-                    style="display: inline-flex; margin-top: 20px; text-decoration: none;">
-                    Falar no WhatsApp
-                </a>
-            </section>
+                                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                                            <input type="checkbox" id="showObsInput" checked
+                                                                onchange="togglePreviewObs(this.checked)"
+                                                                style="width: 20px; height: 20px;">
+                                                            <label for="showObsInput" style="margin: 0;">Permitir
+                                                                comentários
+                                                                (Observação)</label>
+                                                        </div>
 
-            <!-- Moved Updates Here -->
-            <section class="glass-panel" style="padding: 40px; max-width: 800px; margin: 0 auto;">
-                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
-                    <div style="font-size: 2rem;">🚀</div>
-                    <div>
-                        <h2 style="margin: 0;">Novidades e Atualizações</h2>
-                        <p style="color: var(--text-muted);">Confira o que há de novo no Avalia Já.</p>
-                    </div>
-                </div>
-                <div id="changelogContent" style="line-height: 1.6; color: #e2e8f0;">
-                    Carregando histórico...
-                </div>
-            </section>
-        </div>
+                                                        <hr
+                                                            style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
 
-        <!-- VIEW: PERSONALIZAÇÃO -->
-        <div id="view-personalizacao" class="view-section" style="display: none;">
-            <div style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
+                                                        <div>
+                                                            <label>Perguntas Adicionais</label>
+                                                            <p
+                                                                style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">
+                                                                Adicione perguntas
+                                                                extras para o cliente responder (ex: "Como conheceu?").
+                                                            </p>
+                                                            <div id="extraQuestionsList"
+                                                                style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+                                                            </div>
+                                                            <button type="button" onclick="addQuestionField()"
+                                                                class="btn-glow"
+                                                                style="background: rgba(255,255,255,0.1); font-size: 0.8rem; padding: 8px 15px;">+
+                                                                Adicionar Pergunta</button>
+                                                        </div>
 
-                <!-- Controls Column -->
-                <div style="flex: 1; min-width: 300px; max-width: 500px;">
-                    <section class="glass-panel" style="padding: 30px; margin-bottom: 20px;">
-                        <h2 style="margin-bottom: 20px;">Identidade Visual</h2>
-                        <p style="color: var(--text-muted); margin-bottom: 20px;">
-                            Customize a aparência em tempo real.
-                        </p>
-                        <form onsubmit="saveCustomization(event)" style="display: grid; gap: 20px;">
-                            <div>
-                                <label>Cor Principal</label>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <input type="color" id="colorInput" value="#4d4dff"
-                                        style="border: none; background: none; width: 50px; height: 50px; cursor: pointer;"
-                                        oninput="updatePreviewColor(this.value)">
-                                    <span style="font-size: 0.9rem; color: #ccc;">Clique para escolher</span>
-                                </div>
-                            </div>
+                                                        <button type="submit" class="btn-glow">💾 Salvar
+                                                            Alterações</button>
+                                                    </form>
+                                                </section>
+                                            </div>
 
-                            <div>
-                                <label>Logotipo</label>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <label class="btn-glow"
-                                        style="margin: 0; cursor: pointer; display: inline-block; font-size: 0.9rem; padding: 10px 15px;">
-                                        Escolher Arquivo
-                                        <input type="file" id="logoInput" hidden accept="image/*"
-                                            onchange="updatePreviewLogo(this)">
-                                    </label>
-                                    <span style="font-size: 0.8rem; color: #aaa;">Max 2MB (PNG/JPG)</span>
-                                </div>
-                                <div id="logoPreviewContainer" style="margin-top: 10px; display: none;">
-                                    <img id="logoPreviewImg" src="" style="height: 40px; object-fit: contain;">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label>Título da Pergunta de Avaliação</label>
-                                <input type="text" id="questionTitleInput" class="input-light"
-                                    placeholder="Ex: Como foi sua experiência?"
-                                    style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;"
-                                    oninput="updatePreviewText(this.value)">
-                            </div>
-
-                            <div>
-                                <label>Link de Redirecionamento (Opcional)</label>
-                                <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">
-                                    Após avaliar, o cliente será enviado para este link (ex: Google Maps). Deixe vazio
-                                    para mensagem padrão.
-                                </p>
-                                <input type="url" id="redirectUrlInput" class="input-light"
-                                    placeholder="https://g.page/..."
-                                    style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;">
-                            </div>
-
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <input type="checkbox" id="showObsInput" checked
-                                    onchange="togglePreviewObs(this.checked)" style="width: 20px; height: 20px;">
-                                <label for="showObsInput" style="margin: 0;">Permitir comentários
-                                    (Observação)</label>
-                            </div>
-
-                            <button type="submit" class="btn-glow">💾 Salvar Alterações</button>
-                        </form>
-                    </section>
-                </div>
-
-                <!-- Preview Column (Smartphone) -->
-                <div
-                    style="flex: 1; min-width: 320px; display: flex; justify-content: center; align-items: flex-start;">
-                    <div style="text-align: center;">
-                        <span
-                            style="display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem;">Visualização
-                            <h4 style="margin: 30px 0 10px 0;">Simulação (Mobile preview)</h4>
-                            <!-- Mobile Frame Container with Scale -->
-                            <div
-                                style="width: 380px; height: 700px; border: 12px solid #333; border-radius: 40px; overflow: hidden; position: relative; background: #fff; transform: scale(0.7); transform-origin: top left; margin-bottom: -200px;">
-                                <div style="width: 100%; height: 100%; overflow-y: auto;">
-                                    <iframe id="mobilePreviewIframe" src="/ex-atd.html"
-                                        style="width: 100%; height: 100%; border: none;"></iframe>
-                                </div>
-                            </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                            <!-- Preview Column (Smartphone) -->
+                                            <div
+                                                style="flex: 1; min-width: 320px; display: flex; justify-content: center; align-items: flex-start;">
+                                                <div style="text-align: center;">
+                                                    <span
+                                                        style="display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem;">Visualização
+                                                        <h4 style="margin: 30px 0 10px 0;">Simulação (Mobile preview)
+                                                        </h4>
+                                                        <!-- Mobile Frame Container with Scale -->
+                                                        <div
+                                                            style="width: 380px; height: 700px; border: 12px solid #333; border-radius: 40px; overflow: hidden; position: relative; background: #fff; transform: scale(0.7); transform-origin: top center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+                                                            <div style="width: 100%; height: 100%; overflow-y: auto;">
+                                                                <iframe id="mobilePreviewIframe" src="/ex-atd.html"
+                                                                    style="width: 100%; height: 100%; border: none;"></iframe>
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
 
 
@@ -1384,399 +1405,537 @@
         </div>
     </div>
 
+    <!-- SUGGESTION MODAL -->
+    <div class="modal-overlay" id="suggestionModal">
+        <div class="modal-content glass-panel" style="max-width: 500px;">
+            <h2 style="margin-bottom: 20px;">Nova Sugestão</h2>
+            <form onsubmit="submitSuggestion(event)">
+                <textarea id="suggestionText" placeholder="Descreva sua sugestão..." required
+                    style="width: 100%; height: 120px; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; resize: vertical;"></textarea>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn-secondary" onclick="closeSuggestionModal()">Cancelar</button>
+                    <button type="submit" class="btn-glow">Enviar Sugestão</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // --- AUTH & STATE ---
-        const token = localStorage.getItem('token');
-        if (!token) window.location.href = 'index.html';
+        // ... (Existing Scripts) ...
+        // --- SUGGESTIONS LOGIC ---
+        async function loadSuggestions() {
+            const list = document.getElementById('suggestionsList');
+            if (!list) return;
+            // list.innerHTML = '<p style="text-align:center; color:#ccc;">Carregando...</p>';
 
-        let globalData = {
-            metrics: {},
-            reviews: [],
-            reports: [], // New for Reports Tab
-            attendants: []
-        };
-
-        // --- NAVIGATION LOGIC ---
-        function toggleSidebar() {
-            document.querySelector('.sidebar').classList.toggle('active');
-            document.querySelector('.sidebar-overlay').classList.toggle('active');
-        }
-
-        function switchView(viewName, navElement) {
-            // Update Nav
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if (navElement) navElement.classList.add('active');
-
-            // Hide all views
-            document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
-
-            // Show selected
-            document.getElementById(`view-${viewName}`).style.display = 'block';
-
-            // Update Header
-            const titleMap = {
-                'dashboard': 'Visão Geral',
-                'attendants': 'Gestão de Atendentes',
-                'relatorios': 'Relatórios e Análise de Performance', // New Title
-                'personalizacao': 'Personalização',
-                'ajustes': 'Minha Conta',
-                'updates': 'Atualizações do Sistema',
-                'integracoes': 'Integrações',
-                'gestores': 'Gestores',
-                'suporte': 'Suporte'
-            };
-            const title = titleMap[viewName] || 'Painel';
-            document.getElementById('pageTitle').innerText = title;
-
-            // Handle section visibility (Supports both ID formats: view-NAME or NAMESection)
-            document.querySelectorAll('.view-section, .content-section').forEach(el => el.style.display = 'none');
-
-            const viewId = document.getElementById(`view-${viewName}`);
-            const sectionId = document.getElementById(`${viewName}Section`);
-
-            if (viewId) viewId.style.display = 'block';
-            if (sectionId) sectionId.style.display = 'block';
-        }
-
-        function switchTab(tabName, element) {
-            // Update Active Class
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if (element) {
-                element.classList.add('active');
-            } else {
-                // Try to find by onclick
-                const found = document.querySelector(`.nav-item[onclick*="'${tabName}'"]`);
-                if (found) found.classList.add('active');
-            }
-
-            switchView(tabName);
-
-            // Lazy Load Actions
-            if (tabName === 'gestores') loadUsers();
-            if (tabName === 'attendants') renderAttendantsList(globalData.attendants);
-            if (tabName === 'updates') loadChangelog();
-            if (tabName === 'suporte') loadChangelog(); // Load updates in Support tab too
-            if (tabName === 'relatorios') applyReportFilters(true); // Load initial reports
-        }
-
-        async function loadChangelog() {
-            const container = document.getElementById('changelogContent');
             try {
-                const res = await fetch('/changelog.md');
-                if (!res.ok) throw new Error("Erro ao carregar");
+                const res = await fetch('/api/suggestions');
+                const suggestions = await res.json();
 
-                // Check if we accidentally got HTML (login page or app shell)
-                const contentType = res.headers.get("content-type");
-                if (contentType && contentType.includes("text/html")) {
-                    throw new Error("Arquivo não encontrado (Retornou HTML)");
+                list.innerHTML = '';
+                if (suggestions.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:#666;">Nenhuma sugestão ainda. Seja o primeiro!</p>';
+                    return;
                 }
 
-                const text = await res.text();
-                // Parse using Marked (if available) or raw text
-                container.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : `<pre>${text}</pre>`;
-            } catch (e) {
-                console.error(e);
-                container.innerHTML = "Não foi possível carregar o histórico de versões.";
-            }
+                suggestions.forEach(s => {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px;';
+                    div.innerHTML = `
+                        <div style="flex: 1;">
+                            <p style="margin: 0; color: #fff; font-size: 1rem;">${s.text}</p>
+                            <span style="font-size: 0.75rem; color: #666;">${new Date(s.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <button onclick="voteSuggestion(${s.id}, 'like')" class="vote-btn" style="background: rgba(0,255,0,0.1); color: #4ade80; border: 1px solid rgba(0,255,0,0.2); padding: 5px 10px; border-radius: 6px; cursor: pointer;">
+                                👍 ${s.likes}
+                            </button>
+                            <button onclick="voteSuggestion(${s.id}, 'dislike')" class="vote-btn" style="background: rgba(255,0,0,0.1); color: #f87171; border: 1px solid rgba(255,0,0,0.2); padding: 5px 10px; border-radius: 6px; cursor: pointer;">
+                                👎 ${s.dislikes}
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch (e) { console.error(e); list.innerHTML = '<p style="color:red">Erro ao carregar.</p>'; }
         }
 
-        // --- CUSTOMIZATION LOGIC ---
-        async function loadCustomization() {
+        async function voteSuggestion(id, type) {
             try {
-                const res = await fetch('/api/company/settings', {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const res = await fetch(`/api/suggestions/${id}/vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ type })
                 });
                 if (res.ok) {
-                    const data = await res.json();
-
-                    // Populate Fields
-                    if (data.primaryColor) document.getElementById('colorInput').value = data.primaryColor;
-
-                    if (data.settings) {
-                        const s = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
-                        if (s.questionTitle) document.getElementById('questionTitleInput').value = s.questionTitle;
-                        if (s.redirectUrl) document.getElementById('redirectUrlInput').value = s.redirectUrl;
-                        if (s.showObservation !== undefined) document.getElementById('showObsInput').checked = s.showObservation;
-                    }
-
-                    if (data.notifications) {
-                        // Load N8N Webhook
-                        if (data.notifications.webhookUrl && document.getElementById('n8nWebhookInput')) {
-                            document.getElementById('n8nWebhookInput').value = data.notifications.webhookUrl;
-                        }
-                        // Load WhatsApp Numbers (existing logic might need check)
-                        if (data.notifications.whatsappNumbers && document.getElementById('whatsappInput')) {
-                            document.getElementById('whatsappInput').value = data.notifications.whatsappNumbers.join(', ');
-                        }
-                        if (data.notifications.notifyRule && document.getElementById('notifyRuleInput')) {
-                            document.getElementById('notifyRuleInput').value = data.notifications.notifyRule;
-                        }
-                    }
-
-                    if (data.logo) {
-                        const img = document.getElementById('logoPreviewImg');
-                        const container = document.getElementById('logoPreviewContainer');
-                        if (img && container) {
-                            img.src = data.logo;
-                            container.style.display = 'block';
-                        }
-                        if (document.getElementById('sidebarLogo')) {
-                            const sbLogo = document.getElementById('sidebarLogo');
-                            sbLogo.src = data.logo;
-                            // If it's the default logo path, add filter, else remove it
-                            if (data.logo.includes('logo.png')) {
-                                sbLogo.classList.add('logo-default-filter');
-                            } else {
-                                sbLogo.classList.remove('logo-default-filter');
-                            }
-                        }
-                    }
-                }
-            } catch (e) { console.error("Error loading settings", e); }
-        }
-
-        async function saveCustomization(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = "Salvando...";
-            btn.disabled = true;
-
-            const formData = new FormData();
-            formData.append('primaryColor', document.getElementById('colorInput').value);
-
-            const settings = {
-                questionTitle: document.getElementById('questionTitleInput').value,
-                redirectUrl: document.getElementById('redirectUrlInput').value,
-                showObservation: document.getElementById('showObsInput').checked
-            };
-            formData.append('settings', JSON.stringify(settings));
-
-            const logoFile = document.getElementById('logoInput').files[0];
-            if (logoFile) {
-                formData.append('logo', logoFile);
-            }
-
-            try {
-                const res = await fetch('/api/company/settings', {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${token}` }, // No Content-Type for FormData
-                    body: formData
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    alert('Alterações salvas com sucesso!');
-                    // Update preview immediately if logo changed
-                    if (data.company.logo) {
-                        const img = document.getElementById('logoPreviewImg');
-                        const container = document.getElementById('logoPreviewContainer');
-                        if (img && container) {
-                            img.src = data.company.logo;
-                            container.style.display = 'block';
-                        }
-                        if (document.getElementById('sidebarLogo')) {
-                            const sbLogo = document.getElementById('sidebarLogo');
-                            sbLogo.src = data.company.logo;
-                            // Check if default
-                            if (data.company.logo.includes('logo.png')) {
-                                sbLogo.classList.add('logo-default-filter');
-                            } else {
-                                sbLogo.classList.remove('logo-default-filter');
-                            }
-                        }
-                    }
-                } else {
-                    alert('Erro ao salvar.');
+                    loadSuggestions();
                 }
             } catch (e) { console.error(e); }
-
-            btn.innerText = originalText;
-            btn.disabled = false;
         }
 
-        // --- NEW HELPER FUNCTIONS ---
-        function checkPlanLimits(plan, count) {
-            const limits = { 'GRATIS': 5, 'PEQUENAS': 20, 'GRANDES': Infinity };
-            const limit = limits[plan] || 5;
-            const btn = document.querySelector('button[onclick="openAttendantModal()"]');
-
-            if (btn) {
-                if (count >= limit) {
-                    btn.disabled = true;
-                    btn.style.opacity = '0.5';
-                    btn.title = "Limite do plano atingido";
-                } else {
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                    btn.title = "";
-                }
-            }
+        function openSuggestionModal() {
+            document.getElementById('suggestionModal').classList.add('active');
+        }
+        function closeSuggestionModal() {
+            document.getElementById('suggestionModal').classList.remove('active');
         }
 
-        // --- COLOR GENERATOR ---
-        // Vivid Neon Palette for Dark Mode
-        const attendantColors = [
-            '#FF0055', // Neon Red
-            '#00FF99', // Neon Green
-            '#00CCFF', // Neon Blue
-            '#FFDD00', // Neon Yellow
-            '#FF6600', // Neon Orange
-            '#CC00FF', // Neon Purple
-            '#FF00AA', // Hot Pink
-            '#00FFFF', // Cyan
-            '#FF3333', // Bright Red
-            '#39FF14', // Electric Green
-            '#7DF9FF', // Electric Blue
-            '#FF1493', // Deep Pink
-            '#FFFF00', // Electric Yellow
-            '#BF00FF', // Electric Purple
-        ];
+        async function submitSuggestion(e) {
+            e.preventDefault();
+            const text = document.getElementById('suggestionText').value;
+            if (!text) return;
 
-        function getAttendantColor(name) {
-            if (!name) return '#ffffff';
-            let hash = 0;
-            for (let i = 0; i < name.length; i++) {
-                hash = name.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const index = Math.abs(hash % attendantColors.length);
-            return attendantColors[index];
+            try {
+                const res = await fetch('/api/suggestions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ text })
+                });
+                if (res.ok) {
+                    alert('Sugestão enviada!');
+                    closeSuggestionModal();
+                    document.getElementById('suggestionText').value = '';
+                    loadSuggestions();
+                } else alert('Erro ao enviar.');
+            } catch (e) { console.error(e); }
         }
+    </script>
+    // --- AUTH & STATE ---
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'index.html';
 
-        function renderRecentReviews(reviews, targetTbodyId = 'recentReviewsBody') {
-            const tbody = document.getElementById(targetTbodyId);
-            if (!tbody) return;
+    let globalData = {
+    metrics: {},
+    reviews: [],
+    reports: [], // New for Reports Tab
+    attendants: []
+    };
 
-            // Clear logic
-            if (globalData.reviewsPage === 1 && targetTbodyId === 'recentReviewsBody') tbody.innerHTML = '';
+    // --- NAVIGATION LOGIC ---
+    function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.querySelector('.sidebar-overlay').classList.toggle('active');
+    }
 
-            const isDashboard = targetTbodyId === 'recentReviewsBody';
+    function switchView(viewName, navElement) {
+    // Update Nav
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    if (navElement) navElement.classList.add('active');
 
-            reviews.forEach(item => {
-                const tr = document.createElement('tr');
-                const starsHtml = '★'.repeat(item.stars) + '☆'.repeat(5 - item.stars);
-                const attName = item.attendant ? item.attendant.name : 'Geral';
-                const attColor = getAttendantColor(attName);
-                const date = new Date(item.createdAt);
+    // Hide all views
+    document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
 
-                const baseColumns = `
-                    <td style="white-space: nowrap;"><span class="badge badge-attendant" style="color: ${attColor}; border: 1px solid ${attColor}; background: ${attColor}33; font-weight: bold; text-shadow: 0 0 10px ${attColor}44;">${attName}</span></td>
-                    <td style="white-space: nowrap;">${date.toLocaleDateString()} <small>${date.toLocaleTimeString().slice(0, 5)}</small></td>
-                    <td><span class="stars-display">${starsHtml}</span></td>
-                    <td>${item.comment || '-'}</td>
-                `;
+    // Show selected
+    document.getElementById(`view-${viewName}`).style.display = 'block';
 
-                if (isDashboard) {
-                    tr.innerHTML = baseColumns;
-                } else {
-                    // Reports View
-                    const ipDisplay = item.ip ? item.ip : 'N/A';
-                    const mapsLink = item.location ? `<a href="${item.location}" target="_blank" style="color: #4facfe;">📍 Ver Mapa</a>` : '-';
-                    const fullColumns = baseColumns + `
-                        <td>${ipDisplay}</td>
-                        <td>${mapsLink}</td>
-                        <td>${item.city || '-'} / ${item.state || '-'}</td>
-                         <!-- Device Column Removed -->
-                    `;
-                    tr.innerHTML = fullColumns;
-                }
-                tbody.appendChild(tr);
-            });
+    // Update Header
+    const titleMap = {
+    'dashboard': 'Visão Geral',
+    'attendants': 'Gestão de Atendentes',
+    'relatorios': 'Relatórios e Análise de Performance', // New Title
+    'personalizacao': 'Personalização',
+    'ajustes': 'Minha Conta',
+    'updates': 'Atualizações do Sistema',
+    'integracoes': 'Integrações',
+    'gestores': 'Gestores',
+    'suporte': 'Suporte'
+    };
+    const title = titleMap[viewName] || 'Painel';
+    document.getElementById('pageTitle').innerText = title;
+
+    // Handle section visibility (Supports both ID formats: view-NAME or NAMESection)
+    document.querySelectorAll('.view-section, .content-section').forEach(el => el.style.display = 'none');
+
+    const viewId = document.getElementById(`view-${viewName}`);
+    const sectionId = document.getElementById(`${viewName}Section`);
+
+    if (viewId) viewId.style.display = 'block';
+    if (sectionId) sectionId.style.display = 'block';
+    }
+
+    function switchTab(tabName, element) {
+    // Update Active Class
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    if (element) {
+    element.classList.add('active');
+    } else {
+    // Try to find by onclick
+    const found = document.querySelector(`.nav-item[onclick*="'${tabName}'"]`);
+    if (found) found.classList.add('active');
+    }
+
+    switchView(tabName);
+
+    // Lazy Load Actions
+    if (tabName === 'gestores') loadUsers();
+    if (tabName === 'attendants') renderAttendantsList(globalData.attendants);
+    if (tabName === 'updates') loadChangelog();
+    if (tabName === 'suporte') loadChangelog(); // Load updates in Support tab too
+    if (tabName === 'relatorios') applyReportFilters(true); // Load initial reports
+
+    // Handle "Novo Atendente" Button Logic
+    const btnAdd = document.getElementById('btnAddAttendant');
+    if (btnAdd) {
+    if (tabName === 'attendants') {
+    btnAdd.style.display = 'flex';
+    } else {
+    btnAdd.style.display = 'none';
+    }
+    }
+
+    if (tabName === 'integracoes') loadIntegrations();
+    if (tabName === 'suporte') loadSuggestions();
+    }
+
+    async function loadChangelog() {
+    const container = document.getElementById('changelogContent');
+    try {
+    const res = await fetch('/changelog.md');
+    if (!res.ok) throw new Error("Erro ao carregar");
+
+    // Check if we accidentally got HTML (login page or app shell)
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("text/html")) {
+    throw new Error("Arquivo não encontrado (Retornou HTML)");
+    }
+
+    const text = await res.text();
+    // Parse using Marked (if available) or raw text
+    container.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : `
+    <pre>${text}</pre>`;
+    } catch (e) {
+    console.error(e);
+    container.innerHTML = "Não foi possível carregar o histórico de versões.";
+    }
+    }
+
+    // --- CUSTOMIZATION LOGIC ---
+    async function loadCustomization() {
+    try {
+    const res = await fetch('/api/company/settings', {
+    headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) {
+    const data = await res.json();
+
+    // Populate Fields
+    if (data.primaryColor) document.getElementById('colorInput').value = data.primaryColor;
+
+    if (data.settings) {
+    const s = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
+    if (s.questionTitle) document.getElementById('questionTitleInput').value = s.questionTitle;
+    if (s.redirectUrl) document.getElementById('redirectUrlInput').value = s.redirectUrl;
+    if (s.showObservation !== undefined) document.getElementById('showObsInput').checked = s.showObservation;
+    }
+
+    if (data.notifications) {
+    // Load N8N Webhook
+    if (data.notifications.webhookUrl && document.getElementById('n8nWebhookInput')) {
+    document.getElementById('n8nWebhookInput').value = data.notifications.webhookUrl;
+    }
+    // Load WhatsApp Numbers (existing logic might need check)
+    if (data.notifications.whatsappNumbers && document.getElementById('whatsappInput')) {
+    document.getElementById('whatsappInput').value = data.notifications.whatsappNumbers.join(', ');
+    }
+    if (data.notifications.notifyRule && document.getElementById('notifyRuleInput')) {
+    document.getElementById('notifyRuleInput').value = data.notifications.notifyRule;
+    }
+    }
+
+    if (data.logo) {
+    const img = document.getElementById('logoPreviewImg');
+    const container = document.getElementById('logoPreviewContainer');
+    if (img && container) {
+    img.src = data.logo;
+    container.style.display = 'block';
+    }
+    if (document.getElementById('sidebarLogo')) {
+    const sbLogo = document.getElementById('sidebarLogo');
+    sbLogo.src = data.logo;
+    // If it's the default logo path, add filter, else remove it
+    if (data.logo.includes('logo.png')) {
+    sbLogo.classList.add('logo-default-filter');
+    } else {
+    sbLogo.classList.remove('logo-default-filter');
+    }
+    }
+
+    // UPDATE MOCKUP LOGO
+    const iframe = document.getElementById('mobilePreviewIframe');
+    if (iframe) {
+    iframe.onload = () => {
+    updateMockupLogo(data.logo);
+    // Inject Mockup Submit Disable
+    if (iframe.contentWindow) {
+    iframe.contentWindow.submitToApi = async () => alert('Modo de Simulação: Avaliação não enviada.');
+    }
+    };
+    // Also try immediately if already loaded
+    updateMockupLogo(data.logo);
+    }
+    }
+
+    // Load Questions
+    const qList = document.getElementById('extraQuestionsList');
+    if (qList && data.settings && data.settings.questions) {
+    qList.innerHTML = '';
+    data.settings.questions.forEach(q => addQuestionField(q));
+    }
+    }
+    } catch (e) { console.error("Error loading settings", e); }
+    }
+
+    async function saveCustomization(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerText;
+    btn.innerText = "Salvando...";
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('primaryColor', document.getElementById('colorInput').value);
+
+    const settings = {
+    questionTitle: document.getElementById('questionTitleInput').value,
+    redirectUrl: document.getElementById('redirectUrlInput').value,
+    showObservation: document.getElementById('showObsInput').checked,
+    questions: []
+    };
+
+    // Collect Questions
+    document.querySelectorAll('.extra-question-input').forEach(inp => {
+    if (inp.value.trim()) settings.questions.push(inp.value.trim());
+    });
+
+    formData.append('settings', JSON.stringify(settings));
+
+    const logoFile = document.getElementById('logoInput').files[0];
+    if (logoFile) {
+    formData.append('logo', logoFile);
+    }
+
+    try {
+    const res = await fetch('/api/company/settings', {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}` }, // No Content-Type for FormData
+    body: formData
+    });
+
+    if (res.ok) {
+    const data = await res.json();
+    alert('Alterações salvas com sucesso!');
+    // Update preview immediately if logo changed
+    if (data.company.logo) {
+    const img = document.getElementById('logoPreviewImg');
+    const container = document.getElementById('logoPreviewContainer');
+    if (img && container) {
+    img.src = data.company.logo;
+    container.style.display = 'block';
+    }
+    if (document.getElementById('sidebarLogo')) {
+    const sbLogo = document.getElementById('sidebarLogo');
+    sbLogo.src = data.company.logo;
+    // Check if default
+    if (data.company.logo.includes('logo.png')) {
+    sbLogo.classList.add('logo-default-filter');
+    } else {
+    sbLogo.classList.remove('logo-default-filter');
+    }
+    }
+    }
+    } else {
+    alert('Erro ao salvar.');
+    }
+    } catch (e) { console.error(e); }
+
+    btn.innerText = originalText;
+    btn.disabled = false;
+    }
+
+    // --- NEW HELPER FUNCTIONS ---
+    function checkPlanLimits(plan, count) {
+    const limits = { 'GRATIS': 5, 'PEQUENAS': 20, 'GRANDES': Infinity };
+    const limit = limits[plan] || 5;
+    const btn = document.querySelector('button[onclick="openAttendantModal()"]');
+
+    if (btn) {
+    if (count >= limit) {
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    btn.title = "Limite do plano atingido";
+    } else {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.title = "";
+    }
+    }
+    }
+
+    // --- COLOR GENERATOR ---
+    // Vivid Neon Palette for Dark Mode
+    const attendantColors = [
+    '#FF0055', // Neon Red
+    '#00FF99', // Neon Green
+    '#00CCFF', // Neon Blue
+    '#FFDD00', // Neon Yellow
+    '#FF6600', // Neon Orange
+    '#CC00FF', // Neon Purple
+    '#FF00AA', // Hot Pink
+    '#00FFFF', // Cyan
+    '#FF3333', // Bright Red
+    '#39FF14', // Electric Green
+    '#7DF9FF', // Electric Blue
+    '#FF1493', // Deep Pink
+    '#FFFF00', // Electric Yellow
+    '#BF00FF', // Electric Purple
+    ];
+
+    function getAttendantColor(name) {
+    if (!name) return '#ffffff';
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) { hash=name.charCodeAt(i) + ((hash << 5) - hash); } const index=Math.abs(hash
+        % attendantColors.length); return attendantColors[index]; } function renderRecentReviews(reviews,
+        targetTbodyId='recentReviewsBody' ) { const tbody=document.getElementById(targetTbodyId); if (!tbody) return; //
+        Clear logic if (globalData.reviewsPage===1 && targetTbodyId==='recentReviewsBody' ) tbody.innerHTML='' ; const
+        isDashboard=targetTbodyId==='recentReviewsBody' ; reviews.forEach(item=> {
+        const tr = document.createElement('tr');
+        const starsHtml = '★'.repeat(item.stars) + '☆'.repeat(5 - item.stars);
+        const attName = item.attendant ? item.attendant.name : 'Geral';
+        const attColor = getAttendantColor(attName);
+        const date = new Date(item.createdAt);
+
+        const baseColumns = `
+        <td style="white-space: nowrap;"><span class="badge badge-attendant"
+                style="color: ${attColor}; border: 1px solid ${attColor}; background: ${attColor}33; font-weight: bold; text-shadow: 0 0 10px ${attColor}44;">${attName}</span>
+        </td>
+        <td style="white-space: nowrap;">${date.toLocaleDateString()} <small>${date.toLocaleTimeString().slice(0,
+                5)}</small></td>
+        <td><span class="stars-display">${starsHtml}</span></td>
+        <td>${item.comment || '-'}</td>
+        `;
+
+        if (isDashboard) {
+        tr.innerHTML = baseColumns;
+        } else {
+        // Reports View
+        const ipDisplay = item.ip ? item.ip : 'N/A';
+        const mapsLink = item.location ? `<a href="${item.location}" target="_blank" style="color: #4facfe;">📍 Ver
+            Mapa</a>` : '-';
+        const fullColumns = baseColumns + `
+        <td>${ipDisplay}</td>
+        <td>${mapsLink}</td>
+        <td>${item.city || '-'} / ${item.state || '-'}</td>
+        <!-- Device Column Removed -->
+        `;
+        tr.innerHTML = fullColumns;
+        }
+        tbody.appendChild(tr);
+        });
         }
 
         // --- REPORTS & FILTERING LOGIC ---
 
         async function applyReportFilters(reset = false) {
-            const tbody = document.getElementById('reportsTableBody');
-            const btn = document.getElementById('btnLoadMoreReports');
+        const tbody = document.getElementById('reportsTableBody');
+        const btn = document.getElementById('btnLoadMoreReports');
 
-            if (reset) {
-                globalData.reports = [];
-                globalData.reportsPage = 1;
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Carregando dados...</td></tr>';
-                if (btn) btn.style.display = 'inline-block';
-            }
+        if (reset) {
+        globalData.reports = [];
+        globalData.reportsPage = 1;
+        tbody.innerHTML = '<tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Carregando dados...
+            </td>
+        </tr>';
+        if (btn) btn.style.display = 'inline-block';
+        }
 
-            // Get Filter Values
-            const start = document.getElementById('reportStartDate').value;
-            const end = document.getElementById('reportEndDate').value;
-            const search = document.getElementById('reportSearchInput').value;
+        // Get Filter Values
+        const start = document.getElementById('reportStartDate').value;
+        const end = document.getElementById('reportEndDate').value;
+        const search = document.getElementById('reportSearchInput').value;
 
-            // Build Query
-            const params = new URLSearchParams({
-                page: globalData.reportsPage || 1,
-                limit: 30
-            });
-            if (start) params.append('startDate', start);
-            if (end) params.append('endDate', end);
-            if (search) params.append('search', search);
+        // Build Query
+        const params = new URLSearchParams({
+        page: globalData.reportsPage || 1,
+        limit: 30
+        });
+        if (start) params.append('startDate', start);
+        if (end) params.append('endDate', end);
+        if (search) params.append('search', search);
 
-            try {
-                const res = await fetch(`/api/avaliacoes/list?${params.toString()}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+        try {
+        const res = await fetch(`/api/avaliacoes/list?${params.toString()}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-                if (!res.ok) throw new Error("Erro na API");
+        if (!res.ok) throw new Error("Erro na API");
 
-                const newReviews = await res.json();
+        const newReviews = await res.json();
 
-                if (reset) tbody.innerHTML = ''; // Clear loading message
+        if (reset) tbody.innerHTML = ''; // Clear loading message
 
-                if (newReviews.length === 0 && reset) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Nenhuma avaliação encontrada com estes filtros.</td></tr>';
-                    if (btn) btn.style.display = 'none';
-                    return;
-                }
+        if (newReviews.length === 0 && reset) {
+        tbody.innerHTML = '<tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Nenhuma avaliação
+                encontrada com estes filtros.</td>
+        </tr>';
+        if (btn) btn.style.display = 'none';
+        return;
+        }
 
-                if (newReviews.length > 0) {
-                    // Store/Append Data
-                    globalData.reports = reset ? newReviews : [...globalData.reports, ...newReviews];
-                    renderRecentReviews(newReviews, 'reportsTableBody');
-                } else {
-                    if (btn) {
-                        btn.innerText = "Fim dos resultados.";
-                        btn.disabled = true;
-                        setTimeout(() => { btn.style.display = 'none'; btn.disabled = false; btn.innerText = "Carregar Mais Avaliações"; }, 3000);
-                    }
-                }
+        if (newReviews.length > 0) {
+        // Store/Append Data
+        globalData.reports = reset ? newReviews : [...globalData.reports, ...newReviews];
+        renderRecentReviews(newReviews, 'reportsTableBody');
+        } else {
+        if (btn) {
+        btn.innerText = "Fim dos resultados.";
+        btn.disabled = true;
+        setTimeout(() => { btn.style.display = 'none'; btn.disabled = false; btn.innerText = "Carregar Mais Avaliações";
+        }, 3000);
+        }
+        }
 
-            } catch (e) {
-                console.error(e);
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #ef4444;">Erro ao carregar dados. Tente novamente.</td></tr>';
-            }
+        } catch (e) {
+        console.error(e);
+        tbody.innerHTML = '<tr>
+            <td colspan="8" style="text-align: center; padding: 20px; color: #ef4444;">Erro ao carregar dados. Tente
+                novamente.</td>
+        </tr>';
+        }
         }
 
         async function loadMoreReviews(targetId) {
-            // Handle Dashboard Loading
-            if (!targetId || targetId === 'recentReviewsBody') {
-                const btn = document.getElementById('btnLoadMore');
-                if (btn) btn.innerText = "Carregando...";
+        // Handle Dashboard Loading
+        if (!targetId || targetId === 'recentReviewsBody') {
+        const btn = document.getElementById('btnLoadMore');
+        if (btn) btn.innerText = "Carregando...";
 
-                globalData.reviewsPage = (globalData.reviewsPage || 1) + 1;
+        globalData.reviewsPage = (globalData.reviewsPage || 1) + 1;
 
-                try {
-                    const res = await fetch(`/api/avaliacoes/list?page=${globalData.reviewsPage}&limit=30`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    const newReviews = await res.json();
-                    if (newReviews.length > 0) {
-                        renderRecentReviews(newReviews, 'recentReviewsBody');
-                        if (btn) btn.innerText = "Carregar Mais...";
-                    } else {
-                        if (btn) { btn.innerText = "Fim."; btn.disabled = true; }
-                    }
-                } catch (e) { console.error(e); }
-                return;
-            }
+        try {
+        const res = await fetch(`/api/avaliacoes/list?page=${globalData.reviewsPage}&limit=30`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const newReviews = await res.json();
+        if (newReviews.length > 0) {
+        renderRecentReviews(newReviews, 'recentReviewsBody');
+        if (btn) btn.innerText = "Carregar Mais...";
+        } else {
+        if (btn) { btn.innerText = "Fim."; btn.disabled = true; }
+        }
+        } catch (e) { console.error(e); }
+        return;
+        }
 
-            if (targetId === 'reportsTableBody') {
-                globalData.reportsPage = (globalData.reportsPage || 1) + 1;
-                const btn = document.getElementById('btnLoadMoreReports');
-                if (btn) btn.innerText = "Carregando...";
-                applyReportFilters(false).then(() => {
-                    if (btn) btn.innerText = "Carregar Mais Avaliações";
-                });
-            }
+        if (targetId === 'reportsTableBody') {
+        globalData.reportsPage = (globalData.reportsPage || 1) + 1;
+        const btn = document.getElementById('btnLoadMoreReports');
+        if (btn) btn.innerText = "Carregando...";
+        applyReportFilters(false).then(() => {
+        if (btn) btn.innerText = "Carregar Mais Avaliações";
+        });
+        }
         }
 
         // --- INIT ---
@@ -1784,181 +1943,167 @@
         loadCustomization(); // Fetch settings on load
 
         function logout() {
-            localStorage.clear();
-            window.location.href = '/';
+        localStorage.clear();
+        window.location.href = '/';
         }
 
         // --- DATA LOADING ---
         async function loadDashboard() {
-            try {
-                const res = await fetch('/api/avaliacoes/dashboard', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+        try {
+        const res = await fetch('/api/avaliacoes/dashboard', {
+        headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-                if (!res.ok) throw new Error("Falha API");
+        if (!res.ok) throw new Error("Falha API");
 
-                const data = await res.json();
-                globalData = { ...globalData, ...data, reviewsPage: 1 }; // Reset page
+        const data = await res.json();
+        globalData = { ...globalData, ...data, reviewsPage: 1 }; // Reset page
 
-                if (planBadge) {
-                    planBadge.innerText = `PLANO ${data.plan || 'GRATIS'}`;
-                    planBadge.style.display = 'inline-block';
-                }
+        if (planBadge) {
+        planBadge.innerText = `PLANO ${data.plan || 'GRATIS'}`;
+        // Show only if GRATIS
+        if ((data.plan || 'GRATIS') === 'GRATIS') {
+        planBadge.style.display = 'inline-block';
+        } else {
+        planBadge.style.display = 'none';
+        }
+        }
 
-                // UPDATE PLAN CARDS
-                const currentPlan = data.plan || 'GRATIS';
-                document.querySelectorAll('.plan-card').forEach(card => {
-                    // Reset
-                    card.style.border = "1px solid transparent";
-                    card.style.background = "rgba(255,255,255,0.05)";
-                    const btn = card.querySelector('a, button');
-                    if (btn.tagName === 'BUTTON') {
-                        // Reset 'Atual' button check
-                        // If it's the current plan card, disable it. If not (downgrade?), maybe keep disabled or hide.
-                        // But for simplicity, we re-render buttons via logic below or just class toggle.
-                        // Actually simpler:
-                    }
-                });
+        // UPDATE PLAN CARDS
+        const currentPlan = data.plan || 'GRATIS';
+        document.querySelectorAll('.plan-card').forEach(card => {
+        // Reset
+        card.style.border = "1px solid transparent";
+        card.style.background = "rgba(255,255,255,0.05)";
+        const btn = card.querySelector('a, button');
+        if (btn.tagName === 'BUTTON') {
+        // Reset 'Atual' button check
+        // If it's the current plan card, disable it. If not (downgrade?), maybe keep disabled or hide.
+        // But for simplicity, we re-render buttons via logic below or just class toggle.
+        // Actually simpler:
+        }
+        });
 
-                // Highlight Current
-                const activeCard = document.getElementById(`plan-${currentPlan}`);
-                if (activeCard) {
-                    activeCard.style.border = "2px solid var(--accent)";
-                    activeCard.style.background = "rgba(77, 77, 255, 0.1)";
-                    // Change button to "Atual"
-                    const actionEl = activeCard.querySelector('.btn-glow') || activeCard.querySelector('button');
-                    if (actionEl) {
-                        const parent = actionEl.parentNode;
-                        parent.innerHTML += `<button disabled style="width: 100%; padding: 10px; background: var(--accent); border: none; color: #fff; border-radius: 6px;">Plano Atual</button>`;
-                        actionEl.remove();
-                    }
-                }
+        // Highlight Current
+        const activeCard = document.getElementById(`plan-${currentPlan}`);
+        if (activeCard) {
+        activeCard.style.border = "2px solid var(--accent)";
+        activeCard.style.background = "rgba(77, 77, 255, 0.1)";
+        // Change button to "Atual"
+        const actionEl = activeCard.querySelector('.btn-glow') || activeCard.querySelector('button');
+        if (actionEl) {
+        const parent = actionEl.parentNode;
+        parent.innerHTML += `<button disabled
+            style="width: 100%; padding: 10px; background: var(--accent); border: none; color: #fff; border-radius: 6px;">Plano
+            Atual</button>`;
+        actionEl.remove();
+        }
+        }
 
 
-                // Update Header Texts
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                document.getElementById('pageTitle').innerText = data.companyName;
-                document.getElementById('pageSubtitle').innerText = `Bem-vindo(a), ${user.name || 'Gestor'}. Aqui estão os resultados em tempo real.`;
+        // Update Header Texts
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('pageTitle').innerText = data.companyName;
+        document.getElementById('pageSubtitle').innerText = `Bem-vindo(a), ${user.name || 'Gestor'}. Aqui estão os
+        resultados em tempo real.`;
 
-                // Render All Views
-                renderMetrics(data.metrics);
-                renderCharts(data.attendants);
-                renderTable(data.reviews);
+        // Render All Views
+        renderMetrics(data.metrics);
+        renderCharts(data.attendants);
+        renderTable(data.reviews);
 
-                // New logic (Fixing order and adding new charts)
-                renderRecentReviews(data.reviews || []); // Ensure array
-                renderAttendantsList(data.attendants);
-                checkPlanLimits(data.plan, data.metrics.activeAttendants);
+        // New logic (Fixing order and adding new charts)
+        renderRecentReviews(data.reviews || []); // Ensure array
+        renderAttendantsList(data.attendants);
+        checkPlanLimits(data.plan, data.metrics.activeAttendants);
 
-                // Render New Charts (Map + Trend)
-                if (google && google.charts) {
-                    google.charts.setOnLoadCallback(() => renderNewCharts(data.reviewsByState, data.reviewsByDate));
-                }
+        // Render New Charts (Map + Trend)
+        if (google && google.charts) {
+        google.charts.setOnLoadCallback(() => renderNewCharts(data.reviewsByState, data.reviewsByDate));
+        }
 
-            } catch (e) {
-                console.error(e);
-            }
+        } catch (e) {
+        console.error(e);
+        }
         }
 
         function renderMetrics(metrics) {
-            const cards = document.querySelectorAll('.metric-value');
-            if (cards.length >= 4) {
-                cards[0].innerText = metrics.average ? metrics.average.toFixed(1) : '0.0';
-                cards[1].innerText = metrics.total;
-                cards[2].innerText = metrics.nps;
-                cards[3].innerText = metrics.activeAttendants;
-            }
+        const cards = document.querySelectorAll('.metric-value');
+        if (cards.length >= 4) {
+        cards[0].innerText = metrics.average ? metrics.average.toFixed(1) : '0.0';
+        cards[1].innerText = metrics.total;
+        cards[2].innerText = metrics.nps;
+        cards[3].innerText = metrics.activeAttendants;
+        }
         }
 
         let mainChartInstance = null;
         let pieChartInstance = null;
 
         function renderCharts(attendants) {
-            // MAIN CHART
-            const ctxMain = document.getElementById('mainChart').getContext('2d');
-            const labels = attendants.map(a => a.name);
-            const volume = attendants.map(a => a._count.reviews);
+        // MAIN CHART
+        const ctxMain = document.getElementById('mainChart').getContext('2d');
+        const labels = attendants.map(a => a.name);
+        const volume = attendants.map(a => a._count.reviews);
+        const colors = attendants.map(a => getAttendantColor(a.name));
 
-            if (mainChartInstance) mainChartInstance.destroy();
+        if (mainChartInstance) mainChartInstance.destroy();
 
-            mainChartInstance = new Chart(ctxMain, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Desempenho (Volume)',
-                        data: volume,
-                        backgroundColor: 'rgba(43, 29, 167, 0.6)',
-                        borderColor: '#4d4dff',
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-
-            // PIE CHART calculate from reviews
-            const starsCount = [0, 0, 0, 0, 0];
-            globalData.reviews.forEach(r => {
-                if (r.stars >= 1 && r.stars <= 5) starsCount[r.stars - 1]++;
-            });
-
-            const ctxPie = document.getElementById('pieChart').getContext('2d');
-            if (pieChartInstance) pieChartInstance.destroy();
-
-            pieChartInstance = new Chart(ctxPie, {
-                type: 'doughnut',
-                data: {
-                    labels: ['1 ★', '2 ★', '3 ★', '4 ★', '5 ★'],
-                    datasets: [{
-                        data: starsCount,
-                        backgroundColor: ['#ff5252', '#ff9100', '#ffd740', '#69f0ae', '#00c853'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'right' } }
-                }
-            });
+        mainChartInstance = new Chart(ctxMain, {
+        type: 'bar',
+        data: {
+        labels: labels,
+        datasets: [{
+        label: 'Desempenho (Volume)',
+        data: volume,
+        backgroundColor: colors,
+        borderColor: colors.map(c => c), // Same color or darken? Same is fine for neon.
+        borderWidth: 1,
+        borderRadius: 5
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true } }
         }
+        });
 
-        // --- NEW CHARTS (Map & Trend) ---
-        let trendChartInstance = null;
-
-        function renderNewCharts(byState, byDate) {
-            // 1. MAP (Google GeoChart)
-            // Transform { 'SP': 10, 'RJ': 5 } to [['State', 'Reviews'], ['BR-SP', 10], ...]
-            // Google GeoChart for Brazil uses "BR-XX" codes (ISO 3166-2:BR)
-            const mapData = [['Estado', 'Avaliações']];
-            if (byState && byState.length > 0) {
-                byState.forEach(item => {
-                    // item is { state: 'SP', _count: { id: 10 } } from Prisma groupBy
-                    if (item.state) {
-                        // Ensure state code is like "BR-SP"
-                        let code = item.state.toUpperCase();
-                        if (!code.startsWith('BR-')) code = 'BR-' + code;
-                        mapData.push([code, item._count.id]);
-                    }
-                });
+        // PIE CHART calculate from reviews
+        const starsCount = [0, 0, 0, 0, 0];
+        globalData.reviews.forEach(r => {
+        if (r.stars >= 1 && r.stars <= 5) starsCount[r.stars - 1]++; }); const
+            ctxPie=document.getElementById('pieChart').getContext('2d'); if (pieChartInstance)
+            pieChartInstance.destroy(); pieChartInstance=new Chart(ctxPie, { type: 'doughnut' , data: { labels: ['1
+            ★', '2 ★' , '3 ★' , '4 ★' , '5 ★' ], datasets: [{ data: starsCount, backgroundColor: ['#ff5252', '#ff9100'
+            , '#ffd740' , '#69f0ae' , '#00c853' ], borderWidth: 0 }] }, options: { responsive: true,
+            maintainAspectRatio: false, plugins: { legend: { position: 'right' } } } }); } // --- NEW CHARTS (Map &
+            Trend) --- let trendChartInstance=null; function renderNewCharts(byState, byDate) { // 1. MAP (Google
+            GeoChart) // Transform { 'SP' : 10, 'RJ' : 5 } to [['State', 'Reviews' ], ['BR-SP', 10], ...] // Google
+            GeoChart for Brazil uses "BR-XX" codes (ISO 3166-2:BR) const mapData=[['Estado', 'Avaliações' ]]; if
+            (byState && byState.length> 0) {
+            byState.forEach(item => {
+            // item is { state: 'SP', _count: { id: 10 } } from Prisma groupBy
+            if (item.state) {
+            // Ensure state code is like "BR-SP"
+            let code = item.state.toUpperCase();
+            if (!code.startsWith('BR-')) code = 'BR-' + code;
+            mapData.push([code, item._count.id]);
+            }
+            });
             } else {
-                mapData.push(['BR-DF', 0]); // Dummy to render map
+            mapData.push(['BR-DF', 0]); // Dummy to render map
             }
 
             const dataTable = google.visualization.arrayToDataTable(mapData);
             const options = {
-                region: 'BR', // Brazil
-                displayMode: 'regions',
-                resolution: 'provinces',
-                colorAxis: { colors: ['#e0f7fa', '#006064'] }, // Light to Dark Blue
-                backgroundColor: 'transparent',
-                datalessRegionColor: 'rgba(255,255,255,0.05)',
-                defaultColor: '#f5f5f5',
+            region: 'BR', // Brazil
+            displayMode: 'regions',
+            resolution: 'provinces',
+            colorAxis: { colors: ['#e0f7fa', '#006064'] }, // Light to Dark Blue
+            backgroundColor: 'transparent',
+            datalessRegionColor: 'rgba(255,255,255,0.05)',
+            defaultColor: '#f5f5f5',
             };
 
             const chart = new google.visualization.GeoChart(document.getElementById('geoChart'));
@@ -1974,274 +2119,273 @@
             const dataPoints = [];
             const today = new Date();
             for (let i = 29; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(today.getDate() - i);
-                const dayStr = d.toISOString().split('T')[0];
-                labels.push(dayStr.split('-').slice(1).join('/')); // MM/DD
-                dataPoints.push(byDate[dayStr] || 0);
+            const d = new Date();
+            d.setDate(today.getDate() - i);
+            const dayStr = d.toISOString().split('T')[0];
+            labels.push(dayStr.split('-').slice(1).join('/')); // MM/DD
+            dataPoints.push(byDate[dayStr] || 0);
             }
 
             if (trendChartInstance) trendChartInstance.destroy();
 
             trendChartInstance = new Chart(ctxTrend, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Avaliações Diárias',
-                        data: dataPoints,
-                        borderColor: '#00e676', // Green
-                        backgroundColor: 'rgba(0, 230, 118, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
-                        x: { grid: { display: false } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
+            type: 'line',
+            data: {
+            labels: labels,
+            datasets: [{
+            label: 'Avaliações Diárias',
+            data: dataPoints,
+            borderColor: '#00e676', // Green
+            backgroundColor: 'rgba(0, 230, 118, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 3
+            }]
+            },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+            x: { grid: { display: false } }
+            },
+            plugins: { legend: { display: false } }
+            }
             });
-        }
+            }
 
-        // Init Google Charts
-        google.charts.load('current', {
+            // Init Google Charts
+            google.charts.load('current', {
             'packages': ['geochart'],
-            'mapsApiKey': '' // Not needed for simple GeoChart? Check. Yes, old GeoChart (Flash/SVG) works without key usually? 
-            // Wait, Google Maps Key is required for Geocoding, but visualization.GeoChart uses SVG/VML. 
+            'mapsApiKey': '' // Not needed for simple GeoChart? Check. Yes, old GeoChart (Flash/SVG) works without key
+            usually?
+            // Wait, Google Maps Key is required for Geocoding, but visualization.GeoChart uses SVG/VML.
             // It should works.
-        });
+            });
 
-        function renderTable(reviews) {
+            function renderTable(reviews) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
             reviews.forEach(item => {
-                const tr = document.createElement('tr');
-                const starsHtml = '★'.repeat(item.stars) + '☆'.repeat(5 - item.stars);
-                const attName = item.attendant ? item.attendant.name : 'Geral';
-                const date = new Date(item.createdAt);
-                tr.innerHTML = `
-                    <td><span class="badge badge-attendant">${attName}</span></td>
-                    <td>${date.toLocaleDateString()} <small>${date.toLocaleTimeString().slice(0, 5)}</small></td>
-                    <td><span class="stars-display">${starsHtml}</span></td>
-                    <td>${item.comment || '-'}</td>
-                    <td>${item.city || '-'} / ${item.state || '-'}</td>
-                    <td><span class="badge badge-device">${item.device || '?'}</span></td>
-                `;
-                tbody.appendChild(tr);
+            const tr = document.createElement('tr');
+            const starsHtml = '★'.repeat(item.stars) + '☆'.repeat(5 - item.stars);
+            const attName = item.attendant ? item.attendant.name : 'Geral';
+            const date = new Date(item.createdAt);
+            tr.innerHTML = `
+            <td><span class="badge badge-attendant">${attName}</span></td>
+            <td>${date.toLocaleDateString()} <small>${date.toLocaleTimeString().slice(0, 5)}</small></td>
+            <td><span class="stars-display">${starsHtml}</span></td>
+            <td>${item.comment || '-'}</td>
+            <td>${item.city || '-'} / ${item.state || '-'}</td>
+            <td><span class="badge badge-device">${item.device || '?'}</span></td>
+            `;
+            tbody.appendChild(tr);
             });
-        }
+            }
 
-        // --- ATTENDANTS LIST & SORT ---
-        let attendantsSort = 'name'; // default
+            // --- ATTENDANTS LIST & SORT ---
+            let attendantsSort = 'name'; // default
 
-        function toggleAttendantSort() {
+            function toggleAttendantSort() {
             if (attendantsSort === 'name') attendantsSort = 'reviews';
             else attendantsSort = 'name';
             renderAttendantsList(globalData.attendants);
-        }
+            }
 
-        function renderAttendantsList(attendants) {
+            function renderAttendantsList(attendants) {
             const tbody = document.getElementById('attendantsTableBody');
 
             // Create Toolbar if not exists
             let toolbar = document.getElementById('atdToolbar');
             if (!toolbar) {
-                const container = document.querySelector('#view-attendants .glass-panel');
-                // Only insert if container exists and H2 exists
-                const h2 = container.querySelector('h2');
-                if (h2) {
-                    toolbar = document.createElement('div');
-                    toolbar.id = 'atdToolbar';
-                    toolbar.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;";
+            const container = document.querySelector('#view-attendants .glass-panel');
+            // Only insert if container exists and H2 exists
+            const h2 = container.querySelector('h2');
+            if (h2) {
+            toolbar = document.createElement('div');
+            toolbar.id = 'atdToolbar';
+            toolbar.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom:
+            20px;";
 
-                    // Helper text for Plan Limits (Initial placeholder, updated below)
-                    toolbar.innerHTML = `
-                        <div id="planUsageText" style="font-size: 0.9rem; color: var(--text-muted);">
-                           Uso do Plano: --
-                        </div>
-                        <button onclick="toggleAttendantSort()" style="background: rgba(255,255,255,0.1); border:none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-                            ⇅ Ordenar por Avaliações
-                        </button>
-                     `;
-                    h2.insertAdjacentElement('afterend', toolbar);
-                }
+            // Helper text for Plan Limits (Initial placeholder, updated below)
+            toolbar.innerHTML = `
+            <div id="planUsageText" style="font-size: 0.9rem; color: var(--text-muted);">
+                Uso do Plano: --
+            </div>
+            <button onclick="toggleAttendantSort()"
+                style="background: rgba(255,255,255,0.1); border:none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                ⇅ Ordenar por Avaliações
+            </button>
+            `;
+            h2.insertAdjacentElement('afterend', toolbar);
+            }
             }
 
             // Update Limit Text
             const limitTextEl = document.getElementById('planUsageText');
             if (limitTextEl && globalData.plan) {
-                const limits = { 'GRATIS': 5, 'PEQUENAS': 20, 'GRANDES': Infinity };
-                const limit = limits[globalData.plan] || 5;
-                const count = globalData.metrics.activeAttendants || 0;
-                const txt = limit === Infinity ? 'Ilimitado' : `${count}/${limit}`;
-                limitTextEl.innerHTML = `Uso do Plano: <strong style="color: #fff;">${txt}</strong> atendentes`;
+            const limits = { 'GRATIS': 5, 'PEQUENAS': 20, 'GRANDES': Infinity };
+            const limit = limits[globalData.plan] || 5;
+            const count = globalData.metrics.activeAttendants || 0;
+            const txt = limit === Infinity ? 'Ilimitado' : `${count}/${limit}`;
+            limitTextEl.innerHTML = `Uso do Plano: <strong style="color: #fff;">${txt}</strong> atendentes`;
             }
 
             // SORT DATA
             let sorted = [...attendants];
             if (attendantsSort === 'reviews') {
-                sorted.sort((a, b) => b._count.reviews - a._count.reviews);
+            sorted.sort((a, b) => b._count.reviews - a._count.reviews);
             } else {
-                sorted.sort((a, b) => a.name.localeCompare(b.name));
+            sorted.sort((a, b) => a.name.localeCompare(b.name));
             }
 
             tbody.innerHTML = '';
             sorted.forEach(att => {
-                const tr = document.createElement('tr');
-                const attColor = getAttendantColor(att.name);
-                const isActive = att.active !== false; // Default true if undefined
-                const statusBadge = isActive
-                    ? '<span style="color:#00e676;">Ativo</span>'
-                    : '<span style="color:#ef4444;">Inativo</span>';
+            const tr = document.createElement('tr');
+            const attColor = getAttendantColor(att.name);
+            const isActive = att.active !== false; // Default true if undefined
+            const statusBadge = isActive
+            ? '<span style="color:#00e676;">Ativo</span>'
+            : '<span style="color:#ef4444;">Inativo</span>';
 
-                tr.innerHTML = `
-                    <td><b style="color: ${attColor}; font-size: 1.05rem;">${att.name}</b></td>
-                    <td>${att.phone || '-'}</td>
-                    <td>${att.sector || '-'}</td>
-                    <td>${att.integrationId || '-'}</td>
-                    <td>${att._count.reviews} avaliações</td>
-                    <td>${statusBadge}</td>
-                    <td style="display:flex; gap:10px;">
-                        <button onclick="openAttendantModal('${att.id}')" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer;" title="Editar">
-                           ✏️
-                        </button>
-                        <button id="btn-copy-${att.name}" onclick="copyLinkByName('${att.name}')" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer;" title="Copiar Link">
-                           🔗
-                        </button>
-                        <button onclick="deleteAttendant('${att.id}', '${att.name}')" style="background:rgba(255,82,82,0.2); border:none; color:#ff5252; padding:5px 10px; border-radius:5px; cursor:pointer;" title="Excluir">
-                           🗑️
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            tr.innerHTML = `
+            <td><b style="color: ${attColor}; font-size: 1.05rem;">${att.name}</b></td>
+            <td>${att.phone || '-'}</td>
+            <td>${att.sector || '-'}</td>
+            <td>${att.integrationId || '-'}</td>
+            <td>${att._count.reviews} avaliações</td>
+            <td>${statusBadge}</td>
+            <td style="display:flex; gap:10px;">
+                <button onclick="openAttendantModal('${att.id}')"
+                    style="background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer;"
+                    title="Editar">
+                    ✏️
+                </button>
+                <button id="btn-copy-${att.name}" onclick="copyLinkByName('${att.name}')"
+                    style="background:rgba(255,255,255,0.1); border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer;"
+                    title="Copiar Link">
+                    🔗
+                </button>
+                <button onclick="deleteAttendant('${att.id}', '${att.name}')"
+                    style="background:rgba(255,82,82,0.2); border:none; color:#ff5252; padding:5px 10px; border-radius:5px; cursor:pointer;"
+                    title="Excluir">
+                    🗑️
+                </button>
+            </td>
+            `;
+            tbody.appendChild(tr);
             });
-        }
+            }
 
-        // --- FILTERING ---
-        document.getElementById('searchInput').addEventListener('input', (e) => {
+            // --- FILTERING ---
+            document.getElementById('searchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const filtered = globalData.reviews.filter(d =>
-                (d.attendant?.name.toLowerCase().includes(term)) ||
-                (d.city?.toLowerCase().includes(term))
+            (d.attendant?.name.toLowerCase().includes(term)) ||
+            (d.city?.toLowerCase().includes(term))
             );
             renderTable(filtered);
-        });
+            });
 
-        // --- EXPORT FUNCTIONS ---
+            // --- EXPORT FUNCTIONS ---
 
-        function getFilteredDataForExport() {
+            function getFilteredDataForExport() {
             // If in Reports tab, use the loaded reports
             const reportsView = document.getElementById('view-relatorios');
             if (reportsView && reportsView.style.display !== 'none' && globalData.reports.length > 0) {
-                return globalData.reports;
+            return globalData.reports;
             }
 
             // Fallback to existing dashboard logic
-            const startStr = document.getElementById('reportStartDate')?.value || document.getElementById('dateStart')?.value;
+            const startStr = document.getElementById('reportStartDate')?.value ||
+            document.getElementById('dateStart')?.value;
             const endStr = document.getElementById('reportEndDate')?.value || document.getElementById('dateEnd')?.value;
 
             let data = globalData.reviews;
 
             if (startStr || endStr) {
-                const start = startStr ? new Date(startStr) : new Date(0);
-                const end = endStr ? new Date(endStr) : new Date();
-                end.setHours(23, 59, 59, 999);
+            const start = startStr ? new Date(startStr) : new Date(0);
+            const end = endStr ? new Date(endStr) : new Date();
+            end.setHours(23, 59, 59, 999);
 
-                data = data.filter(r => {
-                    const d = new Date(r.createdAt);
-                    return d >= start && d <= end;
-                });
-            }
-            return data;
-        }
-
-        function exportToCSV() {
-            const data = getFilteredDataForExport();
-
-            const rows = [
-                ["Atendente", "Data", "Nota", "Comentario", "IP", "Localizacao", "Cidade", "Estado", "Dispositivo"]
-            ];
-
-            data.forEach(r => {
+            data = data.filter(r => {
+            const d = new Date(r.createdAt);
+            return d >= start && d <= end; }); } return data; } function exportToCSV() { const
+                data=getFilteredDataForExport(); const rows=[ ["Atendente", "Data" , "Nota" , "Comentario" , "IP"
+                , "Localizacao" , "Cidade" , "Estado" , "Dispositivo" ] ]; data.forEach(r=> {
                 const attName = r.attendant ? r.attendant.name : 'Geral';
                 const date = new Date(r.createdAt).toLocaleString();
 
                 rows.push([
-                    `"${attName}"`,
-                    `"${date}"`,
-                    r.stars,
-                    `"${(r.comment || '').replace(/"/g, '""')}"`,
-                    `"${r.ip || ''}"`,
-                    `"${r.location || ''}"`,
-                    `"${r.city || ''}"`,
-                    `"${r.state || ''}"`,
-                    `"${r.device || ''}"`
+                `"${attName}"`,
+                `"${date}"`,
+                r.stars,
+                `"${(r.comment || '').replace(/"/g, '""')}"`,
+                `"${r.ip || ''}"`,
+                `"${r.location || ''}"`,
+                `"${r.city || ''}"`,
+                `"${r.state || ''}"`,
+                `"${r.device || ''}"`
                 ]);
-            });
+                });
 
-            let csvContent = "data:text/csv;charset=utf-8,"
+                let csvContent = "data:text/csv;charset=utf-8,"
                 + rows.map(e => e.join(",")).join("\n");
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `avaliaja_relatorio_${Date.now()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `avaliaja_relatorio_${Date.now()}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                }
 
-        async function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const data = getFilteredDataForExport();
+                async function generatePDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const data = getFilteredDataForExport();
 
-            // Header
-            doc.setFontSize(20);
-            doc.text(globalData.companyName || "Relatório de Avaliações", 14, 22);
-            doc.setFontSize(10);
-            const today = new Date().toLocaleDateString();
-            doc.text(`Gerado em: ${today}`, 14, 30);
+                // Header
+                doc.setFontSize(20);
+                doc.text(globalData.companyName || "Relatório de Avaliações", 14, 22);
+                doc.setFontSize(10);
+                const today = new Date().toLocaleDateString();
+                doc.text(`Gerado em: ${today}`, 14, 30);
 
-            // Summary Stats (calculated from filtered data)
-            const total = data.length;
-            const avg = total > 0 ? (data.reduce((acc, curr) => acc + curr.stars, 0) / total).toFixed(1) : 0;
-            const nps = "N/A (Geral)"; // Simplification for PDF, or calc real NPS if needed
+                // Summary Stats (calculated from filtered data)
+                const total = data.length;
+                const avg = total > 0 ? (data.reduce((acc, curr) => acc + curr.stars, 0) / total).toFixed(1) : 0;
+                const nps = "N/A (Geral)"; // Simplification for PDF, or calc real NPS if needed
 
-            doc.text(`Total no período: ${total} | Média: ${avg}`, 14, 38);
+                doc.text(`Total no período: ${total} | Média: ${avg}`, 14, 38);
 
-            // Table
-            const tableBody = data.map(r => [
+                // Table
+                const tableBody = data.map(r => [
                 r.attendant ? r.attendant.name : 'Geral',
                 new Date(r.createdAt).toLocaleDateString(),
                 r.stars + ' ★',
                 r.comment || '-',
                 r.city || '-'
-            ]);
+                ]);
 
-            doc.autoTable({
+                doc.autoTable({
                 startY: 45,
                 head: [['Atendente', 'Data', 'Nota', 'Com.', 'Cidade']],
                 body: tableBody,
                 theme: 'grid',
                 headStyles: { fillColor: [43, 29, 167] }
-            });
+                });
 
-            doc.save(`relatorio_avaliaja_${Date.now()}.pdf`);
-        }
+                doc.save(`relatorio_avaliaja_${Date.now()}.pdf`);
+                }
 
-        // --- MODAL LOGIC ---
-        function openAttendantModal(attId = null) {
-            const m = document.getElementById('attendantModal');
-            m.classList.add('active');
+                // --- MODAL LOGIC ---
+                function openAttendantModal(attId = null) {
+                const m = document.getElementById('attendantModal');
+                m.classList.add('active');
 
-            if (attId) {
+                if (attId) {
                 // Edit Mode
                 const data = globalData.attendants.find(a => a.id === attId);
                 if (!data) return alert("Erro: Atendente não encontrado.");
@@ -2251,10 +2395,11 @@
                 document.getElementById('attendantPhoneInput').value = data.phone || '';
                 document.getElementById('attendantSectorInput').value = data.sector || '';
                 document.getElementById('attendantIntegrationIdInput').value = data.integrationId || '';
-                document.getElementById('attendantNotifyInput').checked = data.notify !== false; // Default true (conceptually)
+                document.getElementById('attendantNotifyInput').checked = data.notify !== false; // Default true
+                (conceptually)
                 document.getElementById('attendantActiveInput').checked = data.active !== false;
                 document.getElementById('resultArea').style.display = 'none';
-            } else {
+                } else {
                 // Create Mode
                 document.getElementById('attendantIdInput').value = '';
                 document.getElementById('attendantNameInput').value = '';
@@ -2264,214 +2409,215 @@
                 document.getElementById('attendantNotifyInput').checked = true;
                 document.getElementById('attendantActiveInput').checked = true;
                 document.getElementById('resultArea').style.display = 'none';
-            }
-        }
+                }
+                }
 
-        function closeAttendantModal() {
-            document.getElementById('attendantModal').classList.remove('active');
-            // Wait a bit to refresh so the user sees the close animation?
-            // Actually, we should refresh list immediately.
-            loadDashboard();
-        }
+                function closeAttendantModal() {
+                document.getElementById('attendantModal').classList.remove('active');
+                // Wait a bit to refresh so the user sees the close animation?
+                // Actually, we should refresh list immediately.
+                loadDashboard();
+                }
 
-        function getCompSlug() {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            return user.companySlug || 'empresa'; // Fallback
-        }
+                function getCompSlug() {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                return user.companySlug || 'empresa'; // Fallback
+                }
 
-        async function saveAttendant() {
-            const id = document.getElementById('attendantIdInput').value.trim();
-            const name = document.getElementById('attendantNameInput').value.trim();
-            if (!name) return alert("O nome é obrigatório.");
+                async function saveAttendant() {
+                const id = document.getElementById('attendantIdInput').value.trim();
+                const name = document.getElementById('attendantNameInput').value.trim();
+                if (!name) return alert("O nome é obrigatório.");
 
-            const phone = document.getElementById('attendantPhoneInput').value.trim();
-            const sector = document.getElementById('attendantSectorInput').value.trim();
-            const integrationId = document.getElementById('attendantIntegrationIdInput').value.trim();
-            const notify = document.getElementById('attendantNotifyInput').checked;
-            const active = document.getElementById('attendantActiveInput').checked;
+                const phone = document.getElementById('attendantPhoneInput').value.trim();
+                const sector = document.getElementById('attendantSectorInput').value.trim();
+                const integrationId = document.getElementById('attendantIntegrationIdInput').value.trim();
+                const notify = document.getElementById('attendantNotifyInput').checked;
+                const active = document.getElementById('attendantActiveInput').checked;
 
-            const btn = document.querySelector('button[onclick="saveAttendant()"]');
-            const originalText = btn.innerText;
-            btn.innerText = "Salvando...";
-            btn.disabled = true;
+                const btn = document.querySelector('button[onclick="saveAttendant()"]');
+                const originalText = btn.innerText;
+                btn.innerText = "Salvando...";
+                btn.disabled = true;
 
-            const payload = {
+                const payload = {
                 name,
                 phone: phone || null,
                 sector: sector || null,
                 integrationId: integrationId || null,
                 notify,
                 active
-            };
+                };
 
-            try {
+                try {
                 let res;
                 if (id) {
-                    // Update
-                    res = await fetch(`/api/atendentes/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify(payload)
-                    });
+                // Update
+                res = await fetch(`/api/atendentes/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(payload)
+                });
                 } else {
-                    // Create
-                    res = await fetch('/api/atendentes', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify(payload)
-                    });
+                // Create
+                res = await fetch('/api/atendentes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(payload)
+                });
                 }
 
                 if (res.ok) {
-                    const saved = await res.json();
+                const saved = await res.json();
 
-                    if (id) {
-                        alert('Atendente atualizado com sucesso!');
-                        closeAttendantModal();
-                    } else {
-                        // If created, populate link area
-                        const slug = getCompSlug();
-                        const origin = window.location.origin;
-                        const fullLink = `${origin}/${slug}/${encodeURIComponent(saved.name)}`;
+                if (id) {
+                alert('Atendente atualizado com sucesso!');
+                closeAttendantModal();
+                } else {
+                // If created, populate link area
+                const slug = getCompSlug();
+                const origin = window.location.origin;
+                const fullLink = `${origin}/${slug}/${encodeURIComponent(saved.name)}`;
 
-                        document.getElementById('generatedLink').value = fullLink;
-                        document.getElementById('resultArea').style.display = 'block';
-                        btn.innerText = "Salvo!";
+                document.getElementById('generatedLink').value = fullLink;
+                document.getElementById('resultArea').style.display = 'block';
+                btn.innerText = "Salvo!";
 
-                        // We also refresh the background list, but don't close modal yet so they can copy link
-                        loadDashboard();
+                // We also refresh the background list, but don't close modal yet so they can copy link
+                loadDashboard();
 
-                        setTimeout(() => {
-                            btn.innerText = originalText;
-                            btn.disabled = false;
-                        }, 2000);
-                        return; // Exit early to keep modal open
-                    }
+                setTimeout(() => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                }, 2000);
+                return; // Exit early to keep modal open
+                }
 
                 } else {
-                    const err = await res.json();
-                    alert('Erro: ' + (err.error || 'Erro desconhecido'));
+                const err = await res.json();
+                alert('Erro: ' + (err.error || 'Erro desconhecido'));
                 }
-            } catch (e) {
+                } catch (e) {
                 console.error(e);
                 alert('Erro de conexão: ' + (e.message || e));
-            }
+                }
 
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
+                btn.innerText = originalText;
+                btn.disabled = false;
+                }
 
-        function copyLink() {
-            const copyText = document.getElementById("generatedLink");
-            copyText.select();
-            copyText.setSelectionRange(0, 99999); // Mobile compatibility
-            navigator.clipboard.writeText(copyText.value);
+                function copyLink() {
+                const copyText = document.getElementById("generatedLink");
+                copyText.select();
+                copyText.setSelectionRange(0, 99999); // Mobile compatibility
+                navigator.clipboard.writeText(copyText.value);
 
-            const btn = document.getElementById('btnCopy');
-            const original = btn.innerText;
-            btn.innerText = "Copiado!";
-            btn.style.background = "#00e676";
-            setTimeout(() => {
+                const btn = document.getElementById('btnCopy');
+                const original = btn.innerText;
+                btn.innerText = "Copiado!";
+                btn.style.background = "#00e676";
+                setTimeout(() => {
                 btn.innerText = original;
                 btn.style.background = "var(--primary-blue)";
-            }, 2000);
-        }
+                }, 2000);
+                }
 
-        function copyLinkByName(name) {
-            const slug = getCompSlug();
-            const origin = window.location.origin;
-            // Format: domain.com/SLUG/NAME
-            const fullLink = `${origin}/${slug}/${encodeURIComponent(name)}`;
+                function copyLinkByName(name) {
+                const slug = getCompSlug();
+                const origin = window.location.origin;
+                // Format: domain.com/SLUG/NAME
+                const fullLink = `${origin}/${slug}/${encodeURIComponent(name)}`;
 
-            navigator.clipboard.writeText(fullLink);
+                navigator.clipboard.writeText(fullLink);
 
-            // Visual feedback
-            const btn = document.getElementById(`btn-copy-${name}`);
-            if (btn) {
+                // Visual feedback
+                const btn = document.getElementById(`btn-copy-${name}`);
+                if (btn) {
                 const original = btn.innerText;
                 btn.innerText = "Copiado! ✓";
                 btn.style.background = "#00e676";
                 btn.style.color = "#fff";
                 setTimeout(() => {
-                    btn.innerText = original;
-                    btn.style.background = "rgba(255,255,255,0.1)";
-                    btn.style.color = "#fff";
+                btn.innerText = original;
+                btn.style.background = "rgba(255,255,255,0.1)";
+                btn.style.color = "#fff";
                 }, 2000);
-            }
-        }
+                }
+                }
 
-        async function deleteAttendant(id, name) {
-            if (!confirm(`Tem certeza que deseja excluir ${name}? Todas as avaliações dele serão apagadas.`)) return;
+                async function deleteAttendant(id, name) {
+                if (!confirm(`Tem certeza que deseja excluir ${name}? Todas as avaliações dele serão apagadas.`))
+                return;
 
-            try {
+                try {
                 const res = await fetch(`/api/atendentes/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {
-                    loadDashboard(); // Reload logic
+                loadDashboard(); // Reload logic
                 } else {
-                    alert("Erro ao excluir");
+                alert("Erro ao excluir");
                 }
-            } catch (e) {
+                } catch (e) {
                 console.error(e);
-            }
-        }
+                }
+                }
 
-        window.onclick = function (e) {
-            // Only close if clicked strictly on overlay, not content
-            if (e.target == document.getElementById('attendantModal')) closeAttendantModal();
-        }
+                window.onclick = function (e) {
+                // Only close if clicked strictly on overlay, not content
+                if (e.target == document.getElementById('attendantModal')) closeAttendantModal();
+                }
 
-        // Init
-        loadDashboard();
+                // Init
+                loadDashboard();
 
-        // --- PREVIEW LOGIC (POSTMESSAGE) ---
-        function updatePreviewColor(color) {
-            const frame = document.getElementById('previewIframe');
-            if (frame && frame.contentWindow) {
+                // --- PREVIEW LOGIC (POSTMESSAGE) ---
+                function updatePreviewColor(color) {
+                const frame = document.getElementById('previewIframe');
+                if (frame && frame.contentWindow) {
                 frame.contentWindow.postMessage({ type: 'UPDATE_COLOR', color: color }, '*');
-            }
-        }
+                }
+                }
 
-        function updatePreviewText(text) {
-            const frame = document.getElementById('previewIframe');
-            if (frame && frame.contentWindow) {
+                function updatePreviewText(text) {
+                const frame = document.getElementById('previewIframe');
+                if (frame && frame.contentWindow) {
                 frame.contentWindow.postMessage({ type: 'UPDATE_TEXT', text: text }, '*');
-            }
-        }
+                }
+                }
 
-        function togglePreviewObs(show) {
-            const frame = document.getElementById('previewIframe');
-            if (frame && frame.contentWindow) {
+                function togglePreviewObs(show) {
+                const frame = document.getElementById('previewIframe');
+                if (frame && frame.contentWindow) {
                 frame.contentWindow.postMessage({ type: 'TOGGLE_OBS', show: show }, '*');
-            }
-        }
+                }
+                }
 
-        function updatePreviewLogo(input) {
-            if (input.files && input.files[0]) {
+                function updatePreviewLogo(input) {
+                if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    const base64 = e.target.result;
-                    // Show small preview in dashboard
-                    document.getElementById('logoPreviewContainer').style.display = 'block';
-                    document.getElementById('logoPreviewImg').src = base64;
-                    // Send to Iframe
-                    const frame = document.getElementById('previewIframe');
-                    if (frame && frame.contentWindow) {
-                        frame.contentWindow.postMessage({ type: 'UPDATE_LOGO', src: base64 }, '*');
-                    }
+                const base64 = e.target.result;
+                // Show small preview in dashboard
+                document.getElementById('logoPreviewContainer').style.display = 'block';
+                document.getElementById('logoPreviewImg').src = base64;
+                // Send to Iframe
+                const frame = document.getElementById('previewIframe');
+                if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage({ type: 'UPDATE_LOGO', src: base64 }, '*');
+                }
                 }
                 reader.readAsDataURL(input.files[0]);
-            }
-        }
+                }
+                }
 
-        // --- NEW FEATURES LOGIC ---
+                // --- NEW FEATURES LOGIC ---
 
-        async function loadUsers() {
-            try {
+                async function loadUsers() {
+                try {
                 const res = await fetch('/api/company/users', {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const users = await res.json();
                 const tbody = document.getElementById('usersTableBody');
@@ -2483,233 +2629,550 @@
 
                 let displayUsers = [...users];
                 if (currentUser.email && !hasCurrent) {
-                    displayUsers.unshift({
-                        name: currentUser.name + ' (Você)',
-                        email: currentUser.email,
-                        role: 'admin', // Assume admin
-                        isSelf: true
-                    });
+                displayUsers.unshift({
+                name: currentUser.name + ' (Você)',
+                email: currentUser.email,
+                role: 'admin', // Assume admin
+                isSelf: true
+                });
                 }
 
                 displayUsers.forEach(u => {
-                    const isSelf = u.email === currentUser.email || u.isSelf;
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${u.name} ${isSelf ? '<span class="badge" style="background:var(--accent); font-size:0.7em;">VOCÊ</span>' : ''}</td>
-                            <td>${u.email}</td>
-                            <td><span class="badge" style="background: rgba(255,255,255,0.1);">${u.role || 'user'}</span></td>
-                            <td><span style="color: var(--success);">Ativo</span></td>
-                            <td>
-                                ${!isSelf ? '<button onclick="alert(\'Ação restrita.\')" style="border:none; background:none; cursor:pointer;" title="Remover">❌</button>' : ''}
-                            </td>
-                        </tr>
-                    `;
+                const isSelf = u.email === currentUser.email || u.isSelf;
+                tbody.innerHTML += `
+                <tr>
+                    <td>${u.name} ${isSelf ? '<span class="badge"
+                            style="background:var(--accent); font-size:0.7em;">VOCÊ</span>' : ''}</td>
+                    <td>${u.email}</td>
+                    <td><span class="badge" style="background: rgba(255,255,255,0.1);">${u.role || 'user'}</span></td>
+                    <td><span style="color: var(--success);">Ativo</span></td>
+                    <td>
+                        <button onclick="changeUserPassword('${u.id}')"
+                            style="border:none; background:none; cursor:pointer; margin-right: 10px;"
+                            title="Alterar Senha">🔑</button>
+                        ${!isSelf ? '<button onclick="alert(\'Ação restrita.\')"
+                            style="border:none; background:none; cursor:pointer;" title="Remover">❌</button>' : ''}
+                    </td>
+                </tr>
+                `;
                 });
-            } catch (e) { console.error(e); }
-        }
+                } catch (e) { console.error(e); }
+                }
 
-        function openUserModal() {
-            document.getElementById('userModal').classList.add('active');
-        }
+                function openUserModal() {
+                document.getElementById('userModal').classList.add('active');
+                }
 
-        async function handleInviteUser(e) {
-            e.preventDefault();
-            const form = e.target;
-            const data = {
+                async function handleInviteUser(e) {
+                e.preventDefault();
+                const form = e.target;
+                const data = {
                 name: form.name.value,
                 email: form.email.value,
                 password: form.password.value
-            };
+                };
 
-            try {
+                try {
                 const res = await fetch('/api/company/users', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(data)
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(data)
                 });
                 if (res.ok) {
-                    alert('Usuário convidado!');
-                    document.getElementById('userModal').classList.remove('active');
-                    loadUsers();
-                    form.reset();
+                alert('Usuário convidado!');
+                document.getElementById('userModal').classList.remove('active');
+                loadUsers();
+                form.reset();
                 } else {
-                    alert('Erro ao convidar');
+                alert('Erro ao convidar');
                 }
-            } catch (e) { console.error(e); }
-        }
+                } catch (e) { console.error(e); }
+                }
 
-        async function saveIntegrations(e) {
-            e.preventDefault();
-            const whatsappRaw = document.getElementById('whatsappInput') ? document.getElementById('whatsappInput').value : '';
-            // Split comma, trim
-            const whatsappNumbers = whatsappRaw.split(',').map(s => s.trim()).filter(s => s);
+                async function saveIntegrations(e) {
+                e.preventDefault();
+                const whatsappRaw = document.getElementById('whatsappInput') ?
+                document.getElementById('whatsappInput').value : '';
+                // Split comma, trim
+                const whatsappNumbers = whatsappRaw.split(',').map(s => s.trim()).filter(s => s);
 
-            const notificationRule = document.getElementById('notifyRuleInput') ? document.getElementById('notifyRuleInput').value : 'all';
+                const notificationRule = document.getElementById('notifyRuleInput') ?
+                document.getElementById('notifyRuleInput').value : 'all';
 
-            // N8N Webhook
-            const webhookUrl = document.getElementById('n8nWebhookInput') ? document.getElementById('n8nWebhookInput').value : '';
+                // N8N Webhook
+                const webhookUrl = document.getElementById('n8nWebhookInput') ?
+                document.getElementById('n8nWebhookInput').value : '';
 
-            try {
+                try {
                 const res = await fetch('/api/company/settings', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({
-                        whatsapp: whatsappNumbers[0] || "", // Primary
-                        notifications: JSON.stringify({
-                            whatsappRule: notificationRule,
-                            whatsappNumbers: whatsappNumbers, // Save array
-                            webhookUrl: webhookUrl // Save N8N URL
-                        })
-                    })
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                whatsapp: whatsappNumbers[0] || "", // Primary
+                notifications: JSON.stringify({
+                whatsappRule: notificationRule,
+                whatsappNumbers: whatsappNumbers, // Save array
+                webhookUrl: webhookUrl // Save N8N URL
+                })
+                })
                 });
                 if (res.ok) alert('Integrações salvas com sucesso!');
-            } catch (e) { console.error(e); }
-        }
+                } catch (e) { console.error(e); }
+                }
 
-        async function saveAccountDetails(e) {
-            e.preventDefault();
-            const name = document.getElementById('companyNameInput').value;
-            const area = document.getElementById('companyAreaInput').value;
+                async function saveAccountDetails(e) {
+                e.preventDefault();
+                const name = document.getElementById('companyNameInput').value;
+                const area = document.getElementById('companyAreaInput').value;
 
-            try {
+                try {
                 const res = await fetch('/api/company/settings', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ name, area })
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ name, area })
                 });
                 if (res.ok) alert('Dados salvos!');
-            } catch (e) { console.error(e); }
-        }
+                } catch (e) { console.error(e); }
+                }
 
-        // --- DATE FILTER & PDF LOGIC ---
+                // --- DATE FILTER & PDF LOGIC ---
 
-        function filterDashboardByDate() {
-            const startInput = document.getElementById('dateStart').value;
-            const endInput = document.getElementById('dateEnd').value;
+                function filterDashboardByDate() {
+                const startInput = document.getElementById('dateStart').value;
+                const endInput = document.getElementById('dateEnd').value;
 
-            if (!globalData.originalReviews) {
+                if (!globalData.originalReviews) {
                 // Keep backup of originals on first run
                 globalData.originalReviews = [...globalData.reviews];
-            }
+                }
 
-            let filtered = [...globalData.originalReviews];
+                let filtered = [...globalData.originalReviews];
 
-            if (startInput) {
+                if (startInput) {
                 const start = new Date(startInput);
                 filtered = filtered.filter(r => new Date(r.createdAt) >= start);
-            }
-            if (endInput) {
+                }
+                if (endInput) {
                 const end = new Date(endInput);
                 end.setHours(23, 59, 59); // End of day
-                filtered = filtered.filter(r => new Date(r.createdAt) <= end);
-            }
+                filtered = filtered.filter(r => new Date(r.createdAt) <= end); } // Recalculate Metrics const
+                    total=filtered.length; const avg=total> 0 ? (filtered.reduce((acc, r) => acc + r.stars, 0) / total)
+                    : 0;
 
-            // Recalculate Metrics
-            const total = filtered.length;
-            const avg = total > 0 ? (filtered.reduce((acc, r) => acc + r.stars, 0) / total) : 0;
+                    // NPS Calculation
+                    const promoters = filtered.filter(r => r.stars >= 5).length;
+                    const detractors = filtered.filter(r => r.stars <= 3).length; const nps=total> 0 ?
+                        Math.round(((promoters - detractors) / total) * 100) : 0;
 
-            // NPS Calculation
-            const promoters = filtered.filter(r => r.stars >= 5).length;
-            const detractors = filtered.filter(r => r.stars <= 3).length;
-            const nps = total > 0 ? Math.round(((promoters - detractors) / total) * 100) : 0;
+                        // Update UI
+                        renderMetrics({
+                        average: avg,
+                        total: total,
+                        nps: nps,
+                        activeAttendants: globalData.metrics.activeAttendants // Keep static
+                        });
 
-            // Update UI
-            renderMetrics({
-                average: avg,
-                total: total,
-                nps: nps,
-                activeAttendants: globalData.metrics.activeAttendants // Keep static
-            });
+                        // Update Global for other renders
+                        globalData.reviews = filtered;
 
-            // Update Global for other renders
-            globalData.reviews = filtered;
+                        // Recalc chart data (mock reconstruction)
+                        // Ideally we'd re-aggregate by attendant, but for now we rely on review attendant data
+                        const attMap = {};
+                        filtered.forEach(r => {
+                        const name = r.attendant ? r.attendant.name : 'Geral';
+                        if (!attMap[name]) attMap[name] = 0;
+                        attMap[name]++;
+                        });
+                        // Rebuild mock attendant object for chart
+                        const mockAttendants = Object.keys(attMap).map(name => ({
+                        name: name,
+                        _count: { reviews: attMap[name] }
+                        }));
 
-            // Recalc chart data (mock reconstruction)
-            // Ideally we'd re-aggregate by attendant, but for now we rely on review attendant data
-            const attMap = {};
-            filtered.forEach(r => {
-                const name = r.attendant ? r.attendant.name : 'Geral';
-                if (!attMap[name]) attMap[name] = 0;
-                attMap[name]++;
-            });
-            // Rebuild mock attendant object for chart
-            const mockAttendants = Object.keys(attMap).map(name => ({
-                name: name,
-                _count: { reviews: attMap[name] }
-            }));
+                        renderCharts(mockAttendants); // This replots Main Chart
+                        renderRecentReviews(filtered.slice(0, 30));
+                        }
 
-            renderCharts(mockAttendants); // This replots Main Chart
-            renderRecentReviews(filtered.slice(0, 30));
-        }
+                        function exportDashboardPDF() {
+                        const element = document.getElementById('view-dashboard');
+                        const opt = {
+                        margin: 0.5,
+                        filename: 'Relatorio_AvaliaJa.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                        };
 
-        function exportDashboardPDF() {
-            const element = document.getElementById('view-dashboard');
-            const opt = {
-                margin: 0.5,
-                filename: 'Relatorio_AvaliaJa.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
+                        // Hide buttons for cleaner PDF
+                        const buttons = element.querySelectorAll('button');
+                        buttons.forEach(b => b.style.display = 'none');
 
-            // Hide buttons for cleaner PDF
-            const buttons = element.querySelectorAll('button');
-            buttons.forEach(b => b.style.display = 'none');
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Restore buttons
-                buttons.forEach(b => b.style.display = 'block');
-            });
-        }
+                        html2pdf().set(opt).from(element).save().then(() => {
+                        // Restore buttons
+                        buttons.forEach(b => b.style.display = 'block');
+                        });
+                        }
 
 
-        // Update loadCustomization to fill new fields too
-        const oldLoadCustomization = loadCustomization;
-        loadCustomization = async function () {
-            await oldLoadCustomization();
-            // Fill new fields
-            try {
-                const res = await fetch('/api/company/settings', { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
+                        // Update loadCustomization to fill new fields too
+                        const oldLoadCustomization = loadCustomization;
+                        loadCustomization = async function () {
+                        await oldLoadCustomization();
+                        // Fill new fields
+                        try {
+                        const res = await fetch('/api/company/settings', { headers: { 'Authorization': `Bearer ${token}`
+                        } });
+                        const data = await res.json();
 
-                // Profile
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const pName = document.getElementById('profileNameDisplay');
-                const pEmail = document.getElementById('profileEmailDisplay');
-                if (pName) pName.innerText = user.name || 'Gestor';
-                if (pEmail) pEmail.innerText = user.email || '';
+                        // Profile
+                        const user = JSON.parse(localStorage.getItem('user') || '{}');
+                        const pName = document.getElementById('profileNameDisplay');
+                        const pEmail = document.getElementById('profileEmailDisplay');
+                        if (pName) pName.innerText = user.name || 'Gestor';
+                        if (pEmail) pEmail.innerText = user.email || '';
 
-                // Account
-                if (data.name) document.getElementById('companyNameInput').value = data.name;
-                if (data.area) document.getElementById('companyAreaInput').value = data.area;
-                if (data.whatsapp) document.getElementById('whatsappInput').value = data.whatsapp;
+                        // Account
+                        if (data.name) document.getElementById('companyNameInput').value = data.name;
+                        if (data.area) document.getElementById('companyAreaInput').value = data.area;
+                        if (data.whatsapp) document.getElementById('whatsappInput').value = data.whatsapp;
 
-                // Notifications
-                if (data.notifications) {
-                    const n = typeof data.notifications === 'string' ? JSON.parse(data.notifications) : data.notifications;
-                    if (n.whatsappRule) document.getElementById('notifyRuleInput').value = n.whatsappRule;
-                }
+                        // Notifications
+                        if (data.notifications) {
+                        const n = typeof data.notifications === 'string' ? JSON.parse(data.notifications) :
+                        data.notifications;
+                        if (n.whatsappRule) document.getElementById('notifyRuleInput').value = n.whatsappRule;
+                        }
 
-                // Preview Init
-                if (data.primaryColor) updatePreviewColor(data.primaryColor);
-                if (data.logo) document.getElementById('previewLogo').src = data.logo;
-                if (data.settings) {
-                    const s = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
-                    updatePreviewText(s.questionTitle);
-                    togglePreviewObs(s.showObservation);
-                }
+                        // Preview Init
+                        if (data.primaryColor) updatePreviewColor(data.primaryColor);
+                        if (data.logo) document.getElementById('previewLogo').src = data.logo;
+                        if (data.settings) {
+                        const s = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
+                        updatePreviewText(s.questionTitle);
+                        togglePreviewObs(s.showObservation);
+                        }
 
-            } catch (e) { }
-        }
+                        } catch (e) { }
+                        }
 
-        // Load Users when tab is clicked
-        const originalSwitchTab = switchTab;
-        switchTab = function (name, el) {
-            originalSwitchTab(name, el);
-            if (name === 'gestores') loadUsers();
-        }
+                        // Load Users when tab is clicked
+                        const originalSwitchTab = switchTab;
+                        switchTab = function (name, el) {
+                        originalSwitchTab(name, el);
+                        if (name === 'gestores') loadUsers();
+                        }
 
-    </script>
+                        // --- INTEGRATIONS LOGIC ---
+                        function addNewIntegrationCard(type = null, initialData = {}) {
+                        const select = document.getElementById('newIntegrationSelect');
+                        const selectedType = type || select.value;
+                        if (!selectedType) { alert('Selecione um serviço.'); return; }
+
+                        const container = document.getElementById('integrationsContainer');
+                        const cardId = 'int-' + Date.now() + Math.random().toString(36).substr(2, 5);
+
+                        // MAP CONFIG
+                        const config = {
+                        whatsapp: { name: 'WhatsApp', color: '#25D366', icon: '<img src="/whatsapp.png"
+                            style="width:40px;">' },
+                        lnassist: { name: 'LnAssist', color: '#ff9800', icon: '🩺' },
+                        worklab: { name: 'WorkLab', color: '#2196f3', icon: '🧪' },
+                        amplimed: { name: 'Amplimed', color: '#9c27b0', icon: '⚕️' },
+                        webhook: { name: 'Webhook', color: '#ea4b71', icon: '🔌' }
+                        };
+                        const conf = config[selectedType] || config.webhook;
+                        const displayName = initialData.name || conf.name;
+
+                        const div = document.createElement('article');
+                        div.className = 'glass-panel';
+                        div.style.cssText = 'padding: 30px; position: relative; overflow: hidden; display: flex;
+                        flex-direction: column;';
+                        div.id = cardId;
+
+                        div.innerHTML = `
+                        <div style="position: relative; z-index: 1;">
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                                <span style="font-size: 2rem;">${typeof conf.icon === 'string' &&
+                                    !conf.icon.startsWith('<') ? conf.icon : '' }</span>
+                                        ${typeof conf.icon === 'string' && conf.icon.startsWith('<') ? conf.icon : '' }
+                                            <div style="flex: 1;">
+                                            <input type="text" value="${displayName}" class="integration-title"
+                                                style="background: transparent; border: none; color: #fff; font-size: 1.2rem; font-weight: bold; width: 100%; border-bottom: 1px solid transparent; transition: 0.3s;"
+                                                onfocus="this.style.borderBottom='1px solid #fff'"
+                                                onblur="this.style.borderBottom='1px solid transparent'">
+                                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+                                                ${selectedType.toUpperCase()}</p>
+                            </div>
+                            <button onclick="deleteIntegration('${cardId}')"
+                                style="background:transparent; border:none; color:#ef4444; cursor:pointer;"
+                                title="Remover">🗑️</button>
+                        </div>
+
+                        <form onsubmit="saveIntegration(event, '${cardId}')">
+                            <input type="hidden" name="type" value="${selectedType}">
+
+                            ${getIntegrationFields(selectedType, initialData)}
+
+                            <button type="submit" class="btn-glow"
+                                style="width: 100%; justify-content: center; background: ${conf.color};">
+                                Salvar Configuração
+                            </button>
+                        </form>
+                        </div>
+                        `;
+                        container.appendChild(div);
+                        if (!type) select.value = '';
+                        }
+
+                        function getIntegrationFields(type, data) {
+                        if (type === 'whatsapp') {
+                        return `
+                        <div style="margin-bottom: 15px;">
+                            <label style="display:block; margin-bottom: 8px; font-size: 0.85rem; color: #ccc;">Número
+                                (com DDD)</label>
+                            <input type="text" name="value" value="${data.value || ''}" placeholder="Ex: 5511999999999"
+                                style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: #fff;">
+                            <p style="font-size: 0.75rem; color: #666; margin-top: 5px;">Separe múltiplos por vírgula.
+                            </p>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display:block; margin-bottom: 8px; font-size: 0.85rem; color: #ccc;">Regra de
+                                Disparo</label>
+                            <select name="rule"
+                                style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #0a1628; color: #fff;">
+                                <option value="all" ${data.rule==='all' ? 'selected' : '' }>🔔 Todas as avaliações
+                                </option>
+                                <option value="bad" ${data.rule==='bad' ? 'selected' : '' }>⚠️ Apenas notas baixas (1-2)
+                                </option>
+                                <option value="off" ${data.rule==='off' ? 'selected' : '' }>🔕 Desativado</option>
+                            </select>
+                        </div>
+                        `;
+                        }
+                        return `
+                        <div style="margin-bottom: 15px;">
+                            <label style="display:block; margin-bottom: 8px; font-size: 0.85rem; color: #ccc;">URL /
+                                Token / Chave API</label>
+                            <input type="text" name="value" value="${data.value || ''}"
+                                placeholder="Cole aqui a credencial ou URL..."
+                                style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: #fff;">
+                        </div>
+                        `;
+                        }
+
+                        async function deleteIntegration(cardId) {
+                        if (confirm('Remover esta integração? (Clique em Salvar para persistir)')) {
+                        document.getElementById(cardId).remove();
+                        }
+                        }
+
+                        async function loadIntegrations() {
+                        const container = document.getElementById('integrationsContainer');
+                        if (container.children.length > 0) return; // Already loaded
+
+                        try {
+                        const res = await fetch('/api/company/settings', { headers: { 'Authorization': `Bearer ${token}`
+                        } });
+                        const data = await res.json();
+
+                        if (data.settings && data.settings.integrations && Array.isArray(data.settings.integrations)) {
+                        data.settings.integrations.forEach(int => addNewIntegrationCard(int.type, int));
+                        } else {
+                        // Fallback Legacy
+                        if (data.notifications) {
+                        if (data.notifications.whatsappNumbers && data.notifications.whatsappNumbers.length > 0) {
+                        addNewIntegrationCard('whatsapp', {
+                        name: 'WhatsApp Principal',
+                        value: data.notifications.whatsappNumbers.join(', '),
+                        rule: data.notifications.notifyRule
+                        });
+                        }
+                        if (data.notifications.webhookUrl) {
+                        addNewIntegrationCard('webhook', {
+                        name: 'Webhook N8N',
+                        value: data.notifications.webhookUrl
+                        });
+                        }
+                        }
+                        }
+                        } catch (e) { console.error(e); }
+                        }
+
+                        async function saveIntegration(e, cardId) {
+                        e.preventDefault();
+                        const btn = e.target.querySelector('button');
+                        const originalText = btn.innerText;
+                        btn.innerText = "Salvando...";
+                        btn.disabled = true;
+
+                        const integrations = [];
+                        document.querySelectorAll('#integrationsContainer article').forEach(article => {
+                        const cardForm = article.querySelector('form');
+                        if (!cardForm) return;
+                        const type = cardForm.querySelector('input[name="type"]').value;
+                        const name = article.querySelector('.integration-title').value;
+                        const value = cardForm.querySelector('input[name="value"]').value;
+                        const rule = cardForm.querySelector('select[name="rule"]')?.value;
+                        integrations.push({ type, name, value, rule });
+                        });
+
+                        try {
+                        const resGet = await fetch('/api/company/settings', { headers: { 'Authorization': `Bearer
+                        ${token}` } });
+                        const current = await resGet.json();
+                        const newSettings = current.settings || {};
+                        newSettings.integrations = integrations;
+
+                        const formData = new FormData();
+                        formData.append('settings', JSON.stringify(newSettings));
+                        // We should also update legacy fields for compatibility if desired,
+                        // but let's stick to settings.integrations as primary now.
+                        // Legacy fields (whatsapp, notifications) might be overwritten by emptiness if we don't send
+                        them?
+                        // The backend `updateSettings` updates only what is sent.
+                        // So legacy notifications remain unless we update them.
+                        // It's fine.
+
+                        const res = await fetch('/api/company/settings', {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                        });
+
+                        if (res.ok) alert('Integrações salvas com sucesso!');
+                        else alert('Erro ao salvar.');
+
+                        } catch (e) { console.error(e); alert('Erro ao salvar.'); }
+
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                        }
+                        // --- CUSTOMIZATION HELPERS ---
+                        function addQuestionField(value = '') {
+                        const list = document.getElementById('extraQuestionsList');
+                        const div = document.createElement('div');
+                        div.style.display = 'flex';
+                        div.style.gap = '10px';
+                        div.innerHTML = `
+                        <input type="text" class="extra-question-input" value="${value}"
+                            placeholder="Digite a pergunta..."
+                            style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;">
+                        <button type="button" onclick="this.parentElement.remove()"
+                            style="background: transparent; border: none; color: #ef4444; cursor: pointer;">🗑️</button>
+                        `;
+                        list.appendChild(div);
+                        }
+
+                        function updateMockupLogo(logoUrl) {
+                        const iframe = document.getElementById('mobilePreviewIframe');
+                        if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
+                        const logoImgs = iframe.contentWindow.document.querySelectorAll('.logo-top img');
+                        logoImgs.forEach(img => img.src = logoUrl);
+                        }
+                        }
+                        async function changeUserPassword(userId) {
+                        const newPass = prompt("Digite a nova senha para este usuário (min 6 caracteres):");
+                        if (!newPass) return;
+                        if (newPass.length < 6) return alert("Senha muito curta."); try { const res=await
+                            fetch(`/api/company/users/${userId}/password`, { method: 'PUT' , headers: { 'Content-Type'
+                            : 'application/json' , 'Authorization' : `Bearer ${token}` }, body: JSON.stringify({
+                            password: newPass }) }); const data=await res.json(); if (res.ok) alert(data.message); else
+                            alert(data.error || 'Erro ao alterar senha.' ); } catch (e) { console.error(e); alert('Erro
+                            ao alterar senha.'); } } </script>
+                            <!-- SUGGESTION MODAL -->
+                            <div class="modal-overlay" id="suggestionModal">
+                                <div class="modal-content glass-panel" style="max-width: 500px;">
+                                    <h2 style="margin-bottom: 20px;">Nova Sugestão</h2>
+                                    <form onsubmit="submitSuggestion(event)">
+                                        <textarea id="suggestionText" placeholder="Descreva sua sugestão..." required
+                                            style="width: 100%; height: 120px; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; resize: vertical;"></textarea>
+                                        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                            <button type="button" class="btn-secondary"
+                                                onclick="closeSuggestionModal()">Cancelar</button>
+                                            <button type="submit" class="btn-glow">Enviar Sugestão</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <script>
+                                // --- SUGGESTIONS LOGIC ---
+                                async function loadSuggestions() {
+                                    const list = document.getElementById('suggestionsList');
+                                    if (!list) return;
+
+                                    try {
+                                        const res = await fetch('/api/suggestions', { headers: { 'Authorization': `Bearer ${token}` } });
+                                        const suggestions = await res.json();
+
+                                        list.innerHTML = '';
+                                        if (suggestions.length === 0) {
+                                            list.innerHTML = '<p style="text-align:center; color:#666;">Nenhuma sugestão ainda. Seja o primeiro!</p>';
+                                            return;
+                                        }
+
+                                        suggestions.forEach(s => {
+                                            const div = document.createElement('div');
+                                            div.style.cssText = 'background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px;';
+                                            div.innerHTML = `
+                        <div style="flex: 1;">
+                            <p style="margin: 0; color: #fff; font-size: 1rem;">${s.text}</p>
+                            <span style="font-size: 0.75rem; color: #666;">${new Date(s.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <button onclick="voteSuggestion(${s.id}, 'like')" class="vote-btn" style="background: rgba(0,255,0,0.1); color: #4ade80; border: 1px solid rgba(0,255,0,0.2); padding: 5px 10px; border-radius: 6px; cursor: pointer;">
+                                👍 ${s.likes}
+                            </button>
+                            <button onclick="voteSuggestion(${s.id}, 'dislike')" class="vote-btn" style="background: rgba(255,0,0,0.1); color: #f87171; border: 1px solid rgba(255,0,0,0.2); padding: 5px 10px; border-radius: 6px; cursor: pointer;">
+                                👎 ${s.dislikes}
+                            </button>
+                        </div>
+                    `;
+                                            list.appendChild(div);
+                                        });
+                                    } catch (e) { console.error(e); list.innerHTML = '<p style="color:red">Erro ao carregar.</p>'; }
+                                }
+
+                                async function voteSuggestion(id, type) {
+                                    try {
+                                        const res = await fetch(`/api/suggestions/${id}/vote`, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                            body: JSON.stringify({ type })
+                                        });
+                                        if (res.ok) {
+                                            loadSuggestions();
+                                        }
+                                    } catch (e) { console.error(e); }
+                                }
+
+                                function openSuggestionModal() {
+                                    document.getElementById('suggestionModal').classList.add('active');
+                                }
+                                function closeSuggestionModal() {
+                                    document.getElementById('suggestionModal').classList.remove('active');
+                                }
+
+                                async function submitSuggestion(e) {
+                                    e.preventDefault();
+                                    const text = document.getElementById('suggestionText').value;
+                                    if (!text) return;
+
+                                    try {
+                                        const res = await fetch('/api/suggestions', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                            body: JSON.stringify({ text })
+                                        });
+                                        if (res.ok) {
+                                            alert('Sugestão enviada!');
+                                            closeSuggestionModal();
+                                            document.getElementById('suggestionText').value = '';
+                                            loadSuggestions();
+                                        } else alert('Erro ao enviar.');
+                                    } catch (e) { console.error(e); }
+                                }
+                            </script>
 </body>
 
 </html>
