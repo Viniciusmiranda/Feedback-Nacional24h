@@ -67,6 +67,8 @@ const companyRoutes = require('./src/routes/companyRoutes');
 app.use('/api/company', companyRoutes);
 const suggestionRoutes = require('./src/routes/suggestionRoutes');
 app.use('/api/suggestions', suggestionRoutes);
+const adminRoutes = require('./src/routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
 
 // Serve Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
@@ -90,28 +92,38 @@ app.get('/:slug/dashboard', (req, res) => {
 // 2. Evaluation: /:companySlug/:attendantName
 app.get('/:slug/:attendant', async (req, res) => {
     try {
-        const { slug } = req.params;
+        const { slug, attendant: attendantSlug } = req.params;
         const filePath = path.join(frontendPath, 'ex-atd.html');
         let html = fs.readFileSync(filePath, 'utf8');
 
-        // Fetch Company Logic for OG Image
+        // 1. Fetch Company & Attendant
         const company = await prisma.company.findUnique({
             where: { slug: slug },
-            select: { logo: true }
+            select: { name: true, logo: true }
         });
 
-        // Default or Custom Image
-        let ogImage = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/1200px-Google_Maps_icon_%282020%29.svg.png"; // Original Default
+        // Try to find attendant (slug can be ID or slugified name, but usually we just need the name for the title)
+        // For now, let's treat the :attendant param as the display name (decoded)
+        const attendantName = decodeURIComponent(attendantSlug);
+
+        // 2. Prepare Metadata
+        const companyName = company ? company.name : 'Avalia Já';
+        const ogTitle = `Avalie o atendimento de ${attendantName}!`;
+        const ogDescription = `Sua opinião é fundamental para a ${companyName}. Deixe seu feedback agora.`;
+
+        // 3. Image Logic (Company Logo or Professional Default)
+        let ogImage = "https://app.avaliaja.app.br/logo.png"; // Official App Logo
         if (company && company.logo) {
-            // Ensure absolute URL
-            // company.logo is typically "/uploads/..."
             ogImage = `https://app.avaliaja.app.br${company.logo}`;
         }
 
+        // 4. Perform Replacements
+        html = html.replace('__OG_TITLE__', ogTitle);
+        html = html.replace('__OG_DESCRIPTION__', ogDescription);
         html = html.replace('__OG_IMAGE__', ogImage);
+
         res.send(html);
     } catch (err) {
-        // Fallback in case of error (e.g. valid slug but DB error, or read error)
         console.error("Error serving ex-atd.html:", err);
         res.sendFile(path.join(frontendPath, 'ex-atd.html'));
     }
