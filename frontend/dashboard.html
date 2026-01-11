@@ -1653,16 +1653,18 @@
                     }
 
                     if (data.notifications) {
+                        const notif = typeof data.notifications === 'string' ? JSON.parse(data.notifications) : data.notifications;
+
                         // Load N8N Webhook
-                        if (data.notifications.webhookUrl && document.getElementById('n8nWebhookInput')) {
-                            document.getElementById('n8nWebhookInput').value = data.notifications.webhookUrl;
+                        if (notif.webhookUrl && document.getElementById('n8nWebhookInput')) {
+                            document.getElementById('n8nWebhookInput').value = notif.webhookUrl;
                         }
-                        // Load WhatsApp Numbers (existing logic might need check)
-                        if (data.notifications.whatsappNumbers && document.getElementById('whatsappInput')) {
-                            document.getElementById('whatsappInput').value = data.notifications.whatsappNumbers.join(', ');
+                        // Load WhatsApp Numbers
+                        if (notif.whatsappNumbers && document.getElementById('whatsappInput')) {
+                            document.getElementById('whatsappInput').value = notif.whatsappNumbers.join(', ');
                         }
-                        if (data.notifications.notifyRule && document.getElementById('notifyRuleInput')) {
-                            document.getElementById('notifyRuleInput').value = data.notifications.notifyRule;
+                        if (notif.notifyRule && document.getElementById('notifyRuleInput')) {
+                            document.getElementById('notifyRuleInput').value = notif.notifyRule;
                         }
                     }
 
@@ -3048,22 +3050,26 @@
                 });
                 const data = await res.json();
 
-                if (data.settings && data.settings.integrations && Array.isArray(data.settings.integrations)) {
-                    data.settings.integrations.forEach(int => addNewIntegrationCard(int.type, int));
+                // Parse strings if necessary
+                const settings = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
+                const notifications = typeof data.notifications === 'string' ? JSON.parse(data.notifications) : data.notifications;
+
+                if (settings && settings.integrations && Array.isArray(settings.integrations)) {
+                    settings.integrations.forEach(int => addNewIntegrationCard(int.type, int));
                 } else {
                     // Fallback Legacy
-                    if (data.notifications) {
-                        if (data.notifications.whatsappNumbers && data.notifications.whatsappNumbers.length > 0) {
+                    if (notifications) {
+                        if (notifications.whatsappNumbers && notifications.whatsappNumbers.length > 0) {
                             addNewIntegrationCard('whatsapp', {
                                 name: 'WhatsApp Principal',
-                                value: data.notifications.whatsappNumbers.join(', '),
-                                rule: data.notifications.notifyRule
+                                value: notifications.whatsappNumbers.join(', '),
+                                rule: notifications.notifyRule
                             });
                         }
-                        if (data.notifications.webhookUrl) {
+                        if (notifications.webhookUrl) {
                             addNewIntegrationCard('webhook', {
                                 name: 'Webhook N8N',
-                                value: data.notifications.webhookUrl
+                                value: notifications.webhookUrl
                             });
                         }
                     }
