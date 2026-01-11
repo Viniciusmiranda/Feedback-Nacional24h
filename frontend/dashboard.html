@@ -1703,8 +1703,9 @@
                 % attendantColors.length); return attendantColors[index];
         } function renderRecentReviews(reviews,
             targetTbodyId = 'recentReviewsBody') {
-            const tbody = document.getElementById(targetTbodyId); if (!tbody) return; //
-        Clear logic if (globalData.reviewsPage === 1 && targetTbodyId === 'recentReviewsBody') tbody.innerHTML = ''; const
+            const tbody = document.getElementById(targetTbodyId); if (!tbody) return;
+            // Clear logic 
+            if (globalData.reviewsPage === 1 && targetTbodyId === 'recentReviewsBody') tbody.innerHTML = ''; const
                 isDashboard = targetTbodyId === 'recentReviewsBody'; reviews.forEach(item => {
                     const tr = document.createElement('tr');
                     const starsHtml = '★'.repeat(item.stars) + '☆'.repeat(5 - item.stars);
@@ -1750,10 +1751,9 @@
             if (reset) {
                 globalData.reports = [];
                 globalData.reportsPage = 1;
-                tbody.innerHTML = '<tr>
-                    < td colspan = "8" style = "text-align: center; padding: 40px; color: var(--text-muted);" > Carregando dados...
-            </td >
-        </tr > ';
+                tbody.innerHTML = `<tr>
+                    <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Carregando dados...</td>
+                </tr>`;
                 if (btn) btn.style.display = 'inline-block';
             }
 
@@ -1783,10 +1783,9 @@
                 if (reset) tbody.innerHTML = ''; // Clear loading message
 
                 if (newReviews.length === 0 && reset) {
-                    tbody.innerHTML = '<tr>
-                        < td colspan = "8" style = "text-align: center; padding: 40px; color: var(--text-muted);" > Nenhuma avaliação
-                encontrada com estes filtros.</td >
-        </tr > ';
+                    tbody.innerHTML = `<tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Nenhuma avaliação encontrada com estes filtros.</td>
+                    </tr>`;
                     if (btn) btn.style.display = 'none';
                     return;
                 }
@@ -2123,8 +2122,7 @@
                 if (h2) {
                     toolbar = document.createElement('div');
                     toolbar.id = 'atdToolbar';
-                    toolbar.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom:
-                    20px; ";
+                    toolbar.style.cssText = `display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;`;
 
                     // Helper text for Plan Limits (Initial placeholder, updated below)
                     toolbar.innerHTML = `
@@ -2564,260 +2562,262 @@
                     const isSelf = u.email === currentUser.email || u.isSelf;
                     tbody.innerHTML += `
                 <tr>
-                    <td>${u.name} ${isSelf ? '<span class="badge"
-                            style = "background:var(--accent); font-size:0.7em;" > VOCÊ</span > ' : ''}</td>
-                        < td > ${ u.email }</td >
+                    <td>${u.name} ${isSelf ? `<span class="badge" style="background:var(--accent); font-size:0.7em;">VOCÊ</span>` : ''}</td>
+                        < td > ${u.email}</td >
                     <td><span class="badge" style="background: rgba(255,255,255,0.1);">${u.role || 'user'}</span></td>
                     <td><span style="color: var(--success);">Ativo</span></td>
                     <td>
                         <button onclick="changeUserPassword('${u.id}')"
                             style="border:none; background:none; cursor:pointer; margin-right: 10px;"
                             title="Alterar Senha">🔑</button>
-                        ${!isSelf ? '<button onclick="alert(\'Ação restrita.\')"
-                            style="border:none; background:none; cursor:pointer;" title="Remover">❌</button>' : ''}
+                        ${!isSelf ? `<button onclick="alert('Ação restrita.')" style="border:none; background:none; cursor:pointer;" title="Remover">❌</button>` : ''}
                     </td >
                 </tr >
                         `;
                 });
-                } catch (e) { console.error(e); }
-                }
+            } catch (e) { console.error(e); }
+        }
 
-                function openUserModal() {
-                document.getElementById('userModal').classList.add('active');
-                }
+        function openUserModal() {
+            document.getElementById('userModal').classList.add('active');
+        }
 
-                async function handleInviteUser(e) {
-                e.preventDefault();
-                const form = e.target;
-                const data = {
+        async function handleInviteUser(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
                 name: form.name.value,
                 email: form.email.value,
                 password: form.password.value
-                };
+            };
 
-                try {
+            try {
                 const res = await fetch('/api/company/users', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${ token } ` },
-                body: JSON.stringify(data)
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token} ` },
+                    body: JSON.stringify(data)
                 });
                 if (res.ok) {
-                alert('Usuário convidado!');
-                document.getElementById('userModal').classList.remove('active');
-                loadUsers();
-                form.reset();
+                    alert('Usuário convidado!');
+                    document.getElementById('userModal').classList.remove('active');
+                    loadUsers();
+                    form.reset();
                 } else {
-                alert('Erro ao convidar');
+                    alert('Erro ao convidar');
                 }
-                } catch (e) { console.error(e); }
-                }
+            } catch (e) { console.error(e); }
+        }
 
-                async function saveIntegrations(e) {
-                e.preventDefault();
-                const whatsappRaw = document.getElementById('whatsappInput') ?
+        async function saveIntegrations(e) {
+            e.preventDefault();
+            const whatsappRaw = document.getElementById('whatsappInput') ?
                 document.getElementById('whatsappInput').value : '';
-                // Split comma, trim
-                const whatsappNumbers = whatsappRaw.split(',').map(s => s.trim()).filter(s => s);
+            // Split comma, trim
+            const whatsappNumbers = whatsappRaw.split(',').map(s => s.trim()).filter(s => s);
 
-                const notificationRule = document.getElementById('notifyRuleInput') ?
+            const notificationRule = document.getElementById('notifyRuleInput') ?
                 document.getElementById('notifyRuleInput').value : 'all';
 
-                // N8N Webhook
-                const webhookUrl = document.getElementById('n8nWebhookInput') ?
+            // N8N Webhook
+            const webhookUrl = document.getElementById('n8nWebhookInput') ?
                 document.getElementById('n8nWebhookInput').value : '';
 
-                try {
+            try {
                 const res = await fetch('/api/company/settings', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${ token } ` },
-                body: JSON.stringify({
-                whatsapp: whatsappNumbers[0] || "", // Primary
-                notifications: JSON.stringify({
-                whatsappRule: notificationRule,
-                whatsappNumbers: whatsappNumbers, // Save array
-                webhookUrl: webhookUrl // Save N8N URL
-                })
-                })
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token} ` },
+                    body: JSON.stringify({
+                        whatsapp: whatsappNumbers[0] || "", // Primary
+                        notifications: JSON.stringify({
+                            whatsappRule: notificationRule,
+                            whatsappNumbers: whatsappNumbers, // Save array
+                            webhookUrl: webhookUrl // Save N8N URL
+                        })
+                    })
                 });
                 if (res.ok) alert('Integrações salvas com sucesso!');
-                } catch (e) { console.error(e); }
-                }
+            } catch (e) { console.error(e); }
+        }
 
-                async function saveAccountDetails(e) {
-                e.preventDefault();
-                const name = document.getElementById('companyNameInput').value;
-                const area = document.getElementById('companyAreaInput').value;
+        async function saveAccountDetails(e) {
+            e.preventDefault();
+            const name = document.getElementById('companyNameInput').value;
+            const area = document.getElementById('companyAreaInput').value;
 
-                try {
+            try {
                 const res = await fetch('/api/company/settings', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${ token } ` },
-                body: JSON.stringify({ name, area })
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token} ` },
+                    body: JSON.stringify({ name, area })
                 });
                 if (res.ok) alert('Dados salvos!');
-                } catch (e) { console.error(e); }
-                }
+            } catch (e) { console.error(e); }
+        }
 
-                // --- DATE FILTER & PDF LOGIC ---
+        // --- DATE FILTER & PDF LOGIC ---
 
-                function filterDashboardByDate() {
-                const startInput = document.getElementById('dateStart').value;
-                const endInput = document.getElementById('dateEnd').value;
+        function filterDashboardByDate() {
+            const startInput = document.getElementById('dateStart').value;
+            const endInput = document.getElementById('dateEnd').value;
 
-                if (!globalData.originalReviews) {
+            if (!globalData.originalReviews) {
                 // Keep backup of originals on first run
                 globalData.originalReviews = [...globalData.reviews];
-                }
+            }
 
-                let filtered = [...globalData.originalReviews];
+            let filtered = [...globalData.originalReviews];
 
-                if (startInput) {
+            if (startInput) {
                 const start = new Date(startInput);
                 filtered = filtered.filter(r => new Date(r.createdAt) >= start);
-                }
-                if (endInput) {
+            }
+            if (endInput) {
                 const end = new Date(endInput);
                 end.setHours(23, 59, 59); // End of day
-                filtered = filtered.filter(r => new Date(r.createdAt) <= end); } // Recalculate Metrics const
-                    total=filtered.length; const avg=total> 0 ? (filtered.reduce((acc, r) => acc + r.stars, 0) / total)
-                    : 0;
+                filtered = filtered.filter(r => new Date(r.createdAt) <= end);
+            } // Recalculate Metrics const
+            total = filtered.length; const avg = total > 0 ? (filtered.reduce((acc, r) => acc + r.stars, 0) / total)
+                : 0;
 
-                    // NPS Calculation
-                    const promoters = filtered.filter(r => r.stars >= 5).length;
-                    const detractors = filtered.filter(r => r.stars <= 3).length; const nps=total> 0 ?
-                        Math.round(((promoters - detractors) / total) * 100) : 0;
+            // NPS Calculation
+            const promoters = filtered.filter(r => r.stars >= 5).length;
+            const detractors = filtered.filter(r => r.stars <= 3).length; const nps = total > 0 ?
+                Math.round(((promoters - detractors) / total) * 100) : 0;
 
-                        // Update UI
-                        renderMetrics({
-                        average: avg,
-                        total: total,
-                        nps: nps,
-                        activeAttendants: globalData.metrics.activeAttendants // Keep static
-                        });
+            // Update UI
+            renderMetrics({
+                average: avg,
+                total: total,
+                nps: nps,
+                activeAttendants: globalData.metrics.activeAttendants // Keep static
+            });
 
-                        // Update Global for other renders
-                        globalData.reviews = filtered;
+            // Update Global for other renders
+            globalData.reviews = filtered;
 
-                        // Recalc chart data (mock reconstruction)
-                        // Ideally we'd re-aggregate by attendant, but for now we rely on review attendant data
-                        const attMap = {};
-                        filtered.forEach(r => {
-                        const name = r.attendant ? r.attendant.name : 'Geral';
-                        if (!attMap[name]) attMap[name] = 0;
-                        attMap[name]++;
-                        });
-                        // Rebuild mock attendant object for chart
-                        const mockAttendants = Object.keys(attMap).map(name => ({
-                        name: name,
-                        _count: { reviews: attMap[name] }
-                        }));
+            // Recalc chart data (mock reconstruction)
+            // Ideally we'd re-aggregate by attendant, but for now we rely on review attendant data
+            const attMap = {};
+            filtered.forEach(r => {
+                const name = r.attendant ? r.attendant.name : 'Geral';
+                if (!attMap[name]) attMap[name] = 0;
+                attMap[name]++;
+            });
+            // Rebuild mock attendant object for chart
+            const mockAttendants = Object.keys(attMap).map(name => ({
+                name: name,
+                _count: { reviews: attMap[name] }
+            }));
 
-                        renderCharts(mockAttendants); // This replots Main Chart
-                        renderRecentReviews(filtered.slice(0, 30));
-                        }
+            renderCharts(mockAttendants); // This replots Main Chart
+            renderRecentReviews(filtered.slice(0, 30));
+        }
 
-                        function exportDashboardPDF() {
-                        const element = document.getElementById('view-dashboard');
-                        const opt = {
-                        margin: 0.5,
-                        filename: 'Relatorio_AvaliaJa.pdf',
-                        image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { scale: 2 },
-                        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-                        };
+        function exportDashboardPDF() {
+            const element = document.getElementById('view-dashboard');
+            const opt = {
+                margin: 0.5,
+                filename: 'Relatorio_AvaliaJa.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
 
-                        // Hide buttons for cleaner PDF
-                        const buttons = element.querySelectorAll('button');
-                        buttons.forEach(b => b.style.display = 'none');
+            // Hide buttons for cleaner PDF
+            const buttons = element.querySelectorAll('button');
+            buttons.forEach(b => b.style.display = 'none');
 
-                        html2pdf().set(opt).from(element).save().then(() => {
-                        // Restore buttons
-                        buttons.forEach(b => b.style.display = 'block');
-                        });
-                        }
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore buttons
+                buttons.forEach(b => b.style.display = 'block');
+            });
+        }
 
 
-                        // Update loadCustomization to fill new fields too
-                        const oldLoadCustomization = loadCustomization;
-                        loadCustomization = async function () {
-                        await oldLoadCustomization();
-                        // Fill new fields
-                        try {
-                        const res = await fetch('/api/company/settings', { headers: { 'Authorization': `Bearer ${ token } `
-                        } });
-                        const data = await res.json();
+        // Update loadCustomization to fill new fields too
+        const oldLoadCustomization = loadCustomization;
+        loadCustomization = async function () {
+            await oldLoadCustomization();
+            // Fill new fields
+            try {
+                const res = await fetch('/api/company/settings', {
+                    headers: {
+                        'Authorization': `Bearer ${token} `
+                    }
+                });
+                const data = await res.json();
 
-                        // Profile
-                        const user = JSON.parse(localStorage.getItem('user') || '{}');
-                        const pName = document.getElementById('profileNameDisplay');
-                        const pEmail = document.getElementById('profileEmailDisplay');
-                        if (pName) pName.innerText = user.name || 'Gestor';
-                        if (pEmail) pEmail.innerText = user.email || '';
+                // Profile
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const pName = document.getElementById('profileNameDisplay');
+                const pEmail = document.getElementById('profileEmailDisplay');
+                if (pName) pName.innerText = user.name || 'Gestor';
+                if (pEmail) pEmail.innerText = user.email || '';
 
-                        // Account
-                        if (data.name) document.getElementById('companyNameInput').value = data.name;
-                        if (data.area) document.getElementById('companyAreaInput').value = data.area;
-                        if (data.whatsapp) document.getElementById('whatsappInput').value = data.whatsapp;
+                // Account
+                if (data.name) document.getElementById('companyNameInput').value = data.name;
+                if (data.area) document.getElementById('companyAreaInput').value = data.area;
+                if (data.whatsapp) document.getElementById('whatsappInput').value = data.whatsapp;
 
-                        // Notifications
-                        if (data.notifications) {
-                        const n = typeof data.notifications === 'string' ? JSON.parse(data.notifications) :
+                // Notifications
+                if (data.notifications) {
+                    const n = typeof data.notifications === 'string' ? JSON.parse(data.notifications) :
                         data.notifications;
-                        if (n.whatsappRule) document.getElementById('notifyRuleInput').value = n.whatsappRule;
-                        }
+                    if (n.whatsappRule) document.getElementById('notifyRuleInput').value = n.whatsappRule;
+                }
 
-                        // Preview Init
-                        if (data.primaryColor) updatePreviewColor(data.primaryColor);
-                        if (data.logo) document.getElementById('previewLogo').src = data.logo;
-                        if (data.settings) {
-                        const s = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
-                        updatePreviewText(s.questionTitle);
-                        togglePreviewObs(s.showObservation);
-                        }
+                // Preview Init
+                if (data.primaryColor) updatePreviewColor(data.primaryColor);
+                if (data.logo) document.getElementById('previewLogo').src = data.logo;
+                if (data.settings) {
+                    const s = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
+                    updatePreviewText(s.questionTitle);
+                    togglePreviewObs(s.showObservation);
+                }
 
-                        } catch (e) { }
-                        }
+            } catch (e) { }
+        }
 
-                        // Load Users when tab is clicked
-                        const originalSwitchTab = switchTab;
-                        switchTab = function (name, el) {
-                        originalSwitchTab(name, el);
-                        if (name === 'gestores') loadUsers();
-                        }
+        // Load Users when tab is clicked
+        const originalSwitchTab = switchTab;
+        switchTab = function (name, el) {
+            originalSwitchTab(name, el);
+            if (name === 'gestores') loadUsers();
+        }
 
-                        // --- INTEGRATIONS LOGIC ---
-                        function addNewIntegrationCard(type = null, initialData = {}) {
-                        const select = document.getElementById('newIntegrationSelect');
-                        const selectedType = type || select.value;
-                        if (!selectedType) { alert('Selecione um serviço.'); return; }
+        // --- INTEGRATIONS LOGIC ---
+        function addNewIntegrationCard(type = null, initialData = {}) {
+            const select = document.getElementById('newIntegrationSelect');
+            const selectedType = type || select.value;
+            if (!selectedType) { alert('Selecione um serviço.'); return; }
 
-                        const container = document.getElementById('integrationsContainer');
-                        const cardId = 'int-' + Date.now() + Math.random().toString(36).substr(2, 5);
+            const container = document.getElementById('integrationsContainer');
+            const cardId = 'int-' + Date.now() + Math.random().toString(36).substr(2, 5);
 
-                        // MAP CONFIG
-                        const config = {
-                        whatsapp: { name: 'WhatsApp', color: '#25D366', icon: '<img src="/whatsapp.png"
-                            style="width:40px;">' },
-                        lnassist: { name: 'LnAssist', color: '#ff9800', icon: '🩺' },
-                        worklab: { name: 'WorkLab', color: '#2196f3', icon: '🧪' },
-                        amplimed: { name: 'Amplimed', color: '#9c27b0', icon: '⚕️' },
-                        webhook: { name: 'Webhook', color: '#ea4b71', icon: '🔌' }
-                        };
-                        const conf = config[selectedType] || config.webhook;
-                        const displayName = initialData.name || conf.name;
+            // MAP CONFIG
+            const config = {
+                whatsapp: {
+                    name: 'WhatsApp', color: '#25D366', icon: '<img src="/whatsapp.png" style="width:40px;">'
+                },
+                lnassist: { name: 'LnAssist', color: '#ff9800', icon: '🩺' },
+                worklab: { name: 'WorkLab', color: '#2196f3', icon: '🧪' },
+                amplimed: { name: 'Amplimed', color: '#9c27b0', icon: '⚕️' },
+                webhook: { name: 'Webhook', color: '#ea4b71', icon: '🔌' }
+            };
+            const conf = config[selectedType] || config.webhook;
+            const displayName = initialData.name || conf.name;
 
-                        const div = document.createElement('article');
-                        div.className = 'glass-panel';
-                        div.style.cssText = 'padding: 30px; position: relative; overflow: hidden; display: flex;
-                        flex-direction: column;';
-                        div.id = cardId;
+            const div = document.createElement('article');
+            div.className = 'glass-panel';
+            div.style.cssText = 'padding: 30px; position: relative; overflow: hidden; display: flex;
+            flex - direction: column; ';
+            div.id = cardId;
 
-                        div.innerHTML = `
-                        < div style = "position: relative; z-index: 1;" >
+            div.innerHTML = `
+                        <div style="position: relative; z-index: 1;">
                             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-                                <span style="font-size: 2rem;">${typeof conf.icon === 'string' &&
-                                    !conf.icon.startsWith('<') ? conf.icon : '' }</span>
-                                        ${typeof conf.icon === 'string' && conf.icon.startsWith('<') ? conf.icon : '' }
+                                <span style="font-size: 2rem;">${typeof conf.icon === 'string' && !conf.icon.startsWith('<') ? conf.icon : ''}</span>
+                                        ${typeof conf.icon === 'string' && conf.icon.startsWith('<') ? conf.icon : ''}
                                             <div style="flex: 1;">
                                             <input type="text" value="${displayName}" class="integration-title"
                                                 style="background: transparent; border: none; color: #fff; font-size: 1.2rem; font-weight: bold; width: 100%; border-bottom: 1px solid transparent; transition: 0.3s;"
@@ -2843,13 +2843,13 @@
                         </form>
                         </div >
                         `;
-                        container.appendChild(div);
-                        if (!type) select.value = '';
-                        }
+            container.appendChild(div);
+            if (!type) select.value = '';
+        }
 
-                        function getIntegrationFields(type, data) {
-                        if (type === 'whatsapp') {
-                        return `
+        function getIntegrationFields(type, data) {
+            if (type === 'whatsapp') {
+                return `
                         < div style = "margin-bottom: 15px;" >
                             <label style="display:block; margin-bottom: 8px; font-size: 0.85rem; color: #ccc;">Número
                                 (com DDD)</label>
@@ -2863,16 +2863,16 @@
                                 Disparo</label>
                             <select name="rule"
                                 style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #0a1628; color: #fff;">
-                                <option value="all" ${data.rule==='all' ? 'selected' : '' }>🔔 Todas as avaliações
+                                <option value="all" ${data.rule === 'all' ? 'selected' : ''}>🔔 Todas as avaliações
                                 </option>
-                                <option value="bad" ${data.rule==='bad' ? 'selected' : '' }>⚠️ Apenas notas baixas (1-2)
+                                <option value="bad" ${data.rule === 'bad' ? 'selected' : ''}>⚠️ Apenas notas baixas (1-2)
                                 </option>
-                                <option value="off" ${data.rule==='off' ? 'selected' : '' }>🔕 Desativado</option>
+                                <option value="off" ${data.rule === 'off' ? 'selected' : ''}>🔕 Desativado</option>
                             </select>
                         </div>
                     `;
-                        }
-                        return `
+            }
+            return `
                         < div style = "margin-bottom: 15px;" >
                             <label style="display:block; margin-bottom: 8px; font-size: 0.85rem; color: #ccc;">URL /
                                 Token / Chave API</label>
@@ -2881,129 +2881,143 @@
                                 style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: #fff;">
                         </div>
                     `;
-                        }
+        }
 
-                        async function deleteIntegration(cardId) {
-                        if (confirm('Remover esta integração? (Clique em Salvar para persistir)')) {
-                        document.getElementById(cardId).remove();
-                        }
-                        }
+        async function deleteIntegration(cardId) {
+            if (confirm('Remover esta integração? (Clique em Salvar para persistir)')) {
+                document.getElementById(cardId).remove();
+            }
+        }
 
-                        async function loadIntegrations() {
-                        const container = document.getElementById('integrationsContainer');
-                        if (container.children.length > 0) return; // Already loaded
+        async function loadIntegrations() {
+            const container = document.getElementById('integrationsContainer');
+            if (container.children.length > 0) return; // Already loaded
 
-                        try {
-                        const res = await fetch('/api/company/settings', { headers: { 'Authorization': `Bearer ${ token } `
-                        } });
-                        const data = await res.json();
+            try {
+                const res = await fetch('/api/company/settings', {
+                    headers: {
+                        'Authorization': `Bearer ${token} `
+                    }
+                });
+                const data = await res.json();
 
-                        if (data.settings && data.settings.integrations && Array.isArray(data.settings.integrations)) {
-                        data.settings.integrations.forEach(int => addNewIntegrationCard(int.type, int));
-                        } else {
-                        // Fallback Legacy
-                        if (data.notifications) {
+                if (data.settings && data.settings.integrations && Array.isArray(data.settings.integrations)) {
+                    data.settings.integrations.forEach(int => addNewIntegrationCard(int.type, int));
+                } else {
+                    // Fallback Legacy
+                    if (data.notifications) {
                         if (data.notifications.whatsappNumbers && data.notifications.whatsappNumbers.length > 0) {
-                        addNewIntegrationCard('whatsapp', {
-                        name: 'WhatsApp Principal',
-                        value: data.notifications.whatsappNumbers.join(', '),
-                        rule: data.notifications.notifyRule
-                        });
+                            addNewIntegrationCard('whatsapp', {
+                                name: 'WhatsApp Principal',
+                                value: data.notifications.whatsappNumbers.join(', '),
+                                rule: data.notifications.notifyRule
+                            });
                         }
                         if (data.notifications.webhookUrl) {
-                        addNewIntegrationCard('webhook', {
-                        name: 'Webhook N8N',
-                        value: data.notifications.webhookUrl
-                        });
+                            addNewIntegrationCard('webhook', {
+                                name: 'Webhook N8N',
+                                value: data.notifications.webhookUrl
+                            });
                         }
-                        }
-                        }
-                        } catch (e) { console.error(e); }
-                        }
+                    }
+                }
+            } catch (e) { console.error(e); }
+        }
 
-                        async function saveIntegration(e, cardId) {
-                        e.preventDefault();
-                        const btn = e.target.querySelector('button');
-                        const originalText = btn.innerText;
-                        btn.innerText = "Salvando...";
-                        btn.disabled = true;
+        async function saveIntegration(e, cardId) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "Salvando...";
+            btn.disabled = true;
 
-                        const integrations = [];
-                        document.querySelectorAll('#integrationsContainer article').forEach(article => {
-                        const cardForm = article.querySelector('form');
-                        if (!cardForm) return;
-                        const type = cardForm.querySelector('input[name="type"]').value;
-                        const name = article.querySelector('.integration-title').value;
-                        const value = cardForm.querySelector('input[name="value"]').value;
-                        const rule = cardForm.querySelector('select[name="rule"]')?.value;
-                        integrations.push({ type, name, value, rule });
-                        });
+            const integrations = [];
+            document.querySelectorAll('#integrationsContainer article').forEach(article => {
+                const cardForm = article.querySelector('form');
+                if (!cardForm) return;
+                const type = cardForm.querySelector('input[name="type"]').value;
+                const name = article.querySelector('.integration-title').value;
+                const value = cardForm.querySelector('input[name="value"]').value;
+                const rule = cardForm.querySelector('select[name="rule"]')?.value;
+                integrations.push({ type, name, value, rule });
+            });
 
-                        try {
-                        const resGet = await fetch('/api/company/settings', { headers: { 'Authorization': `Bearer
-                        ${ token } ` } });
-                        const current = await resGet.json();
-                        const newSettings = current.settings || {};
-                        newSettings.integrations = integrations;
+            try {
+                const resGet = await fetch('/api/company/settings', {
+                    headers: {
+                        'Authorization': `Bearer
+                        ${token} `
+                    }
+                });
+                const current = await resGet.json();
+                const newSettings = current.settings || {};
+                newSettings.integrations = integrations;
 
-                        const formData = new FormData();
-                        formData.append('settings', JSON.stringify(newSettings));
-                        // We should also update legacy fields for compatibility if desired,
-                        // but let's stick to settings.integrations as primary now.
-                        // Legacy fields (whatsapp, notifications) might be overwritten by emptiness if we don't send
-                        them?
+                const formData = new FormData();
+                formData.append('settings', JSON.stringify(newSettings));
+                // We should also update legacy fields for compatibility if desired,
+                // but let's stick to settings.integrations as primary now.
+                // Legacy fields (whatsapp, notifications) might be overwritten by emptiness if we don't send
+                them ?
                         // The backend `updateSettings` updates only what is sent.
                         // So legacy notifications remain unless we update them.
                         // It's fine.
 
                         const res = await fetch('/api/company/settings', {
-                        method: 'PUT',
-                        headers: { 'Authorization': `Bearer ${ token } ` },
-                        body: formData
-                        });
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token} ` },
+                    body: formData
+                });
 
-                        if (res.ok) alert('Integrações salvas com sucesso!');
-                        else alert('Erro ao salvar.');
+                if (res.ok) alert('Integrações salvas com sucesso!');
+                else alert('Erro ao salvar.');
 
-                        } catch (e) { console.error(e); alert('Erro ao salvar.'); }
+            } catch (e) { console.error(e); alert('Erro ao salvar.'); }
 
-                        btn.innerText = originalText;
-                        btn.disabled = false;
-                        }
-                        // --- CUSTOMIZATION HELPERS ---
-                        function addQuestionField(value = '') {
-                        const list = document.getElementById('extraQuestionsList');
-                        const div = document.createElement('div');
-                        div.style.display = 'flex';
-                        div.style.gap = '10px';
-                        div.innerHTML = `
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+        // --- CUSTOMIZATION HELPERS ---
+        function addQuestionField(value = '') {
+            const list = document.getElementById('extraQuestionsList');
+            const div = document.createElement('div');
+            div.style.display = 'flex';
+            div.style.gap = '10px';
+            div.innerHTML = `
                         < input type = "text" class="extra-question-input" value = "${value}"
                     placeholder = "Digite a pergunta..."
                     style = "flex: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;" >
                         <button type="button" onclick="this.parentElement.remove()"
                             style="background: transparent; border: none; color: #ef4444; cursor: pointer;">🗑️</button>
                     `;
-                        list.appendChild(div);
-                        }
+            list.appendChild(div);
+        }
 
-                        function updateMockupLogo(logoUrl) {
-                        const iframe = document.getElementById('mobilePreviewIframe');
-                        if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
-                        const logoImgs = iframe.contentWindow.document.querySelectorAll('.logo-top img');
-                        logoImgs.forEach(img => img.src = logoUrl);
-                        }
-                        }
-                        async function changeUserPassword(userId) {
-                        const newPass = prompt("Digite a nova senha para este usuário (min 6 caracteres):");
-                        if (!newPass) return;
-                        if (newPass.length < 6) return alert("Senha muito curta."); try { const res=await
-                            fetch(`/ api / company / users / ${ userId } /password`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ password: newPass }) });
-                })
-            }); const data = await res.json(); if (res.ok) alert(data.message); else
-                alert(data.error || 'Erro ao alterar senha.');
-        } catch (e) {
-            console.error(e); alert('Erro
-                            ao alterar senha.'); } } 
+        function updateMockupLogo(logoUrl) {
+            const iframe = document.getElementById('mobilePreviewIframe');
+            if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
+                const logoImgs = iframe.contentWindow.document.querySelectorAll('.logo-top img');
+                logoImgs.forEach(img => img.src = logoUrl);
+            }
+        }
+        async function changeUserPassword(userId) {
+            const newPass = prompt("Digite a nova senha para este usuário (min 6 caracteres):");
+            if (!newPass) return;
+            if (newPass.length < 6) return alert("Senha muito curta.");
+            try {
+                const res = await fetch(`/api/company/users/${userId}/password`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ password: newPass })
+                });
+                const data = await res.json();
+                if (res.ok) alert(data.message);
+                else alert(data.error || 'Erro ao alterar senha.');
+            } catch (e) {
+                console.error(e);
+                alert('Erro ao alterar senha.');
+            }
+        } 
     </script>
     <!-- SUGGESTION MODAL -->
     <div class="modal-overlay" id="suggestionModal">
@@ -3022,35 +3036,35 @@
 
 
     <script>
-                            // --- SUGGESTIONS LOGIC ---
-                            async function loadSuggestions() {
-                    const list = document.getElementById('suggestionsList');
-                    if (!list) return;
+        // --- SUGGESTIONS LOGIC ---
+        async function loadSuggestions() {
+            const list = document.getElementById('suggestionsList');
+            if (!list) return;
 
-                    try {
-                        const res = await fetch('/api/suggestions', {
-                            headers: {
-                                'Authorization': `Bearer ${token}`
-                            }
-                        });
-                        const suggestions = await res.json();
+            try {
+                const res = await fetch('/api/suggestions', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const suggestions = await res.json();
 
-                        list.innerHTML = '';
-                        if (suggestions.length === 0) {
-                            list.innerHTML = '<p style="text-align:center; color:#666;">Nenhuma sugestão ainda. Seja o
-                            primeiro!</p > ';
-                            return;
-                        }
+                list.innerHTML = '';
+                if (suggestions.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:#666;">Nenhuma sugestão ainda. Seja o
+                    primeiro!</p > ';
+                    return;
+                }
 
-                        suggestions.forEach(s => {
-                            const div = document.createElement('div');
-                            div.style.cssText = 'background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;
-                            display: flex; align - items: center; gap: 15px; ';
-                            div.innerHTML = `
+                suggestions.forEach(s => {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;
+                    display: flex; align - items: center; gap: 15px; ';
+                    div.innerHTML = `
                             <div style="flex: 1;">
                                 <p style="margin: 0; color: #fff; font-size: 1rem;">${s.text}</p>
                                 <span style="font-size: 0.75rem; color: #666;">${new
-                                    Date(s.createdAt).toLocaleDateString()}</span>
+                            Date(s.createdAt).toLocaleDateString()}</span>
                             </div>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <button onclick="voteSuggestion(${s.id}, 'like')" class="vote-btn"
@@ -3063,52 +3077,52 @@
                                 </button>
                             </div>
                             `;
-                            list.appendChild(div);
-                        });
-                    } catch (e) {
-                        console.error(e); list.innerHTML = '<p style="color:red">Erro ao carregar.</p>
-                        '; }
-                    }
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                console.error(e); list.innerHTML = '<p style="color:red">Erro ao carregar.</p>
+                '; }
+            }
 
-                    async function voteSuggestion(id, type) {
-                        try {
-                            const res = await fetch(`/api/suggestions/${id}/vote`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                                body: JSON.stringify({ type })
-                            });
-                            if (res.ok) {
-                                loadSuggestions();
-                            }
-                        } catch (e) { console.error(e); }
+            async function voteSuggestion(id, type) {
+                try {
+                    const res = await fetch(`/api/suggestions/${id}/vote`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ type })
+                    });
+                    if (res.ok) {
+                        loadSuggestions();
                     }
+                } catch (e) { console.error(e); }
+            }
 
-                    function openSuggestionModal() {
-                        document.getElementById('suggestionModal').classList.add('active');
-                    }
-                    function closeSuggestionModal() {
-                        document.getElementById('suggestionModal').classList.remove('active');
-                    }
+            function openSuggestionModal() {
+                document.getElementById('suggestionModal').classList.add('active');
+            }
+            function closeSuggestionModal() {
+                document.getElementById('suggestionModal').classList.remove('active');
+            }
 
-                    async function submitSuggestion(e) {
-                        e.preventDefault();
-                        const text = document.getElementById('suggestionText').value;
-                        if (!text) return;
+            async function submitSuggestion(e) {
+                e.preventDefault();
+                const text = document.getElementById('suggestionText').value;
+                if (!text) return;
 
-                        try {
-                            const res = await fetch('/api/suggestions', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                                body: JSON.stringify({ text })
-                            });
-                            if (res.ok) {
-                                alert('Sugestão enviada!');
-                                closeSuggestionModal();
-                                document.getElementById('suggestionText').value = '';
-                                loadSuggestions();
-                            } else alert('Erro ao enviar.');
-                        } catch (e) { console.error(e); }
-                    }
+                try {
+                    const res = await fetch('/api/suggestions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ text })
+                    });
+                    if (res.ok) {
+                        alert('Sugestão enviada!');
+                        closeSuggestionModal();
+                        document.getElementById('suggestionText').value = '';
+                        loadSuggestions();
+                    } else alert('Erro ao enviar.');
+                } catch (e) { console.error(e); }
+            }
     </script>
 </body>
 
