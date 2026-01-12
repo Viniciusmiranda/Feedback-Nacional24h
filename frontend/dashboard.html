@@ -696,9 +696,7 @@
                 v2.2.45
             </div>
         </div>
-        </div>
     </nav>
-    </aside>
 
     <!-- CONTENT -->
     <main class="main-content">
@@ -2079,10 +2077,10 @@
                 const urlSlug = pathParts[1] !== 'dashboard' ? pathParts[1] : null;
 
                 let fetchUrl = '/api/avaliacoes/dashboard';
-                if (urlSlug) fetchUrl += `? slug = ${urlSlug} `;
+                if (urlSlug) fetchUrl += `?slug=${urlSlug}`;
 
                 const res = await fetch(fetchUrl, {
-                    headers: { 'Authorization': `Bearer ${token} ` }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!res.ok) throw new Error("Falha API");
