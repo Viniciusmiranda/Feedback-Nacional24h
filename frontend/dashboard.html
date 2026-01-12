@@ -1870,7 +1870,7 @@
                 });
         }
 
-        async function deleteReview(id) {
+        window.deleteReview = async function (id) {
             const result = await Swal.fire({
                 title: 'Tem certeza?',
                 text: "Você não poderá reverter isso!",
