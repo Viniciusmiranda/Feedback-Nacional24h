@@ -112,6 +112,31 @@ exports.updateReview = async (req, res) => {
     }
 };
 
+// Delete Review
+exports.deleteReview = async (req, res) => {
+    const { id } = req.params;
+    const { companyId } = req.user; // Ensure user owns the review's company
+
+    try {
+        // Verify ownership
+        const review = await prisma.review.findUnique({
+            where: { id },
+            include: { attendant: true }
+        });
+
+        if (!review) return res.status(404).json({ error: 'Avaliação não encontrada.' });
+        if (review.attendant.companyId !== companyId) {
+            return res.status(403).json({ error: 'Acesso negado.' });
+        }
+
+        await prisma.review.delete({ where: { id } });
+        res.json({ message: 'Avaliação excluída com sucesso!' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao excluir avaliação.' });
+    }
+};
+
 // Private: Get Dashboard Data
 exports.getDashboardData = async (req, res) => {
     const { companyId, role } = req.user;

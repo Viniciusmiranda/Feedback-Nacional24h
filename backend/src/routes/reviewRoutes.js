@@ -6,6 +6,7 @@ const auth = require('../middlewares/authMiddleware');
 // Public
 router.post('/', reviewController.submitReview);
 router.put('/:id', reviewController.updateReview); // Public update for flow
+router.delete('/:id', auth, reviewController.deleteReview);
 
 
 // Private

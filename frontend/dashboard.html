@@ -904,9 +904,8 @@
                                 <th>Local (IP)</th>
                                 <th>Mapa</th>
                                 <th>Cidade/UF</th>
-                                <th>Cidade/UF</th>
+                                <th>Ações</th>
                                 <!-- Removed Disp. -->
-                            </tr>
                             </tr>
                         </thead>
                         <tbody id="reportsTableBody">
@@ -1855,11 +1854,77 @@
         <td>${mapsLink}</td>
         <td>${item.city || '-'} / ${item.state || '-'}</td>
         <!-- Device Column Removed -->
-        `;
+                        const deleteBtn = isDashboard ? '' : `
+                            < button class="btn-icon delete-btn" onclick = "deleteReview('${item.id}')" title = "Excluir Avaliação" style = "background: none; border: none; cursor: pointer; color: #ff5252;" >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                                </svg>
+                            </button >
+                            `;
+
+                        const fullColumns = baseColumns + `
+                            < td > ${ ipDisplay }</td >
+        <td>${mapsLink}</td>
+        <td>${item.city || '-'} / ${item.state || '-'}</td>
+        <td style="text-align: center;">${deleteBtn}</td>
+                        `;
                         tr.innerHTML = fullColumns;
                     }
                     tbody.appendChild(tr);
                 });
+        }
+        
+        async function deleteReview(id) {
+            const result = await Swal.fire({
+                title: 'Tem certeza?',
+                text: "Você não poderá reverter isso!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sim, excluir!',
+                cancelButtonText: 'Cancelar',
+                background: '#1e1e2d',
+                color: '#fff'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(`/ api / avaliacoes / ${ id } `, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${ token } ` }
+                    });
+
+                    if (res.ok) {
+                        Swal.fire({
+                            title: 'Excluído!',
+                            text: 'A avaliação foi removida.',
+                            icon: 'success',
+                            background: '#1e1e2d',
+                            color: '#fff'
+                        });
+                        // Refresh Data
+                        if(document.getElementById('view-relatorios').style.display !== 'none'){
+                             applyReportFilters(true);
+                        } else {
+                             loadDashboard(); 
+                        }
+                    } else {
+                        const err = await res.json();
+                        throw new Error(err.error || 'Erro ao excluir');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    Swal.fire({
+                        title: 'Erro!',
+                        text: 'Não foi possível excluir a avaliação.',
+                        icon: 'error',
+                        background: '#1e1e2d',
+                        color: '#fff'
+                    });
+                }
+            }
         }
 
         // --- REPORTS & FILTERING LOGIC ---
@@ -1871,9 +1936,9 @@
             if (reset) {
                 globalData.reports = [];
                 globalData.reportsPage = 1;
-                tbody.innerHTML = `<tr>
-                    <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Carregando dados...</td>
-                </tr>`;
+                tbody.innerHTML = `< tr >
+                            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Carregando dados...</td>
+                </tr > `;
                 if (btn) btn.style.display = 'inline-block';
             }
 
@@ -1892,8 +1957,8 @@
             if (search) params.append('search', search);
 
             try {
-                const res = await fetch(`/api/avaliacoes/list?${params.toString()}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const res = await fetch(`/ api / avaliacoes / list ? ${ params.toString() } `, {
+                    headers: { 'Authorization': `Bearer ${ token } ` }
                 });
 
                 if (!res.ok) throw new Error("Erro na API");
@@ -1903,9 +1968,9 @@
                 if (reset) tbody.innerHTML = ''; // Clear loading message
 
                 if (newReviews.length === 0 && reset) {
-                    tbody.innerHTML = `<tr>
-                        <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Nenhuma avaliação encontrada com estes filtros.</td>
-                    </tr>`;
+                    tbody.innerHTML = `< tr >
+                            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">Nenhuma avaliação encontrada com estes filtros.</td>
+                    </tr > `;
                     if (btn) btn.style.display = 'none';
                     return;
                 }
@@ -1926,9 +1991,9 @@
 
             } catch (e) {
                 console.error(e);
-                tbody.innerHTML = `<tr>
-                    <td colspan="8" style="text-align: center; padding: 20px; color: #ef4444;">Erro ao carregar dados. Tente novamente.</td>
-                </tr>`;
+                tbody.innerHTML = `< tr >
+                            <td colspan="8" style="text-align: center; padding: 20px; color: #ef4444;">Erro ao carregar dados. Tente novamente.</td>
+                </tr > `;
             }
         }
 
@@ -1941,8 +2006,8 @@
                 globalData.reviewsPage = (globalData.reviewsPage || 1) + 1;
 
                 try {
-                    const res = await fetch(`/api/avaliacoes/list?page=${globalData.reviewsPage}&limit=30`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
+                    const res = await fetch(`/ api / avaliacoes / list ? page = ${ globalData.reviewsPage }& limit=30`, {
+                        headers: { 'Authorization': `Bearer ${ token } ` }
                     });
                     const newReviews = await res.json();
                     if (newReviews.length > 0) {
@@ -1992,10 +2057,10 @@
                 const urlSlug = pathParts[1] !== 'dashboard' ? pathParts[1] : null;
 
                 let fetchUrl = '/api/avaliacoes/dashboard';
-                if (urlSlug) fetchUrl += `?slug=${urlSlug}`;
+                if (urlSlug) fetchUrl += `? slug = ${ urlSlug } `;
 
                 const res = await fetch(fetchUrl, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 'Authorization': `Bearer ${ token } ` }
                 });
 
                 if (!res.ok) throw new Error("Falha API");
@@ -2004,7 +2069,7 @@
                 globalData = { ...globalData, ...data, reviewsPage: 1 }; // Reset page
 
                 if (planBadge) {
-                    planBadge.innerText = `PLANO ${data.plan || 'GRATIS'}`;
+                    planBadge.innerText = `PLANO ${ data.plan || 'GRATIS' } `;
                     // Show only if GRATIS
                     if ((data.plan || 'GRATIS') === 'GRATIS') {
                         planBadge.style.display = 'inline-block';
@@ -2029,7 +2094,7 @@
                 });
 
                 // Highlight Current
-                const activeCard = document.getElementById(`plan-${currentPlan}`);
+                const activeCard = document.getElementById(`plan - ${ currentPlan } `);
                 if (activeCard) {
                     activeCard.style.border = "2px solid var(--accent)";
                     activeCard.style.background = "rgba(77, 77, 255, 0.1)";
@@ -2037,9 +2102,9 @@
                     const actionEl = activeCard.querySelector('.btn-glow') || activeCard.querySelector('button');
                     if (actionEl) {
                         const parent = actionEl.parentNode;
-                        parent.innerHTML += `<button disabled
-            style="width: 100%; padding: 10px; background: var(--accent); border: none; color: #fff; border-radius: 6px;">Plano
-            Atual</button>`;
+                        parent.innerHTML += `< button disabled
+                        style = "width: 100%; padding: 10px; background: var(--accent); border: none; color: #fff; border-radius: 6px;" > Plano
+            Atual</button > `;
                         actionEl.remove();
                     }
                 }
@@ -2048,7 +2113,7 @@
                 // Update Header Texts & Sidebar Logo
                 const userObj = JSON.parse(localStorage.getItem('user') || '{}');
                 document.getElementById('pageTitle').innerText = data.companyName;
-                document.getElementById('pageSubtitle').innerText = `Bem-vindo(a), ${userObj.name || 'Gestor'}. Aqui estão os resultados em tempo real.`;
+                document.getElementById('pageSubtitle').innerText = `Bem - vindo(a), ${ userObj.name || 'Gestor' }. Aqui estão os resultados em tempo real.`;
 
                 // Update Sidebar Logo if available
                 if (data.logo) {
@@ -2240,13 +2305,13 @@
                 const attName = item.attendant ? item.attendant.name : 'Geral';
                 const date = new Date(item.createdAt);
                 tr.innerHTML = `
-            <td><span class="badge badge-attendant">${attName}</span></td>
+                            < td > <span class="badge badge-attendant">${attName}</span></td >
             <td>${date.toLocaleDateString()} <small>${date.toLocaleTimeString().slice(0, 5)}</small></td>
             <td><span class="stars-display">${starsHtml}</span></td>
             <td>${item.comment || '-'}</td>
             <td>${item.city || '-'} / ${item.state || '-'}</td>
             <td><span class="badge badge-device">${item.device || '?'}</span></td>
-            `;
+                        `;
                 tbody.appendChild(tr);
             });
         }
@@ -2272,18 +2337,18 @@
                 if (h2) {
                     toolbar = document.createElement('div');
                     toolbar.id = 'atdToolbar';
-                    toolbar.style.cssText = `display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;`;
+                    toolbar.style.cssText = `display: flex; justify - content: space - between; align - items: center; margin - bottom: 20px; `;
 
                     // Helper text for Plan Limits (Initial placeholder, updated below)
                     toolbar.innerHTML = `
-            <div id="planUsageText" style="font-size: 0.9rem; color: var(--text-muted);">
-                Uso do Plano: --
-            </div>
-            <button onclick="toggleAttendantSort()"
-                style="background: rgba(255,255,255,0.1); border:none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-                ⇅ Ordenar por Avaliações
-            </button>
-            `;
+                            < div id = "planUsageText" style = "font-size: 0.9rem; color: var(--text-muted);" >
+                                Uso do Plano: --
+            </div >
+                            <button onclick="toggleAttendantSort()"
+                                style="background: rgba(255,255,255,0.1); border:none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                                ⇅ Ordenar por Avaliações
+                            </button>
+                        `;
                     h2.insertAdjacentElement('afterend', toolbar);
                 }
             }
@@ -2294,28 +2359,28 @@
                 const limits = { 'GRATIS': 5, 'PEQUENAS': 20, 'GRANDES': Infinity };
                 const limit = limits[globalData.plan] || 5;
                 const count = globalData.metrics.activeAttendants || 0;
-                const txt = limit === Infinity ? 'Ilimitado' : `${count}/${limit}`;
-                limitTextEl.innerHTML = `Uso do Plano: <strong style="color: #fff;">${txt}</strong> atendentes`;
-            }
+                const txt = limit === Infinity ? 'Ilimitado' : `${ count }/${limit}`;
+                        limitTextEl.innerHTML = `Uso do Plano: <strong style="color: #fff;">${txt}</strong> atendentes`;
+                    }
 
-            // SORT DATA
-            let sorted = [...attendants];
-            if (attendantsSort === 'reviews') {
-                sorted.sort((a, b) => b._count.reviews - a._count.reviews);
-            } else {
-                sorted.sort((a, b) => a.name.localeCompare(b.name));
-            }
+                    // SORT DATA
+                    let sorted = [...attendants];
+                    if (attendantsSort === 'reviews') {
+                        sorted.sort((a, b) => b._count.reviews - a._count.reviews);
+                    } else {
+                        sorted.sort((a, b) => a.name.localeCompare(b.name));
+                    }
 
-            tbody.innerHTML = '';
-            sorted.forEach(att => {
-                const tr = document.createElement('tr');
-                const attColor = getAttendantColor(att.name);
-                const isActive = att.active !== false; // Default true if undefined
-                const statusBadge = isActive
-                    ? '<span style="color:#00e676;">Ativo</span>'
-                    : '<span style="color:#ef4444;">Inativo</span>';
+                    tbody.innerHTML = '';
+                    sorted.forEach(att => {
+                        const tr = document.createElement('tr');
+                        const attColor = getAttendantColor(att.name);
+                        const isActive = att.active !== false; // Default true if undefined
+                        const statusBadge = isActive
+                            ? '<span style="color:#00e676;">Ativo</span>'
+                            : '<span style="color:#ef4444;">Inativo</span>';
 
-                tr.innerHTML = `
+                        tr.innerHTML = `
             <td><b style="color: ${attColor}; font-size: 1.05rem;">${att.name}</b></td>
             <td>${att.phone || '-'}</td>
             <td>${att.sector || '-'}</td>
@@ -2340,377 +2405,377 @@
                 </button>
             </td>
             `;
-                tbody.appendChild(tr);
-            });
-        }
+                        tbody.appendChild(tr);
+                    });
+                }
 
         // --- FILTERING ---
         document.getElementById('searchInput').addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = globalData.reviews.filter(d =>
-                (d.attendant?.name.toLowerCase().includes(term)) ||
-                (d.city?.toLowerCase().includes(term))
-            );
-            renderTable(filtered);
-        });
-
-        // --- EXPORT FUNCTIONS ---
-
-        function getFilteredDataForExport() {
-            // If in Reports tab, use the loaded reports
-            const reportsView = document.getElementById('view-relatorios');
-            if (reportsView && reportsView.style.display !== 'none' && globalData.reports.length > 0) {
-                return globalData.reports;
-            }
-
-            // Fallback to existing dashboard logic
-            const startStr = document.getElementById('reportStartDate')?.value ||
-                document.getElementById('dateStart')?.value;
-            const endStr = document.getElementById('reportEndDate')?.value || document.getElementById('dateEnd')?.value;
-
-            let data = globalData.reviews;
-
-            if (startStr || endStr) {
-                const start = startStr ? new Date(startStr) : new Date(0);
-                const end = endStr ? new Date(endStr) : new Date();
-                end.setHours(23, 59, 59, 999);
-
-                data = data.filter(r => {
-                    const d = new Date(r.createdAt);
-                    return d >= start && d <= end;
+                    const term = e.target.value.toLowerCase();
+                    const filtered = globalData.reviews.filter(d =>
+                        (d.attendant?.name.toLowerCase().includes(term)) ||
+                        (d.city?.toLowerCase().includes(term))
+                    );
+                    renderTable(filtered);
                 });
-            } return data;
-        } function exportToCSV() {
-            const
-                data = getFilteredDataForExport(); const rows = [["Atendente", "Data", "Nota", "Comentario", "IP"
-                    , "Localizacao", "Cidade", "Estado", "Dispositivo"]]; data.forEach(r => {
-                        const attName = r.attendant ? r.attendant.name : 'Geral';
-                        const date = new Date(r.createdAt).toLocaleString();
 
-                        rows.push([
-                            `"${attName}"`,
-                            `"${date}"`,
-                            r.stars,
-                            `"${(r.comment || '').replace(/"/g, '""')}"`,
-                            `"${r.ip || ''}"`,
-                            `"${r.location || ''}"`,
-                            `"${r.city || ''}"`,
-                            `"${r.state || ''}"`,
-                            `"${r.device || ''}"`
-                        ]);
-                    });
+            // --- EXPORT FUNCTIONS ---
 
-            let csvContent = "data:text/csv;charset=utf-8,"
-                + rows.map(e => e.join(",")).join("\n");
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `avaliaja_relatorio_${Date.now()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        async function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const data = getFilteredDataForExport();
-
-            // Header
-            doc.setFontSize(20);
-            doc.text(globalData.companyName || "Relatório de Avaliações", 14, 22);
-            doc.setFontSize(10);
-            const today = new Date().toLocaleDateString();
-            doc.text(`Gerado em: ${today}`, 14, 30);
-
-            // Summary Stats (calculated from filtered data)
-            const total = data.length;
-            const avg = total > 0 ? (data.reduce((acc, curr) => acc + curr.stars, 0) / total).toFixed(1) : 0;
-            const nps = "N/A (Geral)"; // Simplification for PDF, or calc real NPS if needed
-
-            doc.text(`Total no período: ${total} | Média: ${avg}`, 14, 38);
-
-            // Table
-            const tableBody = data.map(r => [
-                r.attendant ? r.attendant.name : 'Geral',
-                new Date(r.createdAt).toLocaleDateString(),
-                r.stars + ' ★',
-                r.comment || '-',
-                r.city || '-'
-            ]);
-
-            doc.autoTable({
-                startY: 45,
-                head: [['Atendente', 'Data', 'Nota', 'Com.', 'Cidade']],
-                body: tableBody,
-                theme: 'grid',
-                headStyles: { fillColor: [43, 29, 167] }
-            });
-
-            doc.save(`relatorio_avaliaja_${Date.now()}.pdf`);
-        }
-
-        // --- MODAL LOGIC ---
-        function openAttendantModal(attId = null) {
-            const m = document.getElementById('attendantModal');
-            m.classList.add('active');
-
-            if (attId) {
-                // Edit Mode
-                const data = globalData.attendants.find(a => a.id === attId);
-                if (!data) return alert("Erro: Atendente não encontrado.");
-
-                document.getElementById('attendantIdInput').value = data.id;
-                document.getElementById('attendantNameInput').value = data.name;
-                document.getElementById('attendantPhoneInput').value = data.phone || '';
-                document.getElementById('attendantSectorInput').value = data.sector || '';
-                document.getElementById('attendantIntegrationIdInput').value = data.integrationId || '';
-                document.getElementById('attendantNotifyInput').checked = data.notify !== false; // Default true
-                (conceptually)
-                document.getElementById('attendantActiveInput').checked = data.active !== false;
-                document.getElementById('resultArea').style.display = 'none';
-            } else {
-                // Create Mode
-                document.getElementById('attendantIdInput').value = '';
-                document.getElementById('attendantNameInput').value = '';
-                document.getElementById('attendantPhoneInput').value = '';
-                document.getElementById('attendantSectorInput').value = '';
-                document.getElementById('attendantIntegrationIdInput').value = '';
-                document.getElementById('attendantNotifyInput').checked = true;
-                document.getElementById('attendantActiveInput').checked = true;
-                document.getElementById('resultArea').style.display = 'none';
-            }
-        }
-
-        function closeAttendantModal() {
-            document.getElementById('attendantModal').classList.remove('active');
-            // Wait a bit to refresh so the user sees the close animation?
-            // Actually, we should refresh list immediately.
-            loadDashboard();
-        }
-
-        function getCompSlug() {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            return user.companySlug || 'empresa'; // Fallback
-        }
-
-        async function saveAttendant() {
-            const id = document.getElementById('attendantIdInput').value.trim();
-            const name = document.getElementById('attendantNameInput').value.trim();
-            if (!name) return alert("O nome é obrigatório.");
-
-            const phone = document.getElementById('attendantPhoneInput').value.trim();
-            const sector = document.getElementById('attendantSectorInput').value.trim();
-            const integrationId = document.getElementById('attendantIntegrationIdInput').value.trim();
-            const notify = document.getElementById('attendantNotifyInput').checked;
-            const active = document.getElementById('attendantActiveInput').checked;
-
-            const btn = document.querySelector('button[onclick="saveAttendant()"]');
-            const originalText = btn.innerText;
-            btn.innerText = "Salvando...";
-            btn.disabled = true;
-
-            const payload = {
-                name,
-                phone: phone || null,
-                sector: sector || null,
-                integrationId: integrationId || null,
-                notify,
-                active
-            };
-
-            try {
-                let res;
-                if (id) {
-                    // Update
-                    res = await fetch(`/api/atendentes/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify(payload)
-                    });
-                } else {
-                    // Create
-                    res = await fetch('/api/atendentes', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify(payload)
-                    });
+            function getFilteredDataForExport() {
+                // If in Reports tab, use the loaded reports
+                const reportsView = document.getElementById('view-relatorios');
+                if (reportsView && reportsView.style.display !== 'none' && globalData.reports.length > 0) {
+                    return globalData.reports;
                 }
 
-                if (res.ok) {
-                    const saved = await res.json();
+                // Fallback to existing dashboard logic
+                const startStr = document.getElementById('reportStartDate')?.value ||
+                    document.getElementById('dateStart')?.value;
+                const endStr = document.getElementById('reportEndDate')?.value || document.getElementById('dateEnd')?.value;
 
+                let data = globalData.reviews;
+
+                if (startStr || endStr) {
+                    const start = startStr ? new Date(startStr) : new Date(0);
+                    const end = endStr ? new Date(endStr) : new Date();
+                    end.setHours(23, 59, 59, 999);
+
+                    data = data.filter(r => {
+                        const d = new Date(r.createdAt);
+                        return d >= start && d <= end;
+                    });
+                } return data;
+            } function exportToCSV() {
+                const
+                    data = getFilteredDataForExport(); const rows = [["Atendente", "Data", "Nota", "Comentario", "IP"
+                        , "Localizacao", "Cidade", "Estado", "Dispositivo"]]; data.forEach(r => {
+                            const attName = r.attendant ? r.attendant.name : 'Geral';
+                            const date = new Date(r.createdAt).toLocaleString();
+
+                            rows.push([
+                                `"${attName}"`,
+                                `"${date}"`,
+                                r.stars,
+                                `"${(r.comment || '').replace(/"/g, '""')}"`,
+                                `"${r.ip || ''}"`,
+                                `"${r.location || ''}"`,
+                                `"${r.city || ''}"`,
+                                `"${r.state || ''}"`,
+                                `"${r.device || ''}"`
+                            ]);
+                        });
+
+                let csvContent = "data:text/csv;charset=utf-8,"
+                    + rows.map(e => e.join(",")).join("\n");
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `avaliaja_relatorio_${Date.now()}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            async function generatePDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const data = getFilteredDataForExport();
+
+                // Header
+                doc.setFontSize(20);
+                doc.text(globalData.companyName || "Relatório de Avaliações", 14, 22);
+                doc.setFontSize(10);
+                const today = new Date().toLocaleDateString();
+                doc.text(`Gerado em: ${today}`, 14, 30);
+
+                // Summary Stats (calculated from filtered data)
+                const total = data.length;
+                const avg = total > 0 ? (data.reduce((acc, curr) => acc + curr.stars, 0) / total).toFixed(1) : 0;
+                const nps = "N/A (Geral)"; // Simplification for PDF, or calc real NPS if needed
+
+                doc.text(`Total no período: ${total} | Média: ${avg}`, 14, 38);
+
+                // Table
+                const tableBody = data.map(r => [
+                    r.attendant ? r.attendant.name : 'Geral',
+                    new Date(r.createdAt).toLocaleDateString(),
+                    r.stars + ' ★',
+                    r.comment || '-',
+                    r.city || '-'
+                ]);
+
+                doc.autoTable({
+                    startY: 45,
+                    head: [['Atendente', 'Data', 'Nota', 'Com.', 'Cidade']],
+                    body: tableBody,
+                    theme: 'grid',
+                    headStyles: { fillColor: [43, 29, 167] }
+                });
+
+                doc.save(`relatorio_avaliaja_${Date.now()}.pdf`);
+            }
+
+            // --- MODAL LOGIC ---
+            function openAttendantModal(attId = null) {
+                const m = document.getElementById('attendantModal');
+                m.classList.add('active');
+
+                if (attId) {
+                    // Edit Mode
+                    const data = globalData.attendants.find(a => a.id === attId);
+                    if (!data) return alert("Erro: Atendente não encontrado.");
+
+                    document.getElementById('attendantIdInput').value = data.id;
+                    document.getElementById('attendantNameInput').value = data.name;
+                    document.getElementById('attendantPhoneInput').value = data.phone || '';
+                    document.getElementById('attendantSectorInput').value = data.sector || '';
+                    document.getElementById('attendantIntegrationIdInput').value = data.integrationId || '';
+                    document.getElementById('attendantNotifyInput').checked = data.notify !== false; // Default true
+                    (conceptually)
+                    document.getElementById('attendantActiveInput').checked = data.active !== false;
+                    document.getElementById('resultArea').style.display = 'none';
+                } else {
+                    // Create Mode
+                    document.getElementById('attendantIdInput').value = '';
+                    document.getElementById('attendantNameInput').value = '';
+                    document.getElementById('attendantPhoneInput').value = '';
+                    document.getElementById('attendantSectorInput').value = '';
+                    document.getElementById('attendantIntegrationIdInput').value = '';
+                    document.getElementById('attendantNotifyInput').checked = true;
+                    document.getElementById('attendantActiveInput').checked = true;
+                    document.getElementById('resultArea').style.display = 'none';
+                }
+            }
+
+            function closeAttendantModal() {
+                document.getElementById('attendantModal').classList.remove('active');
+                // Wait a bit to refresh so the user sees the close animation?
+                // Actually, we should refresh list immediately.
+                loadDashboard();
+            }
+
+            function getCompSlug() {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                return user.companySlug || 'empresa'; // Fallback
+            }
+
+            async function saveAttendant() {
+                const id = document.getElementById('attendantIdInput').value.trim();
+                const name = document.getElementById('attendantNameInput').value.trim();
+                if (!name) return alert("O nome é obrigatório.");
+
+                const phone = document.getElementById('attendantPhoneInput').value.trim();
+                const sector = document.getElementById('attendantSectorInput').value.trim();
+                const integrationId = document.getElementById('attendantIntegrationIdInput').value.trim();
+                const notify = document.getElementById('attendantNotifyInput').checked;
+                const active = document.getElementById('attendantActiveInput').checked;
+
+                const btn = document.querySelector('button[onclick="saveAttendant()"]');
+                const originalText = btn.innerText;
+                btn.innerText = "Salvando...";
+                btn.disabled = true;
+
+                const payload = {
+                    name,
+                    phone: phone || null,
+                    sector: sector || null,
+                    integrationId: integrationId || null,
+                    notify,
+                    active
+                };
+
+                try {
+                    let res;
                     if (id) {
-                        alert('Atendente atualizado com sucesso!');
-                        closeAttendantModal();
+                        // Update
+                        res = await fetch(`/api/atendentes/${id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify(payload)
+                        });
                     } else {
-                        // If created, populate link area
-                        const slug = getCompSlug();
-                        const origin = window.location.origin;
-                        const fullLink = `${origin}/${slug}/${encodeURIComponent(saved.name)}`;
-
-                        document.getElementById('generatedLink').value = fullLink;
-                        document.getElementById('resultArea').style.display = 'block';
-                        btn.innerText = "Salvo!";
-
-                        // We also refresh the background list, but don't close modal yet so they can copy link
-                        loadDashboard();
-
-                        setTimeout(() => {
-                            btn.innerText = originalText;
-                            btn.disabled = false;
-                        }, 2000);
-                        return; // Exit early to keep modal open
+                        // Create
+                        res = await fetch('/api/atendentes', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify(payload)
+                        });
                     }
 
-                } else {
-                    const err = await res.json();
-                    alert('Erro: ' + (err.error || 'Erro desconhecido'));
+                    if (res.ok) {
+                        const saved = await res.json();
+
+                        if (id) {
+                            alert('Atendente atualizado com sucesso!');
+                            closeAttendantModal();
+                        } else {
+                            // If created, populate link area
+                            const slug = getCompSlug();
+                            const origin = window.location.origin;
+                            const fullLink = `${origin}/${slug}/${encodeURIComponent(saved.name)}`;
+
+                            document.getElementById('generatedLink').value = fullLink;
+                            document.getElementById('resultArea').style.display = 'block';
+                            btn.innerText = "Salvo!";
+
+                            // We also refresh the background list, but don't close modal yet so they can copy link
+                            loadDashboard();
+
+                            setTimeout(() => {
+                                btn.innerText = originalText;
+                                btn.disabled = false;
+                            }, 2000);
+                            return; // Exit early to keep modal open
+                        }
+
+                    } else {
+                        const err = await res.json();
+                        alert('Erro: ' + (err.error || 'Erro desconhecido'));
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('Erro de conexão: ' + (e.message || e));
                 }
-            } catch (e) {
-                console.error(e);
-                alert('Erro de conexão: ' + (e.message || e));
+
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
 
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
+            function copyLink() {
+                const copyText = document.getElementById("generatedLink");
+                copyText.select();
+                copyText.setSelectionRange(0, 99999); // Mobile compatibility
+                navigator.clipboard.writeText(copyText.value);
 
-        function copyLink() {
-            const copyText = document.getElementById("generatedLink");
-            copyText.select();
-            copyText.setSelectionRange(0, 99999); // Mobile compatibility
-            navigator.clipboard.writeText(copyText.value);
-
-            const btn = document.getElementById('btnCopy');
-            const original = btn.innerText;
-            btn.innerText = "Copiado!";
-            btn.style.background = "#00e676";
-            setTimeout(() => {
-                btn.innerText = original;
-                btn.style.background = "var(--primary-blue)";
-            }, 2000);
-        }
-
-        function copyLinkByName(name) {
-            const slug = getCompSlug();
-            const origin = window.location.origin;
-            // Format: domain.com/SLUG/NAME
-            const fullLink = `${origin}/${slug}/${encodeURIComponent(name)}`;
-
-            navigator.clipboard.writeText(fullLink);
-
-            // Visual feedback
-            const btn = document.getElementById(`btn-copy-${name}`);
-            if (btn) {
+                const btn = document.getElementById('btnCopy');
                 const original = btn.innerText;
-                btn.innerText = "Copiado! ✓";
+                btn.innerText = "Copiado!";
                 btn.style.background = "#00e676";
-                btn.style.color = "#fff";
                 setTimeout(() => {
                     btn.innerText = original;
-                    btn.style.background = "rgba(255,255,255,0.1)";
-                    btn.style.color = "#fff";
+                    btn.style.background = "var(--primary-blue)";
                 }, 2000);
             }
-        }
 
-        async function deleteAttendant(id, name) {
-            if (!confirm(`Tem certeza que deseja excluir ${name}? Todas as avaliações dele serão apagadas.`))
-                return;
+            function copyLinkByName(name) {
+                const slug = getCompSlug();
+                const origin = window.location.origin;
+                // Format: domain.com/SLUG/NAME
+                const fullLink = `${origin}/${slug}/${encodeURIComponent(name)}`;
 
-            try {
-                const res = await fetch(`/api/atendentes/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (res.ok) {
-                    loadDashboard(); // Reload logic
-                } else {
-                    alert("Erro ao excluir");
+                navigator.clipboard.writeText(fullLink);
+
+                // Visual feedback
+                const btn = document.getElementById(`btn-copy-${name}`);
+                if (btn) {
+                    const original = btn.innerText;
+                    btn.innerText = "Copiado! ✓";
+                    btn.style.background = "#00e676";
+                    btn.style.color = "#fff";
+                    setTimeout(() => {
+                        btn.innerText = original;
+                        btn.style.background = "rgba(255,255,255,0.1)";
+                        btn.style.color = "#fff";
+                    }, 2000);
                 }
-            } catch (e) {
-                console.error(e);
             }
-        }
 
-        window.onclick = function (e) {
-            // Only close if clicked strictly on overlay, not content
-            if (e.target == document.getElementById('attendantModal')) closeAttendantModal();
-        }
+            async function deleteAttendant(id, name) {
+                if (!confirm(`Tem certeza que deseja excluir ${name}? Todas as avaliações dele serão apagadas.`))
+                    return;
 
-        // Init
-        loadDashboard();
-
-        // --- PREVIEW LOGIC (POSTMESSAGE) ---
-        function updatePreviewColor(color) {
-            const frame = document.getElementById('previewIframe');
-            if (frame && frame.contentWindow) {
-                frame.contentWindow.postMessage({ type: 'UPDATE_COLOR', color: color }, '*');
-            }
-        }
-
-        function updatePreviewText(text) {
-            const frame = document.getElementById('previewIframe');
-            if (frame && frame.contentWindow) {
-                frame.contentWindow.postMessage({ type: 'UPDATE_TEXT', text: text }, '*');
-            }
-        }
-
-        function togglePreviewObs(show) {
-            const frame = document.getElementById('previewIframe');
-            if (frame && frame.contentWindow) {
-                frame.contentWindow.postMessage({ type: 'TOGGLE_OBS', show: show }, '*');
-            }
-        }
-
-        function updatePreviewLogo(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const base64 = e.target.result;
-                    // Show small preview in dashboard
-                    document.getElementById('logoPreviewContainer').style.display = 'block';
-                    document.getElementById('logoPreviewImg').src = base64;
-                    // Send to Iframe
-                    const frame = document.getElementById('previewIframe');
-                    if (frame && frame.contentWindow) {
-                        frame.contentWindow.postMessage({ type: 'UPDATE_LOGO', src: base64 }, '*');
-                    }
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // --- NEW FEATURES LOGIC ---
-
-        async function loadUsers() {
-            try {
-                const res = await fetch('/api/company/users', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const users = await res.json();
-                const tbody = document.getElementById('usersTableBody');
-                tbody.innerHTML = '';
-
-                // Ensure current user is in the list
-                const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-                const hasCurrent = users.find(u => u.email === currentUser.email);
-
-                let displayUsers = [...users];
-                if (currentUser.email && !hasCurrent) {
-                    displayUsers.unshift({
-                        name: currentUser.name + ' (Você)',
-                        email: currentUser.email,
-                        role: 'admin', // Assume admin
-                        isSelf: true
+                try {
+                    const res = await fetch(`/api/atendentes/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
                     });
+                    if (res.ok) {
+                        loadDashboard(); // Reload logic
+                    } else {
+                        alert("Erro ao excluir");
+                    }
+                } catch (e) {
+                    console.error(e);
                 }
+            }
 
-                displayUsers.forEach(u => {
-                    const isSelf = u.email === currentUser.email || u.isSelf;
-                    tbody.innerHTML += `
+            window.onclick = function (e) {
+                // Only close if clicked strictly on overlay, not content
+                if (e.target == document.getElementById('attendantModal')) closeAttendantModal();
+            }
+
+            // Init
+            loadDashboard();
+
+            // --- PREVIEW LOGIC (POSTMESSAGE) ---
+            function updatePreviewColor(color) {
+                const frame = document.getElementById('previewIframe');
+                if (frame && frame.contentWindow) {
+                    frame.contentWindow.postMessage({ type: 'UPDATE_COLOR', color: color }, '*');
+                }
+            }
+
+            function updatePreviewText(text) {
+                const frame = document.getElementById('previewIframe');
+                if (frame && frame.contentWindow) {
+                    frame.contentWindow.postMessage({ type: 'UPDATE_TEXT', text: text }, '*');
+                }
+            }
+
+            function togglePreviewObs(show) {
+                const frame = document.getElementById('previewIframe');
+                if (frame && frame.contentWindow) {
+                    frame.contentWindow.postMessage({ type: 'TOGGLE_OBS', show: show }, '*');
+                }
+            }
+
+            function updatePreviewLogo(input) {
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const base64 = e.target.result;
+                        // Show small preview in dashboard
+                        document.getElementById('logoPreviewContainer').style.display = 'block';
+                        document.getElementById('logoPreviewImg').src = base64;
+                        // Send to Iframe
+                        const frame = document.getElementById('previewIframe');
+                        if (frame && frame.contentWindow) {
+                            frame.contentWindow.postMessage({ type: 'UPDATE_LOGO', src: base64 }, '*');
+                        }
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            // --- NEW FEATURES LOGIC ---
+
+            async function loadUsers() {
+                try {
+                    const res = await fetch('/api/company/users', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const users = await res.json();
+                    const tbody = document.getElementById('usersTableBody');
+                    tbody.innerHTML = '';
+
+                    // Ensure current user is in the list
+                    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+                    const hasCurrent = users.find(u => u.email === currentUser.email);
+
+                    let displayUsers = [...users];
+                    if (currentUser.email && !hasCurrent) {
+                        displayUsers.unshift({
+                            name: currentUser.name + ' (Você)',
+                            email: currentUser.email,
+                            role: 'admin', // Assume admin
+                            isSelf: true
+                        });
+                    }
+
+                    displayUsers.forEach(u => {
+                        const isSelf = u.email === currentUser.email || u.isSelf;
+                        tbody.innerHTML += `
                 <tr>
                     <td>${u.name} ${isSelf ? `<span class="badge" style="background:var(--accent); font-size:0.7em;">VOCÊ</span>` : ''}</td>
                         < td > ${u.email}</td >
@@ -2724,245 +2789,245 @@
                     </td >
                 </tr >
                         `;
-                });
-            } catch (e) { console.error(e); }
-        }
-
-        function openUserModal() {
-            document.getElementById('userModal').classList.add('active');
-        }
-
-        async function handleInviteUser(e) {
-            e.preventDefault();
-            const form = e.target;
-            const data = {
-                name: form.name.value,
-                email: form.email.value,
-                password: form.password.value
-            };
-
-            try {
-                const res = await fetch('/api/company/users', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token} ` },
-                    body: JSON.stringify(data)
-                });
-                if (res.ok) {
-                    alert('Usuário convidado!');
-                    document.getElementById('userModal').classList.remove('active');
-                    loadUsers();
-                    form.reset();
-                } else {
-                    alert('Erro ao convidar');
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        async function saveIntegrations(e) {
-            e.preventDefault();
-            const whatsappRaw = document.getElementById('whatsappInput') ?
-                document.getElementById('whatsappInput').value : '';
-            // Split comma, trim
-            const whatsappNumbers = whatsappRaw.split(',').map(s => s.trim()).filter(s => s);
-
-            const notificationRule = document.getElementById('notifyRuleInput') ?
-                document.getElementById('notifyRuleInput').value : 'all';
-
-            // N8N Webhook
-            const webhookUrl = document.getElementById('n8nWebhookInput') ?
-                document.getElementById('n8nWebhookInput').value : '';
-
-            try {
-                const res = await fetch('/api/company/settings', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token} ` },
-                    body: JSON.stringify({
-                        whatsapp: whatsappNumbers[0] || "", // Primary
-                        notifications: JSON.stringify({
-                            whatsappRule: notificationRule,
-                            whatsappNumbers: whatsappNumbers, // Save array
-                            webhookUrl: webhookUrl // Save N8N URL
-                        })
-                    })
-                });
-                if (res.ok) alert('Integrações salvas com sucesso!');
-            } catch (e) { console.error(e); }
-        }
-
-        async function saveAccountDetails(e) {
-            e.preventDefault();
-            const name = document.getElementById('companyNameInput').value;
-            const area = document.getElementById('companyAreaInput').value;
-
-            try {
-                const res = await fetch('/api/company/settings', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token} ` },
-                    body: JSON.stringify({ name, area })
-                });
-                if (res.ok) alert('Dados salvos!');
-            } catch (e) { console.error(e); }
-        }
-
-        // --- DATE FILTER & PDF LOGIC ---
-
-        function filterDashboardByDate() {
-            const startInput = document.getElementById('dateStart').value;
-            const endInput = document.getElementById('dateEnd').value;
-
-            if (!globalData.originalReviews) {
-                // Keep backup of originals on first run
-                globalData.originalReviews = [...globalData.reviews];
+                    });
+                } catch (e) { console.error(e); }
             }
 
-            let filtered = [...globalData.originalReviews];
-
-            if (startInput) {
-                const start = new Date(startInput);
-                filtered = filtered.filter(r => new Date(r.createdAt) >= start);
+            function openUserModal() {
+                document.getElementById('userModal').classList.add('active');
             }
-            if (endInput) {
-                const end = new Date(endInput);
-                end.setHours(23, 59, 59); // End of day
-                filtered = filtered.filter(r => new Date(r.createdAt) <= end);
-            } // Recalculate Metrics const
-            total = filtered.length; const avg = total > 0 ? (filtered.reduce((acc, r) => acc + r.stars, 0) / total)
-                : 0;
 
-            // NPS Calculation
-            const promoters = filtered.filter(r => r.stars >= 5).length;
-            const detractors = filtered.filter(r => r.stars <= 3).length; const nps = total > 0 ?
-                Math.round(((promoters - detractors) / total) * 100) : 0;
+            async function handleInviteUser(e) {
+                e.preventDefault();
+                const form = e.target;
+                const data = {
+                    name: form.name.value,
+                    email: form.email.value,
+                    password: form.password.value
+                };
 
-            // Update UI
-            renderMetrics({
-                average: avg,
-                total: total,
-                nps: nps,
-                activeAttendants: globalData.metrics.activeAttendants // Keep static
-            });
-
-            // Update Global for other renders
-            globalData.reviews = filtered;
-
-            // Recalc chart data (mock reconstruction)
-            // Ideally we'd re-aggregate by attendant, but for now we rely on review attendant data
-            const attMap = {};
-            filtered.forEach(r => {
-                const name = r.attendant ? r.attendant.name : 'Geral';
-                if (!attMap[name]) attMap[name] = 0;
-                attMap[name]++;
-            });
-            // Rebuild mock attendant object for chart
-            const mockAttendants = Object.keys(attMap).map(name => ({
-                name: name,
-                _count: { reviews: attMap[name] }
-            }));
-
-            renderCharts(mockAttendants); // This replots Main Chart
-            renderRecentReviews(filtered.slice(0, 30));
-        }
-
-        function exportDashboardPDF() {
-            const element = document.getElementById('view-dashboard');
-            const opt = {
-                margin: 0.5,
-                filename: 'Relatorio_AvaliaJa.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
-            // Hide buttons for cleaner PDF
-            const buttons = element.querySelectorAll('button');
-            buttons.forEach(b => b.style.display = 'none');
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Restore buttons
-                buttons.forEach(b => b.style.display = 'block');
-            });
-        }
-
-
-        // Update loadCustomization to fill new fields too
-        const oldLoadCustomization = loadCustomization;
-        loadCustomization = async function () {
-            await oldLoadCustomization();
-            // Fill new fields
-            try {
-                const res = await fetch('/api/company/settings', {
-                    headers: {
-                        'Authorization': `Bearer ${token} `
+                try {
+                    const res = await fetch('/api/company/users', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token} ` },
+                        body: JSON.stringify(data)
+                    });
+                    if (res.ok) {
+                        alert('Usuário convidado!');
+                        document.getElementById('userModal').classList.remove('active');
+                        loadUsers();
+                        form.reset();
+                    } else {
+                        alert('Erro ao convidar');
                     }
+                } catch (e) { console.error(e); }
+            }
+
+            async function saveIntegrations(e) {
+                e.preventDefault();
+                const whatsappRaw = document.getElementById('whatsappInput') ?
+                    document.getElementById('whatsappInput').value : '';
+                // Split comma, trim
+                const whatsappNumbers = whatsappRaw.split(',').map(s => s.trim()).filter(s => s);
+
+                const notificationRule = document.getElementById('notifyRuleInput') ?
+                    document.getElementById('notifyRuleInput').value : 'all';
+
+                // N8N Webhook
+                const webhookUrl = document.getElementById('n8nWebhookInput') ?
+                    document.getElementById('n8nWebhookInput').value : '';
+
+                try {
+                    const res = await fetch('/api/company/settings', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token} ` },
+                        body: JSON.stringify({
+                            whatsapp: whatsappNumbers[0] || "", // Primary
+                            notifications: JSON.stringify({
+                                whatsappRule: notificationRule,
+                                whatsappNumbers: whatsappNumbers, // Save array
+                                webhookUrl: webhookUrl // Save N8N URL
+                            })
+                        })
+                    });
+                    if (res.ok) alert('Integrações salvas com sucesso!');
+                } catch (e) { console.error(e); }
+            }
+
+            async function saveAccountDetails(e) {
+                e.preventDefault();
+                const name = document.getElementById('companyNameInput').value;
+                const area = document.getElementById('companyAreaInput').value;
+
+                try {
+                    const res = await fetch('/api/company/settings', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token} ` },
+                        body: JSON.stringify({ name, area })
+                    });
+                    if (res.ok) alert('Dados salvos!');
+                } catch (e) { console.error(e); }
+            }
+
+            // --- DATE FILTER & PDF LOGIC ---
+
+            function filterDashboardByDate() {
+                const startInput = document.getElementById('dateStart').value;
+                const endInput = document.getElementById('dateEnd').value;
+
+                if (!globalData.originalReviews) {
+                    // Keep backup of originals on first run
+                    globalData.originalReviews = [...globalData.reviews];
+                }
+
+                let filtered = [...globalData.originalReviews];
+
+                if (startInput) {
+                    const start = new Date(startInput);
+                    filtered = filtered.filter(r => new Date(r.createdAt) >= start);
+                }
+                if (endInput) {
+                    const end = new Date(endInput);
+                    end.setHours(23, 59, 59); // End of day
+                    filtered = filtered.filter(r => new Date(r.createdAt) <= end);
+                } // Recalculate Metrics const
+                total = filtered.length; const avg = total > 0 ? (filtered.reduce((acc, r) => acc + r.stars, 0) / total)
+                    : 0;
+
+                // NPS Calculation
+                const promoters = filtered.filter(r => r.stars >= 5).length;
+                const detractors = filtered.filter(r => r.stars <= 3).length; const nps = total > 0 ?
+                    Math.round(((promoters - detractors) / total) * 100) : 0;
+
+                // Update UI
+                renderMetrics({
+                    average: avg,
+                    total: total,
+                    nps: nps,
+                    activeAttendants: globalData.metrics.activeAttendants // Keep static
                 });
-                const data = await res.json();
 
-                // Profile
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const pName = document.getElementById('profileNameDisplay');
-                const pEmail = document.getElementById('profileEmailDisplay');
-                if (pName) pName.innerText = user.name || 'Gestor';
-                if (pEmail) pEmail.innerText = user.email || '';
+                // Update Global for other renders
+                globalData.reviews = filtered;
 
-                // Account
-                if (data.name) document.getElementById('companyNameInput').value = data.name;
-                if (data.area) document.getElementById('companyAreaInput').value = data.area;
-                if (data.whatsapp) document.getElementById('whatsappInput').value = data.whatsapp;
+                // Recalc chart data (mock reconstruction)
+                // Ideally we'd re-aggregate by attendant, but for now we rely on review attendant data
+                const attMap = {};
+                filtered.forEach(r => {
+                    const name = r.attendant ? r.attendant.name : 'Geral';
+                    if (!attMap[name]) attMap[name] = 0;
+                    attMap[name]++;
+                });
+                // Rebuild mock attendant object for chart
+                const mockAttendants = Object.keys(attMap).map(name => ({
+                    name: name,
+                    _count: { reviews: attMap[name] }
+                }));
 
-                // Notifications
-                if (data.notifications) {
-                    const n = typeof data.notifications === 'string' ? JSON.parse(data.notifications) :
-                        data.notifications;
-                    if (n.whatsappRule) document.getElementById('notifyRuleInput').value = n.whatsappRule;
-                }
+                renderCharts(mockAttendants); // This replots Main Chart
+                renderRecentReviews(filtered.slice(0, 30));
+            }
 
-                // Preview Init
-                if (data.primaryColor) updatePreviewColor(data.primaryColor);
-                if (data.logo) document.getElementById('previewLogo').src = data.logo;
-                if (data.settings) {
-                    const s = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
-                    updatePreviewText(s.questionTitle);
-                    togglePreviewObs(s.showObservation);
-                }
+            function exportDashboardPDF() {
+                const element = document.getElementById('view-dashboard');
+                const opt = {
+                    margin: 0.5,
+                    filename: 'Relatorio_AvaliaJa.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
 
-            } catch (e) { }
-        }
+                // Hide buttons for cleaner PDF
+                const buttons = element.querySelectorAll('button');
+                buttons.forEach(b => b.style.display = 'none');
 
-        // Load Users when tab is clicked
-        const originalSwitchTab = switchTab;
-        switchTab = function (name, el) {
-            originalSwitchTab(name, el);
-            if (name === 'gestores') loadUsers();
-        }
+                html2pdf().set(opt).from(element).save().then(() => {
+                    // Restore buttons
+                    buttons.forEach(b => b.style.display = 'block');
+                });
+            }
 
-        // --- INTEGRATIONS LOGIC ---
-        function addNewIntegrationCard(type = null, initialData = {}) {
-            const select = document.getElementById('newIntegrationSelect');
-            const selectedType = type || select.value;
-            if (!selectedType) { alert('Selecione um serviço.'); return; }
 
-            const container = document.getElementById('integrationsContainer');
-            const cardId = 'int-' + Date.now() + Math.random().toString(36).substr(2, 5);
+            // Update loadCustomization to fill new fields too
+            const oldLoadCustomization = loadCustomization;
+            loadCustomization = async function () {
+                await oldLoadCustomization();
+                // Fill new fields
+                try {
+                    const res = await fetch('/api/company/settings', {
+                        headers: {
+                            'Authorization': `Bearer ${token} `
+                        }
+                    });
+                    const data = await res.json();
 
-            // MAP CONFIG
-            const config = {
-                whatsapp: {
-                    name: 'WhatsApp', color: '#25D366', icon: '<img src="/whatsapp.png" style="width:40px;">'
-                },
-                lnassist: { name: 'LnAssist', color: '#ff9800', icon: '🩺' },
-                worklab: { name: 'WorkLab', color: '#2196f3', icon: '🧪' },
-                amplimed: { name: 'Amplimed', color: '#9c27b0', icon: '⚕️' },
-                webhook: { name: 'Webhook', color: '#ea4b71', icon: '🔌' }
-            };
-            const conf = config[selectedType] || config.webhook;
-            const displayName = initialData.name || conf.name;
+                    // Profile
+                    const user = JSON.parse(localStorage.getItem('user') || '{}');
+                    const pName = document.getElementById('profileNameDisplay');
+                    const pEmail = document.getElementById('profileEmailDisplay');
+                    if (pName) pName.innerText = user.name || 'Gestor';
+                    if (pEmail) pEmail.innerText = user.email || '';
 
-            const div = document.createElement('article');
-            div.className = 'glass-panel';
-            div.style.cssText = 'padding: 30px; position: relative; overflow: hidden; display: flex; flex-direction: column;';
-            div.id = cardId;
+                    // Account
+                    if (data.name) document.getElementById('companyNameInput').value = data.name;
+                    if (data.area) document.getElementById('companyAreaInput').value = data.area;
+                    if (data.whatsapp) document.getElementById('whatsappInput').value = data.whatsapp;
 
-            div.innerHTML = `
+                    // Notifications
+                    if (data.notifications) {
+                        const n = typeof data.notifications === 'string' ? JSON.parse(data.notifications) :
+                            data.notifications;
+                        if (n.whatsappRule) document.getElementById('notifyRuleInput').value = n.whatsappRule;
+                    }
+
+                    // Preview Init
+                    if (data.primaryColor) updatePreviewColor(data.primaryColor);
+                    if (data.logo) document.getElementById('previewLogo').src = data.logo;
+                    if (data.settings) {
+                        const s = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
+                        updatePreviewText(s.questionTitle);
+                        togglePreviewObs(s.showObservation);
+                    }
+
+                } catch (e) { }
+            }
+
+            // Load Users when tab is clicked
+            const originalSwitchTab = switchTab;
+            switchTab = function (name, el) {
+                originalSwitchTab(name, el);
+                if (name === 'gestores') loadUsers();
+            }
+
+            // --- INTEGRATIONS LOGIC ---
+            function addNewIntegrationCard(type = null, initialData = {}) {
+                const select = document.getElementById('newIntegrationSelect');
+                const selectedType = type || select.value;
+                if (!selectedType) { alert('Selecione um serviço.'); return; }
+
+                const container = document.getElementById('integrationsContainer');
+                const cardId = 'int-' + Date.now() + Math.random().toString(36).substr(2, 5);
+
+                // MAP CONFIG
+                const config = {
+                    whatsapp: {
+                        name: 'WhatsApp', color: '#25D366', icon: '<img src="/whatsapp.png" style="width:40px;">'
+                    },
+                    lnassist: { name: 'LnAssist', color: '#ff9800', icon: '🩺' },
+                    worklab: { name: 'WorkLab', color: '#2196f3', icon: '🧪' },
+                    amplimed: { name: 'Amplimed', color: '#9c27b0', icon: '⚕️' },
+                    webhook: { name: 'Webhook', color: '#ea4b71', icon: '🔌' }
+                };
+                const conf = config[selectedType] || config.webhook;
+                const displayName = initialData.name || conf.name;
+
+                const div = document.createElement('article');
+                div.className = 'glass-panel';
+                div.style.cssText = 'padding: 30px; position: relative; overflow: hidden; display: flex; flex-direction: column;';
+                div.id = cardId;
+
+                div.innerHTML = `
                         <div style="position: relative; z-index: 1;">
                             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
                                 <span style="font-size: 2rem;">${typeof conf.icon === 'string' && !conf.icon.startsWith('<') ? conf.icon : ''}</span>
@@ -2992,13 +3057,13 @@
                         </form>
                         </div >
                         `;
-            container.appendChild(div);
-            if (!type) select.value = '';
-        }
+                container.appendChild(div);
+                if (!type) select.value = '';
+            }
 
-        function getIntegrationFields(type, data) {
-            if (type === 'whatsapp') {
-                return `
+            function getIntegrationFields(type, data) {
+                if (type === 'whatsapp') {
+                    return `
                         < div style = "margin-bottom: 15px;" >
                             <label style="display:block; margin-bottom: 8px; font-size: 0.85rem; color: #ccc;">Número
                                 (com DDD)</label>
@@ -3020,8 +3085,8 @@
                             </select>
                         </div>
                     `;
-            }
-            return `
+                }
+                return `
                         < div style = "margin-bottom: 15px;" >
                             <label style="display:block; margin-bottom: 8px; font-size: 0.85rem; color: #ccc;">URL /
                                 Token / Chave API</label>
@@ -3030,147 +3095,147 @@
                                 style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: #fff;">
                         </div>
                     `;
-        }
-
-        async function deleteIntegration(cardId) {
-            if (confirm('Remover esta integração? (Clique em Salvar para persistir)')) {
-                document.getElementById(cardId).remove();
             }
-        }
 
-        async function loadIntegrations() {
-            const container = document.getElementById('integrationsContainer');
-            if (container.children.length > 0) return; // Already loaded
-
-            try {
-                const res = await fetch('/api/company/settings', {
-                    headers: {
-                        'Authorization': `Bearer ${token} `
-                    }
-                });
-                const data = await res.json();
-
-                // Parse strings if necessary
-                const settings = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
-                const notifications = typeof data.notifications === 'string' ? JSON.parse(data.notifications) : data.notifications;
-
-                if (settings && settings.integrations && Array.isArray(settings.integrations)) {
-                    settings.integrations.forEach(int => addNewIntegrationCard(int.type, int));
-                } else {
-                    // Fallback Legacy
-                    if (notifications) {
-                        if (notifications.whatsappNumbers && notifications.whatsappNumbers.length > 0) {
-                            addNewIntegrationCard('whatsapp', {
-                                name: 'WhatsApp Principal',
-                                value: notifications.whatsappNumbers.join(', '),
-                                rule: notifications.notifyRule
-                            });
-                        }
-                        if (notifications.webhookUrl) {
-                            addNewIntegrationCard('webhook', {
-                                name: 'Webhook N8N',
-                                value: notifications.webhookUrl
-                            });
-                        }
-                    }
+            async function deleteIntegration(cardId) {
+                if (confirm('Remover esta integração? (Clique em Salvar para persistir)')) {
+                    document.getElementById(cardId).remove();
                 }
-            } catch (e) { console.error(e); }
-        }
+            }
 
-        async function saveIntegration(e, cardId) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = "Salvando...";
-            btn.disabled = true;
+            async function loadIntegrations() {
+                const container = document.getElementById('integrationsContainer');
+                if (container.children.length > 0) return; // Already loaded
 
-            const integrations = [];
-            document.querySelectorAll('#integrationsContainer article').forEach(article => {
-                const cardForm = article.querySelector('form');
-                if (!cardForm) return;
-                const type = cardForm.querySelector('input[name="type"]').value;
-                const name = article.querySelector('.integration-title').value;
-                const value = cardForm.querySelector('input[name="value"]').value;
-                const rule = cardForm.querySelector('select[name="rule"]')?.value;
-                integrations.push({ type, name, value, rule });
-            });
+                try {
+                    const res = await fetch('/api/company/settings', {
+                        headers: {
+                            'Authorization': `Bearer ${token} `
+                        }
+                    });
+                    const data = await res.json();
 
-            try {
-                const resGet = await fetch('/api/company/settings', {
-                    headers: {
-                        'Authorization': `Bearer
-                        ${token} `
+                    // Parse strings if necessary
+                    const settings = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
+                    const notifications = typeof data.notifications === 'string' ? JSON.parse(data.notifications) : data.notifications;
+
+                    if (settings && settings.integrations && Array.isArray(settings.integrations)) {
+                        settings.integrations.forEach(int => addNewIntegrationCard(int.type, int));
+                    } else {
+                        // Fallback Legacy
+                        if (notifications) {
+                            if (notifications.whatsappNumbers && notifications.whatsappNumbers.length > 0) {
+                                addNewIntegrationCard('whatsapp', {
+                                    name: 'WhatsApp Principal',
+                                    value: notifications.whatsappNumbers.join(', '),
+                                    rule: notifications.notifyRule
+                                });
+                            }
+                            if (notifications.webhookUrl) {
+                                addNewIntegrationCard('webhook', {
+                                    name: 'Webhook N8N',
+                                    value: notifications.webhookUrl
+                                });
+                            }
+                        }
                     }
+                } catch (e) { console.error(e); }
+            }
+
+            async function saveIntegration(e, cardId) {
+                e.preventDefault();
+                const btn = e.target.querySelector('button');
+                const originalText = btn.innerText;
+                btn.innerText = "Salvando...";
+                btn.disabled = true;
+
+                const integrations = [];
+                document.querySelectorAll('#integrationsContainer article').forEach(article => {
+                    const cardForm = article.querySelector('form');
+                    if (!cardForm) return;
+                    const type = cardForm.querySelector('input[name="type"]').value;
+                    const name = article.querySelector('.integration-title').value;
+                    const value = cardForm.querySelector('input[name="value"]').value;
+                    const rule = cardForm.querySelector('select[name="rule"]')?.value;
+                    integrations.push({ type, name, value, rule });
                 });
-                const current = await resGet.json();
-                const newSettings = current.settings || {};
-                newSettings.integrations = integrations;
 
-                const formData = new FormData();
-                formData.append('settings', JSON.stringify(newSettings));
-                // We should also update legacy fields for compatibility if desired,
-                // but let's stick to settings.integrations as primary now.
-                // Legacy fields (whatsapp, notifications) might be overwritten by emptiness if we don't send them.
-                // The backend `updateSettings` updates only what is sent.
-                // The backend `updateSettings` updates only what is sent.
-                // So legacy notifications remain unless we update them.
-                // It's fine.
+                try {
+                    const resGet = await fetch('/api/company/settings', {
+                        headers: {
+                            'Authorization': `Bearer
+                        ${token} `
+                        }
+                    });
+                    const current = await resGet.json();
+                    const newSettings = current.settings || {};
+                    newSettings.integrations = integrations;
 
-                const res = await fetch('/api/company/settings', {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${token} ` },
-                    body: formData
-                });
+                    const formData = new FormData();
+                    formData.append('settings', JSON.stringify(newSettings));
+                    // We should also update legacy fields for compatibility if desired,
+                    // but let's stick to settings.integrations as primary now.
+                    // Legacy fields (whatsapp, notifications) might be overwritten by emptiness if we don't send them.
+                    // The backend `updateSettings` updates only what is sent.
+                    // The backend `updateSettings` updates only what is sent.
+                    // So legacy notifications remain unless we update them.
+                    // It's fine.
 
-                if (res.ok) alert('Integrações salvas com sucesso!');
-                else alert('Erro ao salvar.');
+                    const res = await fetch('/api/company/settings', {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token} ` },
+                        body: formData
+                    });
 
-            } catch (e) { console.error(e); alert('Erro ao salvar.'); }
+                    if (res.ok) alert('Integrações salvas com sucesso!');
+                    else alert('Erro ao salvar.');
 
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
-        // --- CUSTOMIZATION HELPERS ---
-        function addQuestionField(value = '') {
-            const list = document.getElementById('extraQuestionsList');
-            const div = document.createElement('div');
-            div.style.display = 'flex';
-            div.style.gap = '10px';
-            div.innerHTML = `
+                } catch (e) { console.error(e); alert('Erro ao salvar.'); }
+
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+            // --- CUSTOMIZATION HELPERS ---
+            function addQuestionField(value = '') {
+                const list = document.getElementById('extraQuestionsList');
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.gap = '10px';
+                div.innerHTML = `
                         < input type = "text" class="extra-question-input" value = "${value}"
                     placeholder = "Digite a pergunta..."
                     style = "flex: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;" >
                         <button type="button" onclick="this.parentElement.remove()"
                             style="background: transparent; border: none; color: #ef4444; cursor: pointer;">🗑️</button>
                     `;
-            list.appendChild(div);
-        }
+                list.appendChild(div);
+            }
 
-        function updateMockupLogo(logoUrl) {
-            const iframe = document.getElementById('mobilePreviewIframe');
-            if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
-                const logoImgs = iframe.contentWindow.document.querySelectorAll('.logo-top img');
-                logoImgs.forEach(img => img.src = logoUrl);
+            function updateMockupLogo(logoUrl) {
+                const iframe = document.getElementById('mobilePreviewIframe');
+                if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
+                    const logoImgs = iframe.contentWindow.document.querySelectorAll('.logo-top img');
+                    logoImgs.forEach(img => img.src = logoUrl);
+                }
             }
-        }
-        async function changeUserPassword(userId) {
-            const newPass = prompt("Digite a nova senha para este usuário (min 6 caracteres):");
-            if (!newPass) return;
-            if (newPass.length < 6) return alert("Senha muito curta.");
-            try {
-                const res = await fetch(`/api/company/users/${userId}/password`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ password: newPass })
-                });
-                const data = await res.json();
-                if (res.ok) alert(data.message);
-                else alert(data.error || 'Erro ao alterar senha.');
-            } catch (e) {
-                console.error(e);
-                alert('Erro ao alterar senha.');
-            }
-        } 
+            async function changeUserPassword(userId) {
+                const newPass = prompt("Digite a nova senha para este usuário (min 6 caracteres):");
+                if (!newPass) return;
+                if (newPass.length < 6) return alert("Senha muito curta.");
+                try {
+                    const res = await fetch(`/api/company/users/${userId}/password`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ password: newPass })
+                    });
+                    const data = await res.json();
+                    if (res.ok) alert(data.message);
+                    else alert(data.error || 'Erro ao alterar senha.');
+                } catch (e) {
+                    console.error(e);
+                    alert('Erro ao alterar senha.');
+                }
+            } 
     </script>
     <!-- SUGGESTION MODAL -->
     <div class="modal-overlay" id="suggestionModal">
@@ -3189,33 +3254,33 @@
 
 
     <script>
-        // --- SUGGESTIONS LOGIC ---
-        async function loadSuggestions() {
-            const list = document.getElementById('suggestionsList');
-            if (!list) return;
+            // --- SUGGESTIONS LOGIC ---
+            async function loadSuggestions() {
+                const list = document.getElementById('suggestionsList');
+                if (!list) return;
 
-            try {
-                const res = await fetch('/api/suggestions', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
+                try {
+                    const res = await fetch('/api/suggestions', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const suggestions = await res.json();
+
+                    list.innerHTML = '';
+                    if (suggestions.length === 0) {
+                        list.innerHTML = '<p style="text-align:center; color:#666;">Nenhuma sugestão ainda. Seja o primeiro!</p>';
+                        return;
                     }
-                });
-                const suggestions = await res.json();
 
-                list.innerHTML = '';
-                if (suggestions.length === 0) {
-                    list.innerHTML = '<p style="text-align:center; color:#666;">Nenhuma sugestão ainda. Seja o primeiro!</p>';
-                    return;
-                }
-
-                suggestions.forEach(s => {
-                    const div = document.createElement('div');
-                    div.style.cssText = 'background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px;';
-                    div.innerHTML = `
+                    suggestions.forEach(s => {
+                        const div = document.createElement('div');
+                        div.style.cssText = 'background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px;';
+                        div.innerHTML = `
                             <div style="flex: 1;">
                                 <p style="margin: 0; color: #fff; font-size: 1rem;">${s.text}</p>
                                 <span style="font-size: 0.75rem; color: #666;">${new
-                            Date(s.createdAt).toLocaleDateString()}</span>
+                                Date(s.createdAt).toLocaleDateString()}</span>
                             </div>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <button onclick="voteSuggestion(${s.id}, 'like')" class="vote-btn"
@@ -3228,110 +3293,110 @@
                                 </button>
                             </div>
                             `;
-                    list.appendChild(div);
-                });
-            } catch (e) {
-                console.error(e);
-                list.innerHTML = '<p style="color:red">Erro ao carregar.</p>';
+                        list.appendChild(div);
+                    });
+                } catch (e) {
+                    console.error(e);
+                    list.innerHTML = '<p style="color:red">Erro ao carregar.</p>';
+                }
             }
-        }
 
-        async function voteSuggestion(id, type) {
-            try {
-                const res = await fetch(`/api/suggestions/${id}/vote`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ type })
+            async function voteSuggestion(id, type) {
+                try {
+                    const res = await fetch(`/api/suggestions/${id}/vote`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ type })
+                    });
+                    if (res.ok) {
+                        loadSuggestions();
+                    }
+                } catch (e) { console.error(e); }
+            }
+
+            function openSuggestionModal() {
+                document.getElementById('suggestionModal').classList.add('active');
+            }
+            function closeSuggestionModal() {
+                document.getElementById('suggestionModal').classList.remove('active');
+            }
+
+            async function submitSuggestion(e) {
+                e.preventDefault();
+                const text = document.getElementById('suggestionText').value;
+                if (!text) return;
+
+                try {
+                    const res = await fetch('/api/suggestions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ text })
+                    });
+                    if (res.ok) {
+                        alert('Sugestão enviada!');
+                        closeSuggestionModal();
+                        document.getElementById('suggestionText').value = '';
+                        loadSuggestions();
+                    } else alert('Erro ao enviar.');
+                } catch (e) { console.error(e); }
+            }
+
+            // --- SAAS ADMIN LOGIC ---
+            let adminPlanChart = null;
+
+            async function loadAdminDashboard() {
+                try {
+                    const res = await fetch('/api/admin/dashboard', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+
+                    document.getElementById('adminTotalCompanies').innerText = data.companies.total;
+                    document.getElementById('adminTotalReviews').innerText = data.reviews.total;
+                    document.getElementById('adminTotalAttendants').innerText = data.attendants.active;
+                    document.getElementById('adminActiveCompanies').innerText = data.companies.active;
+
+                    renderAdminCharts(data.byPlan);
+                } catch (e) { console.error(e); }
+            }
+
+            function renderAdminCharts(byPlan) {
+                const ctx = document.getElementById('adminPlanChart').getContext('2d');
+                if (adminPlanChart) adminPlanChart.destroy();
+
+                const labels = byPlan.map(p => p.plan);
+                const counts = byPlan.map(p => p._count.id);
+
+                adminPlanChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: counts,
+                            backgroundColor: ['#4d4dff', '#00e676', '#ffb300']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
+                    }
                 });
-                if (res.ok) {
-                    loadSuggestions();
-                }
-            } catch (e) { console.error(e); }
-        }
+            }
 
-        function openSuggestionModal() {
-            document.getElementById('suggestionModal').classList.add('active');
-        }
-        function closeSuggestionModal() {
-            document.getElementById('suggestionModal').classList.remove('active');
-        }
+            async function loadAdminCompanies() {
+                try {
+                    const res = await fetch('/api/admin/companies', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const companies = await res.json();
+                    renderAdminCompaniesTable(companies);
+                } catch (e) { console.error(e); }
+            }
 
-        async function submitSuggestion(e) {
-            e.preventDefault();
-            const text = document.getElementById('suggestionText').value;
-            if (!text) return;
-
-            try {
-                const res = await fetch('/api/suggestions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ text })
-                });
-                if (res.ok) {
-                    alert('Sugestão enviada!');
-                    closeSuggestionModal();
-                    document.getElementById('suggestionText').value = '';
-                    loadSuggestions();
-                } else alert('Erro ao enviar.');
-            } catch (e) { console.error(e); }
-        }
-
-        // --- SAAS ADMIN LOGIC ---
-        let adminPlanChart = null;
-
-        async function loadAdminDashboard() {
-            try {
-                const res = await fetch('/api/admin/dashboard', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-
-                document.getElementById('adminTotalCompanies').innerText = data.companies.total;
-                document.getElementById('adminTotalReviews').innerText = data.reviews.total;
-                document.getElementById('adminTotalAttendants').innerText = data.attendants.active;
-                document.getElementById('adminActiveCompanies').innerText = data.companies.active;
-
-                renderAdminCharts(data.byPlan);
-            } catch (e) { console.error(e); }
-        }
-
-        function renderAdminCharts(byPlan) {
-            const ctx = document.getElementById('adminPlanChart').getContext('2d');
-            if (adminPlanChart) adminPlanChart.destroy();
-
-            const labels = byPlan.map(p => p.plan);
-            const counts = byPlan.map(p => p._count.id);
-
-            adminPlanChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels,
-                    datasets: [{
-                        data: counts,
-                        backgroundColor: ['#4d4dff', '#00e676', '#ffb300']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
-                }
-            });
-        }
-
-        async function loadAdminCompanies() {
-            try {
-                const res = await fetch('/api/admin/companies', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const companies = await res.json();
-                renderAdminCompaniesTable(companies);
-            } catch (e) { console.error(e); }
-        }
-
-        function renderAdminCompaniesTable(companies) {
-            const tbody = document.getElementById('adminCompaniesTableBody');
-            tbody.innerHTML = companies.map(c => `
+            function renderAdminCompaniesTable(companies) {
+                const tbody = document.getElementById('adminCompaniesTableBody');
+                tbody.innerHTML = companies.map(c => `
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                     <td style="padding: 15px;">${c.name}</td>
                     <td style="padding: 15px; color: var(--accent);">${c.slug}</td>
@@ -3353,42 +3418,42 @@
                     </td>
                 </tr>
             `).join('');
-        }
+            }
 
-        function openAdminEditModal(id, name, plan, active) {
-            document.getElementById('adminEditCompanyId').value = id;
-            document.getElementById('adminEditCompanyName').value = name;
-            document.getElementById('adminEditCompanyPlan').value = plan;
-            document.getElementById('adminEditCompanyActive').checked = active;
-            document.getElementById('adminEditModal').classList.add('active');
-        }
+            function openAdminEditModal(id, name, plan, active) {
+                document.getElementById('adminEditCompanyId').value = id;
+                document.getElementById('adminEditCompanyName').value = name;
+                document.getElementById('adminEditCompanyPlan').value = plan;
+                document.getElementById('adminEditCompanyActive').checked = active;
+                document.getElementById('adminEditModal').classList.add('active');
+            }
 
-        async function handleAdminUpdateCompany(event) {
-            event.preventDefault();
-            const id = document.getElementById('adminEditCompanyId').value;
-            const name = document.getElementById('adminEditCompanyName').value;
-            const plan = document.getElementById('adminEditCompanyPlan').value;
-            const active = document.getElementById('adminEditCompanyActive').checked;
+            async function handleAdminUpdateCompany(event) {
+                event.preventDefault();
+                const id = document.getElementById('adminEditCompanyId').value;
+                const name = document.getElementById('adminEditCompanyName').value;
+                const plan = document.getElementById('adminEditCompanyPlan').value;
+                const active = document.getElementById('adminEditCompanyActive').checked;
 
-            try {
-                const res = await fetch(`/api/admin/companies/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ name, plan, active })
-                });
+                try {
+                    const res = await fetch(`/api/admin/companies/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ name, plan, active })
+                    });
 
-                if (res.ok) {
-                    alert('Empresa atualizada!');
-                    document.getElementById('adminEditModal').classList.remove('active');
-                    loadAdminCompanies();
-                } else {
-                    alert('Erro ao atualizar.');
-                }
-            } catch (e) { console.error(e); }
-        }
+                    if (res.ok) {
+                        alert('Empresa atualizada!');
+                        document.getElementById('adminEditModal').classList.remove('active');
+                        loadAdminCompanies();
+                    } else {
+                        alert('Erro ao atualizar.');
+                    }
+                } catch (e) { console.error(e); }
+            }
     </script>
 </body>
 
