@@ -92,7 +92,7 @@ function openIntegrationModal(type) {
         title.innerText = 'Logs do WhatsApp';
         // Render Header
         header.innerHTML = `
-            <th>ID Cliente</th>
+            <th>ID</th>
             <th>Data/Hora</th>
             <th>Número</th>
             <th>Mensagem</th>
@@ -103,7 +103,7 @@ function openIntegrationModal(type) {
         title.innerText = 'Atendimentos LnAssist';
         header.innerHTML = `
             <th>Data/Hora</th>
-            <th>ID Cliente</th>
+            <th>ID</th>
             <th>Situação</th>
             <th>Associado</th>
             <th>Placa</th>
@@ -135,7 +135,7 @@ async function loadWhatsappLogs(tbody) {
         data.logs.forEach(log => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${log.companyId}</td>
+                <td>#${log.id}</td>
                 <td>${new Date(log.createdAt).toLocaleString()}</td>
                 <td>${log.phone}</td>
                 <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${log.message}">${log.message}</td>
@@ -169,7 +169,7 @@ async function loadLnAssistLogs(tbody) {
             const date = log.serviceDate ? new Date(log.serviceDate).toLocaleString() : '-';
             tr.innerHTML = `
                 <td>${date}</td>
-                <td>${log.companyId}</td>
+                <td>#${log.id}</td>
                 <td>${log.status}</td>
                 <td>${log.corporateName || '-'}</td>
                 <td>${log.plate || '-'}</td>

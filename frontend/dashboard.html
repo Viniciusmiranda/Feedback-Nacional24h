@@ -2351,6 +2351,7 @@
                 const date = new Date(item.createdAt);
                 tr.innerHTML = `
                             <td><span class="badge badge-attendant">${attName}</span></td>
+            <td>#${item.displayId || '-'}</td>
             <td>${date.toLocaleDateString()} <small>${date.toLocaleTimeString().slice(0, 5)}</small></td>
             <td><span class="stars-display">${starsHtml}</span></td>
             <td>${item.comment || '-'}</td>
@@ -2427,6 +2428,7 @@
 
                 tr.innerHTML = `
             <td><b style="color: ${attColor}; font-size: 1.05rem;">${att.name}</b></td>
+            <td>#${att.displayId || '-'}</td>
             <td>${att.phone || '-'}</td>
             <td>${att.sector || '-'}</td>
             <td>${att.integrationId || '-'}</td>
@@ -3370,6 +3372,7 @@
             tbody.innerHTML = companies.map(c => `
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                     <td style="padding: 15px;">${c.name}</td>
+                    <td style="padding: 15px; color: var(--text-muted); font-size: 0.9em;">#${c.displayId || '-'}</td>
                     <td style="padding: 15px; color: var(--accent);">${c.slug}</td>
                     <td style="padding: 15px;"><span class="badge" style="background: rgba(255,255,255,0.1);">${c.plan}</span></td>
                     <td style="padding: 15px;">${c._count.attendants}</td>

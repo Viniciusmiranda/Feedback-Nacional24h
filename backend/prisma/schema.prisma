@@ -26,6 +26,7 @@ model User {
 
 model Company {
   id        String   @id @default(uuid())
+  displayId Int      @default(autoincrement())
   name      String
   slug      String   @unique
   
@@ -55,6 +56,7 @@ model Company {
 
 model Attendant {
   id        String   @id @default(uuid())
+  displayId Int      @default(autoincrement())
   name      String
   email     String?
   phone     String? // Add phone
@@ -72,6 +74,7 @@ model Attendant {
 
 model Review {
   id          String    @id @default(uuid())
+  displayId   Int       @default(autoincrement())
   stars       Int
   comment     String?
   device      String?
@@ -108,7 +111,7 @@ model Association {
 }
 
 model WhatsappLog {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   companyId String
   company   Company? @relation(fields: [companyId], references: [id]) // Relation is optional for loose coupling or mandatory? Mandatory.
   phone     String
@@ -120,7 +123,7 @@ model WhatsappLog {
 }
 
 model LnAssistLog {
-  id            String   @id @default(uuid())
+  id            Int      @id @default(autoincrement())
   companyId     String
   company       Company? @relation(fields: [companyId], references: [id])
   status        String   // situacao_atendimento
