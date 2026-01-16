@@ -1237,8 +1237,7 @@
             </div>
 
             <!-- VIEW: PERSONALIZAÇÃO -->
-            <div id="view-personalizacao" class="view-section" style="display: none; border: 2px solid red;">
-                <h1 style="color: red;">TESTE VISIVEL - SE VC LER ISSO A DIV ESTA ABERTA</h1>
+            <div id="view-personalizacao" class="view-section" style="display: none;">
                 <div style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
 
                     <!-- Controls Column -->
@@ -1637,17 +1636,21 @@
         }
 
         function switchView(viewName, navElement) {
-            // Update Nav
+            // 1. Update Nav Active State
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if (navElement) navElement.classList.add('active');
+            if (navElement) {
+                navElement.classList.add('active');
+            } else {
+                const found = document.querySelector(`.nav-item[onclick*="'${viewName}'"]`);
+                if (found) found.classList.add('active');
+            }
 
-            // Hide all views
-            document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+            // 2. Hide ALL views and sections first
+            document.querySelectorAll('.view-section, .content-section').forEach(el => {
+                el.style.display = 'none';
+            });
 
-            // Show selected
-            document.getElementById(`view-${viewName}`).style.display = 'block';
-
-            // Update Header
+            // 3. Update Header Titles
             const titleMap = {
                 'dashboard': globalData.companyName || 'Visão Geral',
                 'attendants': 'Gestão de Atendentes',
@@ -1663,24 +1666,36 @@
                 'adminIntegrations': 'Gestão de Integrações SaaS'
             };
             const title = titleMap[viewName] || 'Painel';
-            document.getElementById('pageTitle').innerText = title;
+            const pageTitle = document.getElementById('pageTitle');
+            if (pageTitle) pageTitle.innerText = title;
 
-            // Update Subtitle only on dashboard
             if (viewName === 'dashboard') {
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
-                document.getElementById('pageSubtitle').innerText = `Bem-vindo(a), ${user.name || 'Gestor'}. Aqui estão os resultados em tempo real.`;
+                const subt = document.getElementById('pageSubtitle');
+                if (subt) subt.innerText = `Bem-vindo(a), ${user.name || 'Gestor'}. Aqui estão os resultados em tempo real.`;
             } else {
-                document.getElementById('pageSubtitle').innerText = 'Gerencie suas configurações e acompanhe seus resultados.';
+                const subt = document.getElementById('pageSubtitle');
+                if (subt) subt.innerText = 'Gerencie suas configurações.';
             }
 
-            // Handle section visibility (Supports both ID formats: view-NAME or NAMESection)
-            document.querySelectorAll('.view-section, .content-section').forEach(el => el.style.display = 'none');
+            // 4. Show the Requested View
+            const targetId = `view-${viewName}`;
+            const targetEl = document.getElementById(targetId);
 
-            const viewId = document.getElementById(`view-${viewName}`);
-            const sectionId = document.getElementById(`${viewName}Section`);
+            // Fallback for legacy ID naming (e.g. dashboardSection) although we try to standardize on view-*
+            const legacyId = `${viewName}Section`;
+            const legacyEl = document.getElementById(legacyId);
 
-            if (viewId) viewId.style.display = 'block';
-            if (sectionId) sectionId.style.display = 'block';
+            if (targetEl) {
+                targetEl.style.display = 'block';
+                // alert(`DEBUG: Exibindo ${targetId}`); // Uncomment for debugging
+            } else if (legacyEl) {
+                legacyEl.style.display = 'block';
+            } else {
+                console.warn(`View not found: ${viewName} (Checked #${targetId} and #${legacyId})`);
+                alert(`Erro: Tela não encontrada (${viewName})`);
+            }
+        }
         }
 
         function switchTab(tabName, element) {
