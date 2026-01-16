@@ -2376,30 +2376,7 @@
         function renderAttendantsList(attendants) {
             const tbody = document.getElementById('attendantsTableBody');
 
-            // Create Toolbar if not exists
-            let toolbar = document.getElementById('atdToolbar');
-            if (!toolbar) {
-                const container = document.querySelector('#view-attendants .glass-panel');
-                // Only insert if container exists and H2 exists
-                const h2 = container.querySelector('h2');
-                if (h2) {
-                    toolbar = document.createElement('div');
-                    toolbar.id = 'atdToolbar';
-                    toolbar.style.cssText = `display: flex; justify - content: space - between; align - items: center; margin - bottom: 20px; `;
-
-                    // Helper text for Plan Limits (Initial placeholder, updated below)
-                    toolbar.innerHTML = `
-                            < div id = "planUsageText" style = "font-size: 0.9rem; color: var(--text-muted);" >
-                                Uso do Plano: --
-            </div >
-                            <button onclick="toggleAttendantSort()"
-                                style="background: rgba(255,255,255,0.1); border:none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-                                ⇅ Ordenar por Avaliações
-                            </button>
-                        `;
-                    h2.insertAdjacentElement('afterend', toolbar);
-                }
-            }
+            // Toolbar is already defined in HTML as 'atdToolbarHTML'
 
             // Update Limit Text
             const limitTextEl = document.getElementById('planUsageText');
