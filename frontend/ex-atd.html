@@ -1049,6 +1049,83 @@
       pContainer.appendChild(p);
     }
   </script>
+  <!-- PREVIEW LISTENER SCRIPT -->
+  <script>
+    window.addEventListener('message', function (event) {
+      const data = event.data;
+      if (!data) return;
+
+      switch (data.type) {
+        case 'UPDATE_THEME':
+          if (data.primaryColor) {
+            document.documentElement.style.setProperty('--primary', data.primaryColor);
+            // Update button background specifically if needed, though variable should handle it
+            const btn = document.querySelector('.btn-main');
+            if (btn) btn.style.background = data.primaryColor;
+          }
+          break;
+
+        case 'UPDATE_LOGO':
+          if (data.logoSrc) {
+            const logoImg = document.querySelector('.logo-top img');
+            if (logoImg) logoImg.src = data.logoSrc;
+          }
+          break;
+
+        case 'UPDATE_TITLE':
+          if (data.text) {
+            const title = document.querySelector('.rating-title');
+            if (title) title.innerText = data.text;
+          }
+          break;
+
+        case 'UPDATE_OBS':
+          // Hide/Show Observation Stage text area or relevant container
+          const obsContainer = document.getElementById('obsSection');
+          // Since this view logic relies on state transitions, we might just hide the textarea if it's visible or toggle a flag
+          // For preview purposes, we might want to force jump to obs section or just hide the specific element
+          // Let's assume we toggle the visibility of the textarea container
+          if (obsContainer) {
+            if (data.show === false) {
+              obsContainer.style.display = 'none';
+            } else {
+              obsContainer.style.display = 'block';
+            }
+          }
+          break;
+
+        case 'UPDATE_QUESTIONS':
+          // This requires dynamic rendering of extra questions which might not exist in vanilla ex-atd.html yet
+          // We need to inject them into the DOM
+          const extraContainer = document.getElementById('extraQuestionsPreview');
+          if (!extraContainer) {
+            // Create container if missing, insert before submit button
+            const btnSubmit = document.querySelector('.btn-submit-obs');
+            if (btnSubmit && btnSubmit.parentNode) {
+              const container = document.createElement('div');
+              container.id = 'extraQuestionsPreview';
+              container.style.marginTop = '20px';
+              btnSubmit.parentNode.insertBefore(container, btnSubmit);
+            }
+          }
+
+          const container = document.getElementById('extraQuestionsPreview');
+          if (container && data.questions) {
+            container.innerHTML = ''; // Clear
+            data.questions.forEach(q => {
+              const qDiv = document.createElement('div');
+              qDiv.style.marginBottom = '10px';
+              qDiv.innerHTML = `
+                             <label style="display:block; color:#fff; margin-bottom:5px; font-size:0.9rem;">${q}</label>
+                             <input type="text" class="input-obs" style="height:40px;">
+                         `;
+              container.appendChild(qDiv);
+            });
+          }
+          break;
+      }
+    });
+  </script>
 </body>
 
 </html>

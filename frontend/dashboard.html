@@ -99,6 +99,93 @@
             animation-delay: 5s;
         }
 
+
+
+        /* Responsive Grid for Personalization */
+        @media (max-width: 1000px) {
+            #view-personalizacao>div {
+                grid-template-columns: 1fr !important;
+            }
+
+            #view-personalizacao .mobile-preview-col {
+                order: -1;
+            }
+        }
+
+        /* Validations */
+        .input-error {
+            border-color: #ff6b6b !important;
+            box-shadow: 0 0 0 1px #ff6b6b !important;
+        }
+
+        /* Toast */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 250px;
+            font-size: 0.9rem;
+        }
+
+        .toast.success {
+            border-left-color: #4caf50;
+        }
+
+        .toast.error {
+            border-left-color: #f44336;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading Spinner */
+        .loader-mini {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
         .orb3 {
             width: 350px;
             height: 350px;
@@ -1239,39 +1326,57 @@
 
         <!-- VIEW: PERSONALIZAÇÃO -->
         <div id="view-personalizacao" class="view-section" style="display: none;">
-            <div style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
+            <!-- GRID LAYOUT CONTAINER -->
+            <div style="display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start;">
 
                 <!-- Controls Column -->
-                <div style="flex: 1; min-width: 400px;">
+                <div style="min-width: 0;"> <!-- prevent grid blowout -->
                     <section class="glass-panel" style="padding: 30px; margin-bottom: 20px;">
                         <h2 style="margin-bottom: 20px;">Identidade Visual</h2>
                         <p style="color: var(--text-muted); margin-bottom: 20px;">
                             Customize a aparência em tempo real.
                         </p>
                         <form onsubmit="saveCustomization(event)" style="display: grid; gap: 20px;">
-                            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                                <div style="flex: 0 1 auto;">
+
+                            <!-- Color & Logo Row -->
+                            <div
+                                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+
+                                <!-- COLOR -->
+                                <div>
                                     <label>Cor Principal</label>
-                                    <div style="display: flex; gap: 10px; align-items: center;">
-                                        <input type="color" id="colorInput" value="#4d4dff"
-                                            style="border: none; background: none; width: 50px; height: 50px; cursor: pointer;"
-                                            oninput="updatePreviewColor(this.value)">
-                                        <span style="font-size: 0.9rem; color: #ccc;">Clique para escolher</span>
+                                    <div style="display: flex; gap: 10px; align-items: center; margin-top:5px;">
+                                        <div
+                                            style="position: relative; width: 50px; height: 50px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
+                                            <input type="color" id="colorInput" value="#4d4dff"
+                                                style="position: absolute; top: -10px; left: -10px; width: 70px; height: 70px; cursor: pointer; border: none;"
+                                                oninput="updatePreviewColor(this.value)">
+                                        </div>
+                                        <input type="text" id="colorHexInput" value="#4d4dff" maxlength="7"
+                                            class="input-light"
+                                            style="width: 100px; padding: 10px; text-transform: uppercase; font-family: monospace;"
+                                            oninput="updatePreviewColor(this.value, true)">
                                     </div>
                                 </div>
 
-                                <div style="flex: 1; min-width: 200px;">
+                                <!-- LOGO -->
+                                <div>
                                     <label>Logotipo</label>
-                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                    <div style="display: flex; gap: 10px; align-items: center; margin-top:5px;">
                                         <label class="btn-glow"
-                                            style="margin: 0; cursor: pointer; display: inline-block; font-size: 0.9rem; padding: 10px 15px;">
-                                            Escolher Arquivo
+                                            style="margin: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 10px 15px;">
+                                            <span>📁</span> Escolher
                                             <input type="file" id="logoInput" hidden accept="image/*"
                                                 onchange="updatePreviewLogo(this)">
                                         </label>
-                                        <span style="font-size: 0.8rem; color: #aaa;">Max 2MB (PNG/JPG)</span>
+                                        <div id="fileInfo"
+                                            style="font-size: 0.8rem; color: #aaa; display: flex; flex-direction: column; line-height: 1.2;">
+                                            <span id="fileName">Nenhum arquivo</span>
+                                            <span id="fileSize">Max 2MB</span>
+                                        </div>
                                     </div>
-                                    <div id="logoPreviewContainer" style="margin-top: 10px; display: none;">
+                                    <div id="logoPreviewContainer"
+                                        style="margin-top: 10px; display: none; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
                                         <img id="logoPreviewImg" src="" style="height: 40px; object-fit: contain;">
                                     </div>
                                 </div>
@@ -1288,74 +1393,70 @@
                             <div>
                                 <label>Link de Redirecionamento (Opcional)</label>
                                 <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">
-                                    Após avaliar, o cliente será enviado para este link (ex: Google Maps). Deixe
-                                    vazio
-                                    para mensagem padrão.
+                                    Após avaliar, o cliente será enviado para este link.
                                 </p>
                                 <input type="url" id="redirectUrlInput" class="input-light"
-                                    placeholder="https://g.page/..."
+                                    placeholder="https://g.page/..." pattern="https?://.+"
+                                    title="Deve começar com http:// ou https://" oninput="validateUrl(this)"
                                     style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff;">
+                                <span id="urlErrorMsg"
+                                    style="color: #ff6b6b; font-size: 0.8rem; display: none; margin-top: 5px;">
+                                    ⚠️ URL inválida (use https://...)
+                                </span>
                             </div>
 
-                            <div style="display: flex; align-items: center; gap: 10px;">
+                            <div
+                                style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
                                 <input type="checkbox" id="showObsInput" checked
-                                    onchange="togglePreviewObs(this.checked)" style="width: 20px; height: 20px;">
-                                <label for="showObsInput" style="margin: 0;">Permitir
-                                    comentários
+                                    onchange="togglePreviewObs(this.checked)"
+                                    style="width: 20px; height: 20px; accent-color: var(--primary);">
+                                <label for="showObsInput" style="margin: 0; cursor: pointer;">Permitir comentários
                                     (Observação)</label>
                             </div>
 
-                            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+                            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;">
 
                             <div>
                                 <label>Perguntas Adicionais</label>
                                 <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">
-                                    Adicione perguntas
-                                    extras para o cliente responder (ex: "Como conheceu?").
+                                    Adicione perguntas extras para o cliente responder.
                                 </p>
                                 <div id="extraQuestionsList"
                                     style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
                                 </div>
-                                <button type="button" onclick="addQuestionField()" class="btn-glow"
-                                    style="background: rgba(255,255,255,0.1); font-size: 0.8rem; padding: 8px 15px;">+
-                                    Adicionar Pergunta</button>
+                                <button type="button" onclick="addQuestionField()" class="btn-secondary"
+                                    style="font-size: 0.8rem; padding: 8px 15px;">+ Adicionar Pergunta</button>
                             </div>
 
-                            <button type="submit" class="btn-glow">💾 Salvar
-                                Alterações</button>
+                            <button type="submit" id="btnSaveCustomization" class="btn-glow" style="margin-top: 10px;">
+                                💾 Salvar Alterações
+                            </button>
                         </form>
                     </section>
                 </div>
 
                 <!-- Preview Column (Smartphone) -->
-                <div style="flex: 0 0 360px; display: flex; justify-content: center; align-items: flex-start;">
-                    <div style="text-align: center;">
-                        <span
-                            style="display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem;">Visualização
-                        </span>
-                        <h4 style="margin: 30px 0 10px 0;">Simulação (Mobile preview)
-                        </h4>
-                        <!-- Mobile Frame Container with Scale -->
-                        <!-- Mobile Frame Container with Image -->
-                        <div
-                            style="position: relative; width: 330px; height: 660px; margin: 0 auto; transform: scale(1); transform-origin: top center;">
-                            <!-- Mockup Frame -->
-                            <img src="/images/mockup-mobile.png"
-                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; object-fit: contain;">
+                <div style="position: sticky; top: 20px; display: flex; flex-direction: column; align-items: center;">
+                    <span style="display: block; margin-bottom: 15px; color: var(--text-muted); font-size: 0.9rem;">
+                        Simulação (Mobile preview)
+                    </span>
 
-                            <!-- Screen Content Area (Adjust padding to fit typical mockups) -->
-                            <!-- Assuming a standard modern phone with thin bezels:
-                                 Top: ~15px, Sides: ~12px, Bottom: ~15px
-                                 We use percentages for responsiveness within the container -->
-                            <div
-                                style="position: absolute; top: 2.5%; left: 4%; width: 92%; height: 95%; z-index: 10; border-radius: 35px; overflow: hidden; background: #000;">
-                                <iframe id="mobilePreviewIframe" src="/ex-atd.html"
-                                    style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
-                            </div>
+                    <!-- Mobile Frame Container -->
+                    <div
+                        style="position: relative; width: 330px; height: 660px; margin: 0 auto; transform: scale(1); transform-origin: top center;">
+                        <!-- Mockup Frame -->
+                        <img src="/images/mockup-mobile.png"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; object-fit: contain;">
+
+                        <div
+                            style="position: absolute; top: 2.5%; left: 4%; width: 92%; height: 95%; z-index: 10; border-radius: 35px; overflow: hidden; background: #000;">
+                            <iframe id="mobilePreviewIframe" src="/ex-atd.html" allow="clipboard-write"
+                                style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
     </main>
