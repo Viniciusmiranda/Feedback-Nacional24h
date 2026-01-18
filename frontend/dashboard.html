@@ -2902,20 +2902,23 @@
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
 
-                await html2pdf().set(opt).from(reportContainer).save();
+                // Generate Blob and Open
+                const pdfBlobUrl = await html2pdf().set(opt).from(reportContainer).output('bloburl');
+                window.open(pdfBlobUrl, '_blank');
 
-                // Cleanup
                 document.body.removeChild(reportContainer);
-
             } catch (err) {
-                console.error(err);
-                alert("Erro ao gerar PDF.");
+                console.error("Erro ao gerar PDF:", err);
+                alert("Erro ao gerar PDF. Verifique o console.");
             } finally {
-                // 4. RESTORE VISIBILITY
+                // Restore
                 originalDisplays.forEach(item => {
                     item.element.style.display = item.display;
                 });
                 if (btn) btn.innerText = originalText;
+
+                // Allow scrolling again
+                document.body.style.overflow = '';
             }
         }
 
