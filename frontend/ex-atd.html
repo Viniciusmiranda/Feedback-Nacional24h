@@ -20,6 +20,11 @@
     :root {
       --primary: #ffffff;
       --accent-blue: #2b1da7;
+      /* Legacy fallback */
+      --btn-color: #2b1da7;
+      /* Default Button Color */
+      --bg-color: #030518;
+      /* Default Background Color */
       --deep-blue: #030518;
       --gold: #FFD700;
     }
@@ -151,7 +156,9 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle at center, var(--accent-blue) 0%, transparent 60%);
+      height: 200%;
+      background: radial-gradient(circle at center, var(--bg-color) 0%, transparent 60%);
+      opacity: 0.7;
       opacity: 0.7;
       animation: pulseBg 6s ease-in-out infinite alternate;
       z-index: 0;
@@ -165,7 +172,7 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(15, 23, 42, 0) 60deg, var(--accent-blue) 180deg, transparent 360deg);
+      background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(15, 23, 42, 0) 60deg, var(--bg-color) 180deg, transparent 360deg);
       opacity: 0.5;
       animation: rotateBg 12s linear infinite;
       z-index: 0;
@@ -242,8 +249,8 @@
       height: 100px;
       border: 2px solid rgba(255, 255, 255, 0.5);
       border-radius: 50px;
-      background: var(--accent-blue);
-      /* Dynamic */
+      background: var(--btn-color);
+      /* Dynamic Button Color */
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       color: var(--primary);
@@ -1085,11 +1092,16 @@
 
       switch (data.type) {
         case 'UPDATE_THEME':
-          if (data.primaryColor) {
-            // Update variable for backgrounds/buttons
-            document.documentElement.style.setProperty('--accent-blue', data.primaryColor);
-            // Also update primary text if needed
-            // document.documentElement.style.setProperty('--primary', data.primaryColor);
+          if (data.color && data.target) {
+            if (data.target === 'button') {
+              document.documentElement.style.setProperty('--btn-color', data.color);
+            } else if (data.target === 'background') {
+              document.documentElement.style.setProperty('--bg-color', data.color);
+            }
+          } else if (data.primaryColor) {
+            // Fallback for old calls or single-theme
+            document.documentElement.style.setProperty('--btn-color', data.primaryColor);
+            // document.documentElement.style.setProperty('--bg-color', data.primaryColor); // Optional: sync both if legacy
           }
           break;
 

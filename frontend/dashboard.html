@@ -1342,20 +1342,37 @@
                             <div
                                 style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
 
-                                <!-- COLOR -->
+                                <!-- BUTTON COLOR -->
                                 <div>
-                                    <label>Cor Principal</label>
+                                    <label>Cor do Botão</label>
                                     <div style="display: flex; gap: 10px; align-items: center; margin-top:5px;">
                                         <div
                                             style="position: relative; width: 50px; height: 50px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
                                             <input type="color" id="colorInput" value="#4d4dff"
                                                 style="position: absolute; top: -10px; left: -10px; width: 70px; height: 70px; cursor: pointer; border: none;"
-                                                oninput="updatePreviewColor(this.value)">
+                                                oninput="updatePreviewColor(this.value, false, 'button')">
                                         </div>
                                         <input type="text" id="colorHexInput" value="#4d4dff" maxlength="7"
                                             class="input-light"
                                             style="width: 100px; padding: 10px; text-transform: uppercase; font-family: monospace;"
-                                            oninput="updatePreviewColor(this.value, true)">
+                                            oninput="updatePreviewColor(this.value, true, 'button')">
+                                    </div>
+                                </div>
+
+                                <!-- BACKGROUND COLOR -->
+                                <div>
+                                    <label>Cor de Fundo (Degradê)</label>
+                                    <div style="display: flex; gap: 10px; align-items: center; margin-top:5px;">
+                                        <div
+                                            style="position: relative; width: 50px; height: 50px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
+                                            <input type="color" id="bgColorInput" value="#030518"
+                                                style="position: absolute; top: -10px; left: -10px; width: 70px; height: 70px; cursor: pointer; border: none;"
+                                                oninput="updatePreviewColor(this.value, false, 'background')">
+                                        </div>
+                                        <input type="text" id="bgColorHexInput" value="#030518" maxlength="7"
+                                            class="input-light"
+                                            style="width: 100px; padding: 10px; text-transform: uppercase; font-family: monospace;"
+                                            oninput="updatePreviewColor(this.value, true, 'background')">
                                     </div>
                                 </div>
 
@@ -1880,11 +1897,35 @@
                     const data = await res.json();
 
                     // Populate Fields
-                    if (data.primaryColor) document.getElementById('colorInput').value = data.primaryColor;
+                    if (data.primaryColor) {
+                        document.getElementById('colorInput').value = data.primaryColor;
+                        document.getElementById('colorHexInput').value = data.primaryColor;
+                    }
 
+                    // Background Color (Stored in Settings or new field?)
+                    // Let's store it in settings for now since DB schema might be rigid
+                    // Or if we can assume `backgroundColor` is on company model?
+                    // Implementation Plan said "new saved field `backgroundColor`". 
+                    // Assuming we pass it to backend and backend handles it or we stash in settings.
+                    // Let's look at `loadCustomization` data object. 
+                    // If backend doesn't support it yet, we must stash in `settings`.
+                    // But wait, the prompt implies I can change storage. 
+                    // Ideally stash in settings JSON if schema is locked.
+                    // The `saveCustomization` (seen later) sends `primaryColor`.
+                    // I will check if I can send `backgroundColor` too.
+
+                    // For now, load from settings if exists
                     if (data.settings) {
                         let s = typeof data.settings === 'string' ? JSON.parse(data.settings) : data.settings;
                         if (s) {
+                            if (s.backgroundColor) {
+                                document.getElementById('bgColorInput').value = s.backgroundColor;
+                                document.getElementById('bgColorHexInput').value = s.backgroundColor;
+                            } else {
+                                // Default fallback to match current theme
+                                document.getElementById('bgColorInput').value = '#2b1da7';
+                                document.getElementById('bgColorHexInput').value = '#2b1da7';
+                            }
                             if (s.questionTitle) document.getElementById('questionTitleInput').value = s.questionTitle;
                             if (s.redirectUrl) document.getElementById('redirectUrlInput').value = s.redirectUrl;
                             if (s.showObservation !== undefined) document.getElementById('showObsInput').checked = s.showObservation;
@@ -1972,26 +2013,34 @@
 
         async function saveCustomization(e) {
             e.preventDefault();
-            const btn = e.target.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = "Salvando...";
+            const btn = document.getElementById('btnSaveCustomization');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loader-mini"></div> Salvando...';
             btn.disabled = true;
 
-            const formData = new FormData();
-            formData.append('primaryColor', document.getElementById('colorInput').value);
+            const primaryColor = document.getElementById('colorInput').value;
+            const backgroundColor = document.getElementById('bgColorInput').value;
 
-            const settings = {
-                questionTitle: document.getElementById('questionTitleInput').value,
-                redirectUrl: document.getElementById('redirectUrlInput').value,
-                showObservation: document.getElementById('showObsInput').checked,
-                questions: []
-            };
+            const title = document.getElementById('questionTitleInput').value;
+            const url = document.getElementById('redirectUrlInput').value;
+            const showObs = document.getElementById('showObsInput').checked;
 
-            // Collect Questions
-            document.querySelectorAll('.extra-question-input').forEach(inp => {
-                if (inp.value.trim()) settings.questions.push(inp.value.trim());
+            // Extra Questions
+            const extraQuestions = [];
+            document.querySelectorAll('.extra-question-input').forEach(input => {
+                if (input.value.trim()) extraQuestions.push(input.value.trim());
             });
 
+            const settings = {
+                questionTitle: title,
+                redirectUrl: url,
+                showObservation: showObs,
+                questions: extraQuestions, // Renamed from extraQuestions to questions to match backend
+                backgroundColor: backgroundColor // Saving here!
+            };
+
+            const formData = new FormData();
+            formData.append('primaryColor', primaryColor);
             formData.append('settings', JSON.stringify(settings));
 
             const logoFile = document.getElementById('logoInput').files[0];
@@ -2002,7 +2051,7 @@
             try {
                 const res = await fetch('/api/company/settings', {
                     method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${token}` }, // No Content-Type for FormData
+                    headers: { 'Authorization': `Bearer ${token}` }, // No Content-Type for FormData when sending files
                     body: formData
                 });
 
@@ -3227,10 +3276,27 @@
         loadDashboard();
 
         // --- PREVIEW LOGIC (POSTMESSAGE) ---
-        function updatePreviewColor(color) {
-            const frame = document.getElementById('previewIframe');
+        function updatePreviewColor(val, fromHex = false, type = 'button') {
+            const picker = type === 'button' ? document.getElementById('colorInput') : document.getElementById('bgColorInput');
+            const hexInput = type === 'button' ? document.getElementById('colorHexInput') : document.getElementById('bgColorHexInput');
+
+            if (fromHex) {
+                if (/^#[0-9A-F]{6}$/i.test(val)) {
+                    picker.value = val;
+                } else {
+                    return;
+                }
+            } else {
+                hexInput.value = val;
+            }
+
+            const frame = document.getElementById('mobilePreviewIframe'); // Correct ID
             if (frame && frame.contentWindow) {
-                frame.contentWindow.postMessage({ type: 'UPDATE_COLOR', color: color }, '*');
+                frame.contentWindow.postMessage({
+                    type: 'UPDATE_THEME',
+                    color: val,
+                    target: type // 'button' or 'background'
+                }, '*');
             }
         }
 
