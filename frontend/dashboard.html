@@ -2687,8 +2687,21 @@
                 const dates = Object.keys(timelineMap);
                 const dailyCounts = Object.values(timelineMap);
 
+                // Aggregation: City (New)
+                const cityMap = {};
+                data.forEach(r => {
+                    // Try to get City - could be in r.city or we might need to parse? Assuming r.city exists from viewing previous code.
+                    const city = r.city || 'Não identificado';
+                    if (!cityMap[city]) cityMap[city] = 0;
+                    cityMap[city]++;
+                });
+                const cities = Object.keys(cityMap).sort((a, b) => cityMap[b] - cityMap[a]).slice(0, 10); // Top 10
+                const cityCounts = cities.map(c => cityMap[c]);
+
+
                 // HTML Structure
                 reportContainer.innerHTML = `
+                    <!-- PAGE 1: OVERVIEW -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid ${primaryColor}; padding-bottom: 20px;">
                         <div>
                             <h1 style="color: ${primaryColor}; margin: 0; font-size: 24px;">Relatório de Desempenho</h1>
@@ -2698,23 +2711,22 @@
                         <img src="${logoSrc}" style="height: 60px; object-fit: contain;">
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
-                        <div style="background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
+                    <div style="display: flex; gap: 20px; margin-bottom: 40px;">
+                        <div style="flex: 1; background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
                             <div style="font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">Total Avaliações</div>
                             <div style="font-size: 32px; font-weight: bold; color: ${primaryColor};">${total}</div>
                         </div>
-                        <div style="background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
+                        <div style="flex: 1; background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
                             <div style="font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">Média Geral</div>
                             <div style="font-size: 32px; font-weight: bold; color: ${primaryColor};">${avg} <span style="font-size: 16px;">★</span></div>
                         </div>
-                        <div style="background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
+                        <div style="flex: 1; background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
                             <div style="font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">NPS</div>
                             <div style="font-size: 32px; font-weight: bold; color: ${primaryColor};">${nps}</div>
                         </div>
                     </div>
 
-                    <!-- Row 1: Bar & Pie -->
-                    <div style="display: flex; gap: 20px; margin-bottom: 40px; height: 300px; page-break-inside: avoid;">
+                    <div style="display: flex; gap: 20px; margin-bottom: 20px; height: 300px;">
                         <div style="flex: 1; border: 1px solid #eee; border-radius: 10px; padding: 10px;">
                             <h4 style="margin: 0 0 10px 0; text-align: center; color: #555;">Volume por Atendente</h4>
                             <div style="position: relative; height: 240px; width: 100%;">
@@ -2729,15 +2741,31 @@
                         </div>
                     </div>
 
-                    <!-- Row 2: Line Chart (New) -->
-                    <div style="margin-bottom: 40px; height: 300px; page-break-inside: avoid; border: 1px solid #eee; border-radius: 10px; padding: 10px;">
+                    <!-- FORCE PAGE BREAK -->
+                    <div class="html2pdf__page-break"></div>
+
+                    <!-- PAGE 2: TRENDS & LOCATION -->
+                    <h3 style="margin-bottom: 20px; color: ${primaryColor}; margin-top: 40px;">Tendências e Localização</h3>
+                    
+                    <div style="margin-bottom: 40px; height: 300px; border: 1px solid #eee; border-radius: 10px; padding: 10px;">
                          <h4 style="margin: 0 0 10px 0; text-align: center; color: #555;">Evolução Diária</h4>
                          <div style="position: relative; height: 240px; width: 100%;">
                              <canvas id="pdfLineChart"></canvas>
                          </div>
                     </div>
 
-                    <h3 style="margin-bottom: 15px; color: #333; border-left: 4px solid ${primaryColor}; padding-left: 10px; page-break-before: auto;">Desempenho por Atendente</h3>
+                    <div style="margin-bottom: 40px; height: 300px; border: 1px solid #eee; border-radius: 10px; padding: 10px;">
+                         <h4 style="margin: 0 0 10px 0; text-align: center; color: #555;">Volume por Cidade (Top 10)</h4>
+                         <div style="position: relative; height: 240px; width: 100%;">
+                             <canvas id="pdfCityChart"></canvas>
+                         </div>
+                    </div>
+
+                    <!-- FORCE PAGE BREAK -->
+                    <div class="html2pdf__page-break"></div>
+
+                    <!-- PAGE 3: ATTENDANTS -->
+                    <h3 style="margin-bottom: 15px; color: #333; border-left: 4px solid ${primaryColor}; padding-left: 10px; margin-top: 40px;">Desempenho por Atendente</h3>
                     <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 40px;">
                         <thead style="background: ${primaryColor}; color: white;">
                             <tr>
@@ -2751,18 +2779,20 @@
                             ${Object.entries(attendantsMap).map(([name, stat], i) => {
                     const statAvg = (stat.sum / stat.count).toFixed(1);
                     return `
-                                <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#fff'}; border-bottom: 1px solid #eee; page-break-inside: avoid;">
+                                <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#fff'}; border-bottom: 1px solid #eee;">
                                     <td style="padding: 10px;"><strong>${name}</strong></td>
                                     <td style="padding: 10px; text-align: center;">${stat.count}</td>
                                     <td style="padding: 10px; text-align: center; font-weight: bold; color: ${statAvg >= 4 ? 'green' : (statAvg <= 2 ? 'red' : 'orange')}">${statAvg}</td>
-                                    <td style="padding: 10px; text-align: center;">-</td>
+                                    <td style="padding: 10px; text-align: center;">-</td> 
                                 </tr>
                                 `;
                 }).join('')}
                         </tbody>
                     </table>
 
-                     <h3 style="margin-bottom: 15px; color: #333; border-left: 4px solid ${primaryColor}; padding-left: 10px; page-break-before: always;">Detalhamento Geral</h3>
+                    <!-- FORCE PAGE BREAK? Maybe let flow, assuming table fits or flows to page 4 -->
+                    
+                    <h3 style="margin-bottom: 15px; color: #333; border-left: 4px solid ${primaryColor}; padding-left: 10px; margin-top: 40px;">Detalhamento Geral</h3>
                     <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                         <thead style="background: ${primaryColor}; color: white;">
                             <tr>
@@ -2775,7 +2805,7 @@
                         </thead>
                         <tbody>
                             ${data.map((r, i) => `
-                                <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#fff'}; border-bottom: 1px solid #eee; page-break-inside: avoid;">
+                                <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#fff'}; border-bottom: 1px solid #eee;">
                                     <td style="padding: 10px;">${new Date(r.createdAt).toLocaleDateString()}</td>
                                     <td style="padding: 10px;"><strong>${r.attendant ? r.attendant.name : 'Geral'}</strong></td>
                                     <td style="padding: 10px; color: ${r.stars >= 4 ? 'green' : (r.stars <= 2 ? 'red' : 'orange')}; font-weight: bold;">
@@ -2803,7 +2833,7 @@
                 new Chart(reportContainer.querySelector('#pdfBarChart'), {
                     type: 'bar',
                     data: { labels: names, datasets: [{ label: 'Avaliações', data: counts, backgroundColor: primaryColor, barThickness: 20 }] },
-                    options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { display: true } }, x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } } } }
+                    options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
                 });
 
                 // Pie
@@ -2832,6 +2862,27 @@
                     options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
                 });
 
+                // Horizontal Bar (Cities)
+                new Chart(reportContainer.querySelector('#pdfCityChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: cities,
+                        datasets: [{
+                            label: 'Avaliações por Cidade',
+                            data: cityCounts,
+                            backgroundColor: primaryColor,
+                            barThickness: 15
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y', // Horizontal
+                        animation: false,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
                 // Wait
                 await new Promise(r => setTimeout(r, 1000));
 
@@ -2841,7 +2892,7 @@
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
                     jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: ['css', 'legacy'] } // Removed 'avoid-all' to respect my manual CSS classes better
+                    pagebreak: { mode: ['css', 'legacy'] }
                 };
 
                 await html2pdf().set(opt).from(reportContainer).save();
