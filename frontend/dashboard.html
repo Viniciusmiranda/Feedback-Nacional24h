@@ -2359,27 +2359,36 @@
             // Transform { 'SP': 10, 'RJ': 5 } to [['State', 'Reviews'], ['BR-SP', 10], ...]
             // Google GeoChart for Brazil uses "BR-XX" codes (ISO 3166-2:BR)
             // Mapping Full Names to ISO Codes
+            // Mapping Full Names to ISO Codes (Normalized for robustness)
             const stateMap = {
-                'ACRE': 'AC', 'ALAGOAS': 'AL', 'AMAPÁ': 'AP', 'AMAZONAS': 'AM', 'BAHIA': 'BA', 'CEARÁ': 'CE',
-                'DISTRITO FEDERAL': 'DF', 'ESPÍRITO SANTO': 'ES', 'GOIÁS': 'GO', 'MARANHÃO': 'MA',
-                'MATO GROSSO': 'MT', 'MATO GROSSO DO SUL': 'MS', 'MINAS GERAIS': 'MG', 'PARÁ': 'PA',
-                'PARAÍBA': 'PB', 'PARANÁ': 'PR', 'PERNAMBUCO': 'PE', 'PIAUÍ': 'PI', 'RIO DE JANEIRO': 'RJ',
-                'RIO GRANDE DO NORTE': 'RN', 'RIO GRANDE DO SUL': 'RS', 'RONDÔNIA': 'RO', 'RORAIMA': 'RR',
-                'SANTA CATARINA': 'SC', 'SÃO PAULO': 'SP', 'SERGIPE': 'SE', 'TOCANTINS': 'TO'
+                'AC': 'BR-AC', 'AL': 'BR-AL', 'AP': 'BR-AP', 'AM': 'BR-AM', 'BA': 'BR-BA', 'CE': 'BR-CE',
+                'DF': 'BR-DF', 'ES': 'BR-ES', 'GO': 'BR-GO', 'MA': 'BR-MA', 'MT': 'BR-MT', 'MS': 'BR-MS',
+                'MG': 'BR-MG', 'PA': 'BR-PA', 'PB': 'BR-PB', 'PR': 'BR-PR', 'PE': 'BR-PE', 'PI': 'BR-PI',
+                'RJ': 'BR-RJ', 'RN': 'BR-RN', 'RS': 'BR-RS', 'RO': 'BR-RO', 'RR': 'BR-RR', 'SC': 'BR-SC',
+                'SP': 'BR-SP', 'SE': 'BR-SE', 'TO': 'BR-TO',
+                // Full Names (Normalized)
+                'ACRE': 'BR-AC', 'ALAGOAS': 'BR-AL', 'AMAPA': 'BR-AP', 'AMAZONAS': 'BR-AM', 'BAHIA': 'BR-BA',
+                'CEARA': 'BR-CE', 'DISTRITO FEDERAL': 'BR-DF', 'ESPIRITO SANTO': 'BR-ES', 'GOIAS': 'BR-GO',
+                'MARANHAO': 'BR-MA', 'MATO GROSSO': 'BR-MT', 'MATO GROSSO DO SUL': 'BR-MS',
+                'MINAS GERAIS': 'BR-MG', 'PARA': 'BR-PA', 'PARAIBA': 'BR-PB', 'PARANA': 'BR-PR',
+                'PERNAMBUCO': 'BR-PE', 'PIAUI': 'BR-PI', 'RIO DE JANEIRO': 'BR-RJ',
+                'RIO GRANDE DO NORTE': 'BR-RN', 'RIO GRANDE DO SUL': 'BR-RS', 'RONDONIA': 'BR-RO',
+                'RORAIMA': 'BR-RR', 'SANTA CATARINA': 'BR-SC', 'SAO PAULO': 'BR-SP', 'SERGIPE': 'BR-SE',
+                'TOCANTINS': 'BR-TO'
             };
 
             const mapData = [['Estado', 'Avaliações']];
             if (byState && byState.length > 0) {
                 byState.forEach(item => {
-                    // item is { state: 'SP', _count: { id: 10 } } from Prisma groupBy
                     if (item.state) {
-                        let rawState = item.state.toUpperCase().trim();
-                        // Try to map full name or use code
-                        let iso = stateMap[rawState] || rawState;
+                        // Normalize: Uppercase + Remove Accents
+                        let raw = item.state.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 
-                        // Ensure format BR-XX
-                        if (iso.length === 2 && !iso.startsWith('BR-')) {
-                            iso = 'BR-' + iso;
+                        let iso = stateMap[raw];
+                        if (!iso) {
+                            // Helper to try 2-letter code if raw is length 2
+                            if (raw.length === 2) iso = 'BR-' + raw;
+                            else iso = 'BR-' + raw; // Fallback
                         }
 
                         mapData.push([iso, item._count.id]);
@@ -2618,99 +2627,217 @@
         }
 
         async function generatePDF() {
-            // Create a temporary container for the PDF content
-            const reportContainer = document.createElement('div');
-            reportContainer.style.width = '800px'; // Fixed width for A4
-            reportContainer.style.padding = '40px';
-            reportContainer.style.background = '#fff';
-            reportContainer.style.color = '#333';
-            reportContainer.style.fontFamily = 'Montserrat, sans-serif';
+            // Show loading state
+            const btn = document.querySelector('button[onclick="generatePDF()"]');
+            const originalText = btn ? btn.innerText : '';
+            if (btn) btn.innerText = "Gerando PDF...";
 
-            // Branding
-            const primaryColor = globalData.primaryColor || '#2b1da7';
-            const logoSrc = globalData.logo || 'images/logo.png';
+            try {
+                // Create a temporary container for the PDF content
+                const reportContainer = document.createElement('div');
+                reportContainer.style.width = '800px'; // Fixed width for A4
+                reportContainer.style.padding = '40px';
+                reportContainer.style.background = '#fff';
+                reportContainer.style.color = '#333';
+                reportContainer.style.fontFamily = 'Montserrat, sans-serif';
 
-            // Statistics
-            const data = getFilteredDataForExport();
-            const total = data.length;
-            const avg = total > 0 ? (data.reduce((acc, curr) => acc + curr.stars, 0) / total).toFixed(1) : '0.0';
+                // Branding
+                const primaryColor = globalData.primaryColor || '#2b1da7';
+                const logoSrc = globalData.logo || 'images/logo.png';
 
-            const promoters = data.filter(r => r.stars >= 5).length;
-            const detractors = data.filter(r => r.stars <= 3).length;
-            const nps = total > 0 ? Math.round(((promoters - detractors) / total) * 100) : 0;
+                // Statistics
+                const data = getFilteredDataForExport();
+                const total = data.length;
+                const avg = total > 0 ? (data.reduce((acc, curr) => acc + curr.stars, 0) / total).toFixed(1) : '0.0';
 
-            // HTML Structure
-            reportContainer.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid ${primaryColor}; padding-bottom: 20px;">
-                    <div>
-                        <h1 style="color: ${primaryColor}; margin: 0; font-size: 24px;">Relatório de Desempenho</h1>
-                        <p style="margin: 5px 0 0; color: #666;">${globalData.companyName || 'Sua Empresa'}</p>
-                        <small style="color: #999;">Gerado em: ${new Date().toLocaleDateString()} às ${new Date().toLocaleTimeString()}</small>
+                const promoters = data.filter(r => r.stars >= 5).length;
+                const detractors = data.filter(r => r.stars <= 3).length;
+                const nps = total > 0 ? Math.round(((promoters - detractors) / total) * 100) : 0;
+
+                // Aggregation by Attendant
+                const attendantsMap = {};
+                data.forEach(r => {
+                    const name = r.attendant ? r.attendant.name : 'Geral';
+                    if (!attendantsMap[name]) attendantsMap[name] = { count: 0, sum: 0, stars: [] };
+                    attendantsMap[name].count++;
+                    attendantsMap[name].sum += r.stars;
+                    attendantsMap[name].stars.push(r.stars);
+                });
+
+                // HTML Structure
+                reportContainer.innerHTML = `
+                    <!-- Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid ${primaryColor}; padding-bottom: 20px;">
+                        <div>
+                            <h1 style="color: ${primaryColor}; margin: 0; font-size: 24px;">Relatório de Desempenho</h1>
+                            <p style="margin: 5px 0 0; color: #666;">${globalData.companyName || 'Sua Empresa'}</p>
+                            <small style="color: #999;">Gerado em: ${new Date().toLocaleDateString()} às ${new Date().toLocaleTimeString()}</small>
+                        </div>
+                        <img src="${logoSrc}" style="height: 60px; object-fit: contain;">
                     </div>
-                    <img src="${logoSrc}" style="height: 60px; object-fit: contain;">
-                </div>
 
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
-                    <div style="background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
-                        <div style="font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">Total Avaliações</div>
-                        <div style="font-size: 32px; font-weight: bold; color: ${primaryColor};">${total}</div>
+                    <!-- KPI Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
+                        <div style="background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
+                            <div style="font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">Total Avaliações</div>
+                            <div style="font-size: 32px; font-weight: bold; color: ${primaryColor};">${total}</div>
+                        </div>
+                        <div style="background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
+                            <div style="font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">Média Geral</div>
+                            <div style="font-size: 32px; font-weight: bold; color: ${primaryColor};">${avg} <span style="font-size: 16px;">★</span></div>
+                        </div>
+                        <div style="background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
+                            <div style="font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">NPS</div>
+                            <div style="font-size: 32px; font-weight: bold; color: ${primaryColor};">${nps}</div>
+                        </div>
                     </div>
-                    <div style="background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
-                        <div style="font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">Média Geral</div>
-                        <div style="font-size: 32px; font-weight: bold; color: ${primaryColor};">${avg} <span style="font-size: 16px;">★</span></div>
-                    </div>
-                    <div style="background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
-                        <div style="font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">NPS</div>
-                        <div style="font-size: 32px; font-weight: bold; color: ${primaryColor};">${nps}</div>
-                    </div>
-                </div>
 
-                <h3 style="margin-bottom: 15px; color: #333; border-left: 4px solid ${primaryColor}; padding-left: 10px;">Detalhamento</h3>
-                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                    <thead style="background: ${primaryColor}; color: white;">
-                        <tr>
-                            <th style="padding: 10px; text-align: left;">Data</th>
-                            <th style="padding: 10px; text-align: left;">Atendente</th>
-                            <th style="padding: 10px; text-align: left;">Nota</th>
-                            <th style="padding: 10px; text-align: left;">Comentário</th>
-                            <th style="padding: 10px; text-align: left;">Local</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${data.slice(0, 100).map((r, i) => `
-                            <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#fff'}; border-bottom: 1px solid #eee;">
-                                <td style="padding: 10px;">${new Date(r.createdAt).toLocaleDateString()}</td>
-                                <td style="padding: 10px;"><strong>${r.attendant ? r.attendant.name : 'Geral'}</strong></td>
-                                <td style="padding: 10px; color: ${r.stars >= 4 ? 'green' : (r.stars <= 2 ? 'red' : 'orange')}; font-weight: bold;">
-                                    ${r.stars} ★
-                                </td>
-                                <td style="padding: 10px; color: #555;">${r.comment || '-'}</td>
-                                <td style="padding: 10px; color: #777;">${r.city || '-'} / ${r.state || '-'}</td>
+                    <!-- Charts Section -->
+                    <div style="display: flex; gap: 20px; margin-bottom: 40px; height: 300px; page-break-inside: avoid;">
+                        <div style="flex: 1; border: 1px solid #eee; border-radius: 10px; padding: 10px;">
+                            <h4 style="margin: 0 0 10px 0; text-align: center; color: #555;">Volume por Atendente</h4>
+                            <div style="position: relative; height: 240px; width: 100%;">
+                                <canvas id="pdfBarChart"></canvas>
+                            </div>
+                        </div>
+                        <div style="flex: 1; border: 1px solid #eee; border-radius: 10px; padding: 10px;">
+                            <h4 style="margin: 0 0 10px 0; text-align: center; color: #555;">Distribuição de Notas</h4>
+                            <div style="position: relative; height: 240px; width: 100%;">
+                                <canvas id="pdfPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendants Table -->
+                    <h3 style="margin-bottom: 15px; color: #333; border-left: 4px solid ${primaryColor}; padding-left: 10px; page-break-before: auto;">Desempenho por Atendente</h3>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 40px; page-break-inside: avoid;">
+                        <thead style="background: ${primaryColor}; color: white;">
+                            <tr>
+                                <th style="padding: 10px; text-align: left;">Atendente</th>
+                                <th style="padding: 10px; text-align: center;">Total</th>
+                                <th style="padding: 10px; text-align: center;">Média</th>
+                                <th style="padding: 10px; text-align: center;">NPS (Est.)</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <div style="margin-top: 20px; text-align: center; color: #999; font-size: 10px;">
-                    Relatório gerado automaticamente por Avalia Já.
-                </div>
-            `;
+                        </thead>
+                        <tbody>
+                            ${Object.entries(attendantsMap).map(([name, stat], i) => {
+                    const statAvg = (stat.sum / stat.count).toFixed(1);
+                    return `
+                                <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#fff'}; border-bottom: 1px solid #eee;">
+                                    <td style="padding: 10px;"><strong>${name}</strong></td>
+                                    <td style="padding: 10px; text-align: center;">${stat.count}</td>
+                                    <td style="padding: 10px; text-align: center; font-weight: bold; color: ${statAvg >= 4 ? 'green' : (statAvg <= 2 ? 'red' : 'orange')}">${statAvg}</td>
+                                    <td style="padding: 10px; text-align: center;">-</td> 
+                                </tr>
+                                `;
+                }).join('')}
+                        </tbody>
+                    </table>
 
-            // Append to body but hide from view (optional, or just render off-screen)
-            // html2pdf doesn't need it to be in DOM necessarily if we pass the element, but better for images to load.
-            // For images to render in PDF, they must be loaded.
+                    <!-- Full Data Table -->
+                    <h3 style="margin-bottom: 15px; color: #333; border-left: 4px solid ${primaryColor}; padding-left: 10px; page-break-before: always;">Detalhamento Geral</h3>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead style="background: ${primaryColor}; color: white;">
+                            <tr>
+                                <th style="padding: 10px; text-align: left;">Data</th>
+                                <th style="padding: 10px; text-align: left;">Atendente</th>
+                                <th style="padding: 10px; text-align: left;">Nota</th>
+                                <th style="padding: 10px; text-align: left;">Comentário</th>
+                                <th style="padding: 10px; text-align: left;">Local</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map((r, i) => `
+                                <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#fff'}; border-bottom: 1px solid #eee; page-break-inside: avoid;">
+                                    <td style="padding: 10px;">${new Date(r.createdAt).toLocaleDateString()}</td>
+                                    <td style="padding: 10px;"><strong>${r.attendant ? r.attendant.name : 'Geral'}</strong></td>
+                                    <td style="padding: 10px; color: ${r.stars >= 4 ? 'green' : (r.stars <= 2 ? 'red' : 'orange')}; font-weight: bold;">
+                                        ${r.stars} ★
+                                    </td>
+                                    <td style="padding: 10px; color: #555;">${r.comment || '-'}</td>
+                                    <td style="padding: 10px; color: #777;">${r.city || '-'} / ${r.state || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 20px; text-align: center; color: #999; font-size: 10px;">
+                        Relatório gerado automaticamente por Avalia Já.
+                    </div>
+                `;
 
-            // Wrapper to ensure images load? 
-            // We use simple html2pdf call.
+                // Render Charts
+                // Temporarily append content to DOM (hidden) to allow Chart.js to render?
+                // Actually Chart.js needs canvas to be in DOM? Not strictly if check is disabled but safer to append off-screen.
+                reportContainer.style.position = 'absolute';
+                reportContainer.style.left = '-9999px';
+                document.body.appendChild(reportContainer);
 
-            const opt = {
-                margin: 0.5,
-                filename: `relatorio_${globalData.companyName || 'avaliaja'}_${Date.now()}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
+                // Bar Chart
+                const names = Object.keys(attendantsMap);
+                const counts = names.map(n => attendantsMap[n].count);
+                new Chart(reportContainer.querySelector('#pdfBarChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: names,
+                        datasets: [{
+                            label: 'Avaliações',
+                            data: counts,
+                            backgroundColor: primaryColor,
+                            barThickness: 20
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, ticks: { display: true } }, x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } } }
+                    }
+                });
 
-            await html2pdf().set(opt).from(reportContainer).save();
+                // Pie Chart
+                const starCounts = [0, 0, 0, 0, 0];
+                data.forEach(r => { if (r.stars >= 1 && r.stars <= 5) starCounts[r.stars - 1]++; });
+                new Chart(reportContainer.querySelector('#pdfPieChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['1★', '2★', '3★', '4★', '5★'],
+                        datasets: [{
+                            data: starCounts,
+                            backgroundColor: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#15803d']
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right' } }
+                    }
+                });
+
+                // Wait for render (minimal since animation off)
+                await new Promise(r => setTimeout(r, 500));
+
+                const opt = {
+                    margin: 0.5,
+                    filename: `relatorio_${globalData.companyName || 'avaliaja'}_${Date.now()}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                await html2pdf().set(opt).from(reportContainer).save();
+
+                // Cleanup
+                document.body.removeChild(reportContainer);
+
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao gerar PDF.");
+            } finally {
+                if (btn) btn.innerText = originalText;
+            }
         }
 
         // --- MODAL LOGIC ---
