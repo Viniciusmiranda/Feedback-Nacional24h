@@ -2627,15 +2627,26 @@
         }
 
         async function generatePDF() {
-            // Show loading state
             const btn = document.querySelector('button[onclick="generatePDF()"]');
             const originalText = btn ? btn.innerText : '';
             if (btn) btn.innerText = "Gerando PDF...";
 
+            // 1. VISIBILITY ISOLATION STRATEGY
+            // Hide everything in body *except* our new container to ensure clean capture
+            const originalDisplays = [];
+            const bodyChildren = Array.from(document.body.children);
+            bodyChildren.forEach(child => {
+                if (child.tagName !== 'SCRIPT') { // Keep scripts
+                    originalDisplays.push({ element: child, display: child.style.display });
+                    child.style.display = 'none';
+                }
+            });
+
             try {
-                // Create a temporary container for the PDF content
+                // 2. Create Container (Standard Flow)
                 const reportContainer = document.createElement('div');
-                reportContainer.style.width = '800px'; // Fixed width for A4
+                reportContainer.style.width = '800px';
+                reportContainer.style.margin = '0 auto'; // Center it
                 reportContainer.style.padding = '40px';
                 reportContainer.style.background = '#fff';
                 reportContainer.style.color = '#333';
@@ -2654,7 +2665,7 @@
                 const detractors = data.filter(r => r.stars <= 3).length;
                 const nps = total > 0 ? Math.round(((promoters - detractors) / total) * 100) : 0;
 
-                // Aggregation by Attendant
+                // Aggregation
                 const attendantsMap = {};
                 data.forEach(r => {
                     const name = r.attendant ? r.attendant.name : 'Geral';
@@ -2666,7 +2677,6 @@
 
                 // HTML Structure
                 reportContainer.innerHTML = `
-                    <!-- Header -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid ${primaryColor}; padding-bottom: 20px;">
                         <div>
                             <h1 style="color: ${primaryColor}; margin: 0; font-size: 24px;">Relatório de Desempenho</h1>
@@ -2676,7 +2686,6 @@
                         <img src="${logoSrc}" style="height: 60px; object-fit: contain;">
                     </div>
 
-                    <!-- KPI Cards -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
                         <div style="background: ${primaryColor}15; padding: 20px; border-radius: 10px; border-left: 5px solid ${primaryColor};">
                             <div style="font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">Total Avaliações</div>
@@ -2692,7 +2701,6 @@
                         </div>
                     </div>
 
-                    <!-- Charts Section -->
                     <div style="display: flex; gap: 20px; margin-bottom: 40px; height: 300px; page-break-inside: avoid;">
                         <div style="flex: 1; border: 1px solid #eee; border-radius: 10px; padding: 10px;">
                             <h4 style="margin: 0 0 10px 0; text-align: center; color: #555;">Volume por Atendente</h4>
@@ -2708,7 +2716,6 @@
                         </div>
                     </div>
 
-                    <!-- Attendants Table -->
                     <h3 style="margin-bottom: 15px; color: #333; border-left: 4px solid ${primaryColor}; padding-left: 10px; page-break-before: auto;">Desempenho por Atendente</h3>
                     <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 40px; page-break-inside: avoid;">
                         <thead style="background: ${primaryColor}; color: white;">
@@ -2734,8 +2741,7 @@
                         </tbody>
                     </table>
 
-                    <!-- Full Data Table -->
-                    <h3 style="margin-bottom: 15px; color: #333; border-left: 4px solid ${primaryColor}; padding-left: 10px; page-break-before: always;">Detalhamento Geral</h3>
+                     <h3 style="margin-bottom: 15px; color: #333; border-left: 4px solid ${primaryColor}; padding-left: 10px; page-break-before: always;">Detalhamento Geral</h3>
                     <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                         <thead style="background: ${primaryColor}; color: white;">
                             <tr>
@@ -2760,69 +2766,37 @@
                             `).join('')}
                         </tbody>
                     </table>
-                    <div style="margin-top: 20px; text-align: center; color: #999; font-size: 10px;">
+                     <div style="margin-top: 20px; text-align: center; color: #999; font-size: 10px;">
                         Relatório gerado automaticamente por Avalia Já.
                     </div>
                 `;
 
-                // Render Charts
-                // Temporarily append content to DOM to allow Chart.js to render.
-                // WE MUST MAKE IT VISIBLE for html2canvas to work reliably.
-                // It will overlay the dashboard for a second.
-                reportContainer.style.position = 'absolute';
-                reportContainer.style.top = '0';
-                reportContainer.style.left = '0';
-                reportContainer.style.zIndex = '10000'; // Make it visible on top
+                // 3. Append and Scroll
                 document.body.appendChild(reportContainer);
+                window.scrollTo(0, 0);
 
-                // Bar Chart
+                // Render Charts
                 const names = Object.keys(attendantsMap);
                 const counts = names.map(n => attendantsMap[n].count);
                 new Chart(reportContainer.querySelector('#pdfBarChart'), {
                     type: 'bar',
-                    data: {
-                        labels: names,
-                        datasets: [{
-                            label: 'Avaliações',
-                            data: counts,
-                            backgroundColor: primaryColor,
-                            barThickness: 20
-                        }]
-                    },
-                    options: {
-                        animation: false, // Critical for PDF
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, ticks: { display: true } }, x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } } }
-                    }
+                    data: { labels: names, datasets: [{ label: 'Avaliações', data: counts, backgroundColor: primaryColor, barThickness: 20 }] },
+                    options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { display: true } }, x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } } } }
                 });
 
-                // Pie Chart
                 const starCounts = [0, 0, 0, 0, 0];
                 data.forEach(r => { if (r.stars >= 1 && r.stars <= 5) starCounts[r.stars - 1]++; });
                 new Chart(reportContainer.querySelector('#pdfPieChart'), {
                     type: 'doughnut',
-                    data: {
-                        labels: ['1★', '2★', '3★', '4★', '5★'],
-                        datasets: [{
-                            data: starCounts,
-                            backgroundColor: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#15803d']
-                        }]
-                    },
-                    options: {
-                        animation: false, // Critical for PDF
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'right' } }
-                    }
+                    data: { labels: ['1★', '2★', '3★', '4★', '5★'], datasets: [{ data: starCounts, backgroundColor: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#15803d'] }] },
+                    options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
                 });
 
-                // Wait for render (Increased to 1s to ensure Canvas is painted)
+                // Wait
                 await new Promise(r => setTimeout(r, 1000));
 
                 const opt = {
-                    margin: [0.5, 0.5, 0.5, 0.5], // Top, Left, Bottom, Right
+                    margin: [0.5, 0.5, 0.5, 0.5],
                     filename: `relatorio_${globalData.companyName || 'avaliaja'}_${Date.now()}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
@@ -2839,6 +2813,10 @@
                 console.error(err);
                 alert("Erro ao gerar PDF.");
             } finally {
+                // 4. RESTORE VISIBILITY
+                originalDisplays.forEach(item => {
+                    item.element.style.display = item.display;
+                });
                 if (btn) btn.innerText = originalText;
             }
         }
